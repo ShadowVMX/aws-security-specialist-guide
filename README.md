@@ -26,7 +26,7 @@ python3 -m http.server 8000
 |---|---|---|
 | 1. Detection | 16% | ⏳ Pendiente |
 | 2. Incident Response | 14% | ⏳ Pendiente |
-| 3. Infrastructure Security | 18% | ⏳ Pendiente |
+| 3. Infrastructure Security | 18% | ✅ Completo |
 | 4. Identity and Access Management | 20% | ✅ Completo |
 | 5. Data Protection | 18% | ✅ Completo |
 | 6. Security Foundations & Governance | 14% | ⏳ Pendiente |

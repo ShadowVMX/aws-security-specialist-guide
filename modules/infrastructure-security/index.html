@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infrastructure Security — AWS Security Specialist (SCS-C03)</title>
+<link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="dot">●</span> AWS Security Specialist</div>
+    <nav class="topnav">
+      <a href="../../index.html">← Dominios</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero" style="padding-top:40px;">
+    <span class="badge">SCS-C03 · Dominio 3 · 18% del examen</span>
+    <h1>Infrastructure Security</h1>
+    <p>Tres capas: seguridad en el borde (edge), seguridad de las cargas de trabajo (compute), y controles de red. El examen combina las tres constantemente en escenarios de "diseña la arquitectura completa".</p>
+  </section>
+</div>
+
+<div class="wrap module-layout">
+
+  <aside class="sidebar">
+    <h4>3.1 Edge services</h4>
+    <a href="#defense-depth">Defense in depth (edge→workload)</a>
+    <a href="#waf-shield">WAF, Shield &amp; CloudFront</a>
+    <a href="#edge-controls">Reglas de edge &amp; OCSF</a>
+    <h4>3.2 Compute workloads</h4>
+    <a href="#hardened-images">AMIs &amp; imágenes hardened</a>
+    <a href="#instance-roles">Instance profiles &amp; roles</a>
+    <a href="#vuln-scanning">Inspector, GuardDuty &amp; patching</a>
+    <a href="#secure-admin">Acceso administrativo seguro</a>
+    <a href="#pipeline-genai">Pipeline security &amp; GenAI</a>
+    <h4>3.3 Network controls</h4>
+    <a href="#sg-nacl">Security Groups vs NACLs</a>
+    <a href="#hybrid-connectivity">Conectividad híbrida</a>
+    <a href="#segmentation">Segmentación &amp; Network Firewall</a>
+    <h4>Práctica</h4>
+    <a href="#quiz">Quiz (20 preguntas)</a>
+  </aside>
+
+  <main class="content">
+
+    <h2 id="defense-depth">Defense in depth: del edge a la carga de trabajo</h2>
+    <p class="lede">El examen espera que sepas en qué CAPA se aplica cada control. Haz clic en cada capa del diagrama.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 700 570" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="dd-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#7c8aa0"></path>
+          </marker>
+        </defs>
+        <line class="dline" x1="230" y1="50" x2="230" y2="80" marker-end="url(#dd-arrow)"></line>
+        <line class="dline" x1="230" y1="150" x2="230" y2="180" marker-end="url(#dd-arrow)"></line>
+        <line class="dline" x1="230" y1="250" x2="230" y2="280" marker-end="url(#dd-arrow)"></line>
+        <line class="dline" x1="230" y1="330" x2="230" y2="360" marker-end="url(#dd-arrow)"></line>
+        <line class="dline" x1="230" y1="410" x2="230" y2="440" marker-end="url(#dd-arrow)"></line>
+        <line class="dline" x1="230" y1="490" x2="230" y2="520" marker-end="url(#dd-arrow)"></line>
+
+        <g class="dstep" data-label="1. Internet." data-explain="El tráfico de un cliente/atacante parte de la red pública de Internet — punto de partida del tráfico north/south.">
+          <rect class="dbox" x="40" y="10" width="380" height="40" rx="8"></rect>
+          <text x="60" y="35" class="dtitle">1. Internet</text>
+        </g>
+
+        <g class="dstep" data-label="2. Shield (Standard/Advanced)." data-explain="Primera línea: protección DDoS de capa 3/4 automática (Standard, gratis) o ampliada con DRT y cost protection (Advanced, de pago) en el edge de AWS, antes de que el tráfico llegue a tus recursos.">
+          <rect class="dbox" x="40" y="80" width="380" height="70" rx="8"></rect>
+          <text x="60" y="108" class="dtitle">2. AWS Shield — protección DDoS</text>
+          <text x="60" y="126" class="dtitle">de capa 3/4 en el edge</text>
+        </g>
+
+        <g class="dstep" data-label="3. CloudFront + WAF." data-explain="CloudFront distribuye y cachea en el edge; WAF inspecciona capa 7 (reglas de firma OWASP, rate-based rules, geo-match, fingerprinting) antes de reenviar la petición al origen.">
+          <rect class="dbox" x="40" y="180" width="380" height="70" rx="8"></rect>
+          <text x="60" y="208" class="dtitle">3. CloudFront + AWS WAF — inspección</text>
+          <text x="60" y="226" class="dtitle">de capa 7 y reglas de edge</text>
+        </g>
+
+        <g class="dstep" data-label="4. ALB (TLS + security policy)." data-explain="El Application Load Balancer termina TLS con la security policy configurada (versión mínima, cipher suites) y distribuye tráfico a los targets — punto donde se aplican los security policies de ELB (5.1.1).">
+          <rect class="dbox" x="40" y="280" width="380" height="50" rx="8"></rect>
+          <text x="60" y="310" class="dtitle">4. ALB — terminación TLS + security policy</text>
+        </g>
+
+        <g class="dstep" data-label="5. Network ACL (subnet)." data-explain="Antes de llegar a cualquier ENI dentro de la subnet, el tráfico pasa por la NACL: stateless, reglas numeradas Allow/Deny evaluadas en orden, aplicada a TODO lo que entra o sale de la subnet.">
+          <rect class="dbox" x="40" y="360" width="380" height="50" rx="8"></rect>
+          <text x="60" y="390" class="dtitle">5. Network ACL — filtrado stateless a nivel subnet</text>
+        </g>
+
+        <g class="dstep" data-label="6. Security Group (instancia)." data-explain="Justo antes de llegar a la instancia: stateful, solo reglas Allow, evaluado por ENI/instancia — el tráfico de retorno se permite automáticamente.">
+          <rect class="dbox" x="40" y="440" width="380" height="50" rx="8"></rect>
+          <text x="60" y="470" class="dtitle">6. Security Group — filtrado stateful a nivel instancia</text>
+        </g>
+
+        <g class="dstep" data-label="7. Carga de trabajo hardened." data-explain="Finalmente, la instancia/contenedor: AMI hardened (Image Builder), parcheada (Patch Manager), con un Instance Profile de mínimo privilegio y escaneada continuamente por Inspector/GuardDuty.">
+          <rect class="dbox dbox-allow" x="40" y="520" width="380" height="50" rx="8"></rect>
+          <text x="60" y="550" class="dtitle">7. Workload: AMI hardened + parcheada + rol mínimo</text>
+        </g>
+      </svg>
+      <div class="dexplain">Haz clic en cualquier capa del diagrama para ver la explicación detallada.</div>
+      <p class="diagram-note">Defense in depth: cada capa asume que la anterior puede fallar</p>
+    </div>
+
+    <h2 id="waf-shield">WAF, Shield &amp; CloudFront (3.1.1 / 3.1.2 / 3.1.3)</h2>
+    <table>
+      <tr><th>Servicio</th><th>Protege contra</th></tr>
+      <tr><td><strong>AWS WAF</strong></td><td>OWASP Top 10 (SQLi, XSS...), rate-based rules (fuerza bruta/scraping), geo-match, reglas gestionadas por AWS o de terceros (AWS Marketplace).</td></tr>
+      <tr><td><strong>Shield Standard / Advanced</strong></td><td>DDoS de capa 3/4 (siempre activo) y, con Advanced, mitigación ampliada de capa 7 combinada con WAF.</td></tr>
+      <tr><td><strong>CloudFront</strong></td><td>Reduce superficie de ataque directa al origen (Origin Access Control), añade headers de seguridad, cachea y absorbe picos de tráfico en el edge.</td></tr>
+      <tr><td><strong>S3 CORS</strong></td><td>Controla qué orígenes de navegador pueden hacer peticiones cross-origin directamente a un bucket — es una capa distinta a la bucket policy.</td></tr>
+    </table>
+
+    <p class="code-label">Rate-based rule en WAF vía CLI (bloquea tras 2000 requests/5min por IP)</p>
+    <pre><code>aws wafv2 create-rule-group \
+  --name "rate-limit-login" \
+  --scope REGIONAL \
+  --capacity 50 \
+  --rules '[{
+    "Name": "block-high-rate",
+    "Priority": 0,
+    "Action": {"Block": {}},
+    "Statement": {"RateBasedStatement": {"Limit": 2000, "AggregateKeyType": "IP"}},
+    "VisibilityConfig": {"SampledRequestsEnabled": true, "CloudWatchMetricsEnabled": true, "MetricName": "rateLimitLogin"}
+  }]'</code></pre>
+
+    <div class="callout azure">
+      <b>Si vienes de Azure</b>
+      <table>
+        <tr><th>Azure</th><th>AWS</th><th>Diferencia clave</th></tr>
+        <tr><td><strong>Azure Front Door / WAF</strong></td><td><strong>CloudFront + AWS WAF</strong></td><td>Mapeo casi directo: CDN + WAF integrado en el edge.</td></tr>
+        <tr><td><strong>Azure DDoS Protection (Standard)</strong></td><td><strong>Shield Advanced</strong></td><td>Ambos son la capa de pago sobre la protección básica gratuita que ya viene incluida (Shield Standard / DDoS IP Protection básico).</td></tr>
+      </table>
+    </div>
+
+    <h2 id="edge-controls">Reglas de edge avanzadas &amp; OCSF (3.1.3 / 3.1.4)</h2>
+    <ul>
+      <li><strong>Geolocation / rate limiting / client fingerprinting</strong>: WAF combina condiciones (país, volumen, huella del cliente vía JA3/JA4 fingerprinting) para bloquear patrones de bot sofisticados que rotan de IP.</li>
+      <li><strong>Reglas de terceros</strong>: AWS Marketplace ofrece managed rule groups de proveedores de seguridad especializados (además de las AWS Managed Rules).</li>
+      <li><strong>OCSF (Open Cybersecurity Schema Framework)</strong>: esquema abierto que normaliza eventos de seguridad de AWS y terceros al mismo formato — usado nativamente por Amazon Security Lake para poder correlacionar sin escribir un parser por cada fuente.</li>
+    </ul>
+
+    <h2 id="hardened-images">AMIs &amp; imágenes de contenedor hardened (3.2.1)</h2>
+    <p class="lede">EC2 Image Builder automatiza un pipeline: imagen base → componentes de hardening/config → parches → tests → AMI/imagen de contenedor publicada.</p>
+    <div class="callout azure">
+      <b>Si vienes de Azure</b>
+      <strong>Azure Image Builder</strong> es prácticamente el mismo concepto con el mismo nombre: pipeline gestionado para construir imágenes VM hardened y reproducibles a partir de una imagen base + customizaciones. Uno de los mapeos más directos de todo el examen.
+    </div>
+
+    <h2 id="instance-roles">Instance profiles, service roles &amp; execution roles (3.2.2)</h2>
+    <table>
+      <tr><th>Tipo</th><th>Se usa en</th></tr>
+      <tr><td><strong>Instance Profile</strong></td><td>EC2 — contenedor que asocia un IAM Role a la instancia; el SDK obtiene credenciales automáticamente del Instance Metadata Service (IMDS).</td></tr>
+      <tr><td><strong>Service Role</strong></td><td>Un servicio de AWS (ej. Config, CodePipeline) asume este rol para actuar en tu nombre sobre otros recursos.</td></tr>
+      <tr><td><strong>Execution Role</strong></td><td>Lambda/ECS/Fargate — permisos que tiene el CÓDIGO en ejecución, distinto del rol que despliega la función/tarea.</td></tr>
+    </table>
+    <div class="callout warn">
+      <b>Cuidado con IMDSv1 vs IMDSv2</b>
+      IMDSv1 (basado en simples peticiones HTTP GET) es vulnerable a SSRF: una petición HTTP maliciosa reenviada por la app puede robar las credenciales del Instance Profile. <strong>IMDSv2 exige un token de sesión obtenido con PUT</strong>, que la mayoría de bibliotecas SSRF no reenvían — fuérzalo con <code>HttpTokens=required</code> en la configuración de metadata de la instancia (o vía Declarative Policy a nivel de organización).
+    </div>
+
+    <h2 id="vuln-scanning">Inspector, GuardDuty runtime &amp; patching (3.2.3 / 3.2.4)</h2>
+    <table>
+      <tr><th>Servicio</th><th>Qué detecta</th><th>Cuándo</th></tr>
+      <tr><td><strong>Amazon Inspector</strong></td><td>CVEs conocidas en paquetes de SO (EC2), imágenes de contenedor (ECR) y dependencias de funciones Lambda</td><td>Escaneo continuo, estático</td></tr>
+      <tr><td><strong>GuardDuty (Runtime Monitoring)</strong></td><td>Comportamiento anómalo en tiempo real (ej. proceso sospechoso, conexión a IP maliciosa)</td><td>Continuo, en ejecución</td></tr>
+      <tr><td><strong>Systems Manager Patch Manager</strong></td><td>Aplica parches según baseline aprobado</td><td>Programado (Maintenance Windows)</td></tr>
+    </table>
+
+    <h2 id="secure-admin">Acceso administrativo seguro (3.2.5)</h2>
+    <div class="callout azure">
+      <b>Si vienes de Azure</b>
+      <strong>Systems Manager Session Manager</strong> ↔ <strong>Azure Bastion</strong>: ambos dan acceso de shell sin abrir puertos entrantes (22/3389) ni exponer IP pública, con sesiones auditadas centralmente. La diferencia: Azure Bastion es un recurso de red que despliegas en la VNet (con coste fijo por hora); Session Manager es un agente + servicio gestionado sin recurso de red que aprovisionar, y además funciona sobre instancias híbridas (on-premises) registradas en Systems Manager.
+    </div>
+    <p class="code-label">Iniciar una sesión sin SSH ni puerto abierto</p>
+    <pre><code>aws ssm start-session --target i-0123456789abcdef0</code></pre>
+
+    <h2 id="pipeline-genai">Seguridad en el pipeline &amp; guardrails GenAI (3.2.6 / 3.2.7)</h2>
+    <ul>
+      <li><strong>Amazon CodeGuru Security</strong>: análisis estático (SAST) de código fuente en el pipeline — vulnerabilidades y secretos hardcodeados antes de desplegar.</li>
+      <li><strong>Amazon Q Developer</strong>: sugerencias de remediación asistidas por IA integradas en el IDE/pipeline.</li>
+    </ul>
+    <div class="callout plain">
+      <b>Ejemplo llano — nuevo en SCS-C03</b>
+      Si tu aplicación expone un chatbot basado en un LLM (ej. vía Bedrock) a usuarios finales, el <strong>OWASP Top 10 for LLM Applications</strong> cataloga riesgos específicos que no existen en apps tradicionales: <em>prompt injection</em> (un usuario manipula el prompt para saltarse las instrucciones del sistema), <em>fuga de datos sensibles</em> en las respuestas del modelo, o <em>envenenamiento</em> de los datos usados para fine-tuning/RAG. Implementar guardrails (ej. Amazon Bedrock Guardrails) para filtrar entradas/salidas es la respuesta típica del examen ante este escenario.
+    </div>
+
+    <h2 id="sg-nacl">Security Groups vs Network ACLs (3.3.1)</h2>
+    <table>
+      <tr><th></th><th>Security Group</th><th>Network ACL</th></tr>
+      <tr><td><strong>Nivel</strong></td><td>ENI / instancia</td><td>Subnet</td></tr>
+      <tr><td><strong>Estado</strong></td><td>Stateful (el retorno se permite solo)</td><td>Stateless (hay que permitir ida y vuelta)</td></tr>
+      <tr><td><strong>Reglas</strong></td><td>Solo Allow</td><td>Allow y Deny, evaluadas en orden numérico</td></tr>
+      <tr><td><strong>Alcance</strong></td><td>Se evalúan TODAS las reglas (no hay orden)</td><td>Se detiene en la primera regla que haga match</td></tr>
+    </table>
+
+    <div class="callout warn">
+      <b>Cuidado si vienes de Azure — esto es distinto</b>
+      Azure tiene UN solo constructo, el <strong>Network Security Group (NSG)</strong>, que puedes asociar a una subnet O a una NIC, y que SÍ soporta reglas explícitas de Deny con prioridad numérica — es decir, un NSG se parece un poco a la mezcla de Security Group + NACL de AWS. En AWS, en cambio, son DOS mecanismos separados con comportamientos distintos (stateful vs stateless) que se aplican SIEMPRE juntos (primero NACL de la subnet, luego SG de la instancia). No asumas que "ya tengo NACL configurada = no necesito Security Group" ni al revés: en AWS ambas capas actúan simultáneamente.
+    </div>
+
+    <h2 id="hybrid-connectivity">Conectividad híbrida &amp; multi-cloud (3.3.2 / 3.3.3)</h2>
+    <p class="lede">Skill 3.3.2/3.3.3 explícitamente. Sigue este árbol de decisión.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 700 400" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="hc-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#7c8aa0"></path>
+          </marker>
+          <marker id="hc-arrow-si" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#3ecf8e"></path>
+          </marker>
+        </defs>
+
+        <line class="dline" x1="230" y1="80" x2="230" y2="140" marker-end="url(#hc-arrow)"></line>
+        <line class="dline" x1="230" y1="210" x2="230" y2="270" marker-end="url(#hc-arrow)"></line>
+
+        <line class="dline-deny" style="stroke:#3ecf8e" x1="420" y1="45" x2="470" y2="45" marker-end="url(#hc-arrow-si)"></line>
+        <line class="dline-deny" style="stroke:#3ecf8e" x1="420" y1="175" x2="470" y2="175" marker-end="url(#hc-arrow-si)"></line>
+        <line class="dline-deny" style="stroke:#3ecf8e" x1="420" y1="305" x2="470" y2="305" marker-end="url(#hc-arrow-si)"></line>
+
+        <g class="dstep" data-label="¿Ancho de banda dedicado sin pasar por Internet?" data-explain="¿Necesitas una conexión privada y predecible de alto ancho de banda entre tu datacenter y AWS, sin atravesar la Internet pública?">
+          <rect class="dbox" x="40" y="10" width="380" height="70" rx="8"></rect>
+          <text x="60" y="38" class="dtitle">¿Necesitas ancho de banda dedicado,</text>
+          <text x="60" y="56" class="dtitle">sin pasar por Internet pública?</text>
+        </g>
+        <g class="dstep" data-label="→ Direct Connect (+ MACsec si hace falta cifrado)." data-explain="Direct Connect da una conexión física dedicada. Como no cifra por defecto, añade MACsec (capa 2) en conexiones dedicadas de alta velocidad si el cifrado es un requisito.">
+          <rect class="dbox dbox-allow" x="470" y="10" width="190" height="70" rx="8"></rect>
+          <text x="490" y="40" class="dtitle">Direct Connect</text>
+          <text x="490" y="58" class="dtitle">(+ MACsec)</text>
+        </g>
+
+        <g class="dstep" data-label="¿Cifrado rápido de desplegar sobre Internet?" data-explain="¿Te vale un túnel cifrado desplegable en minutos, sin contratar una línea dedicada, aceptando que el rendimiento depende de la Internet pública?">
+          <rect class="dbox" x="40" y="140" width="380" height="70" rx="8"></rect>
+          <text x="60" y="168" class="dtitle">¿Cifrado rápido de desplegar,</text>
+          <text x="60" y="186" class="dtitle">sin hardware dedicado?</text>
+        </g>
+        <g class="dstep" data-label="→ AWS Site-to-Site VPN." data-explain="Túnel IPsec cifrado sobre Internet entre tu red y una VPC — se despliega en minutos, sin depender de un partner de Direct Connect.">
+          <rect class="dbox dbox-allow" x="470" y="140" width="190" height="70" rx="8"></rect>
+          <text x="490" y="180" class="dtitle">Site-to-Site VPN</text>
+        </g>
+
+        <g class="dstep" data-label="¿Acceso a UNA aplicación con Zero Trust?" data-explain="¿Es acceso de usuarios/dispositivos a aplicaciones específicas (no red completa), evaluando identidad y postura del dispositivo en cada request?">
+          <rect class="dbox" x="40" y="270" width="380" height="70" rx="8"></rect>
+          <text x="60" y="298" class="dtitle">¿Acceso Zero Trust a aplicaciones</text>
+          <text x="60" y="316" class="dtitle">específicas (no red completa)?</text>
+        </g>
+        <g class="dstep" data-label="→ AWS Verified Access." data-explain="Evalúa identidad (Identity Center) y postura del dispositivo en cada solicitud, sin exponer un túnel de red completo — funciona igual para oficina o remoto.">
+          <rect class="dbox dbox-allow" x="470" y="270" width="190" height="70" rx="8"></rect>
+          <text x="490" y="310" class="dtitle">Verified Access</text>
+        </g>
+      </svg>
+      <div class="dexplain">Haz clic en cualquier paso del diagrama para ver la explicación detallada.</div>
+      <p class="diagram-note">Elegir conectividad híbrida (Skills 3.3.2 / 3.3.3)</p>
+    </div>
+
+    <div class="callout azure">
+      <b>Si vienes de Azure</b>
+      <strong>Direct Connect</strong> ↔ <strong>Azure ExpressRoute</strong> (ExpressRoute Direct también soporta MACsec — mapeo muy directo). <strong>Site-to-Site VPN</strong> ↔ <strong>Azure VPN Gateway (S2S)</strong>. Sin equivalente 1:1 sencillo: <strong>Verified Access</strong> se parece más a Entra Private Access que a cualquier producto de red tradicional de Azure.
+    </div>
+
+    <h2 id="segmentation">Segmentación de red &amp; AWS Network Firewall (3.3.4 / 3.3.5)</h2>
+    <ul>
+      <li><strong>North/south</strong>: tráfico que cruza el perímetro (Internet ↔ VPC). <strong>East/west</strong>: tráfico interno entre cargas de trabajo — aislarlo reduce el blast radius si un componente se compromete.</li>
+      <li><strong>Subnets aisladas</strong> (sin ruta a Internet, ni siquiera vía NAT) para las cargas más sensibles (ej. bases de datos).</li>
+      <li><strong>AWS Network Firewall</strong>: inspección de capa 3-7 con estado, reglas de dominio (FQDN) y firmas tipo IDS/IPS (Suricata) — más avanzado que SG/NACL para tráfico de tránsito.</li>
+      <li><strong>Detectar accesos no intencionados</strong>: Amazon Inspector (Network Reachability) y VPC Network Access Analyzer modelan toda la cadena SG+NACL+route tables para encontrar rutas alcanzables que no deberían existir.</li>
+    </ul>
+
+    <div class="callout azure">
+      <b>Si vienes de Azure</b>
+      <strong>AWS Network Firewall</strong> ↔ <strong>Azure Firewall</strong>: ambos son firewalls gestionados de capa 3-7 con reglas de dominio, pensados para tráfico centralizado de tránsito (a menudo detrás de un Transit Gateway / Virtual WAN respectivamente).
+    </div>
+
+    <h2 id="quiz">Quiz de práctica — Infrastructure Security</h2>
+    <p class="lede">20 preguntas estilo examen. Elige una opción para ver si es correcta y por qué.</p>
+    <div id="quiz-root"></div>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">Guía de estudio personal — no es material oficial de AWS. Contenido revisado a fecha de 2026.</div>
+</footer>
+
+<script src="quiz-data.js"></script>
+<script src="../../assets/js/quiz.js"></script>
+<script src="../../assets/js/app.js"></script>
+</body>
+</html>
