@@ -150,6 +150,14 @@
       <p class="diagram-note">Orden de evaluación de políticas IAM (actualizado con RCP, 2024+)</p>
     </div>
 
+    <div class="callout plain">
+      <b>Ejemplo paso a paso</b>
+      Ana (developer) intenta borrar un objeto del bucket <code>finance-reports</code> con <code>s3:DeleteObject</code>.<br><br>
+      <strong>1.</strong> Llega la petición: Principal = Ana, Acción = <code>s3:DeleteObject</code>, Recurso = el objeto.<br>
+      <strong>2.</strong> ¿Deny explícito? La bucket policy de <code>finance-reports</code> tiene un Deny explícito para <code>s3:DeleteObject</code> salvo para el rol <code>FinanceAdmin</code>. Ana no es ese rol → <strong>DENY inmediato</strong>, fin de la evaluación. No importa que su identity policy le diera <code>s3:*</code>: el Deny explícito de un tercer documento (la bucket policy) gana igualmente.<br><br>
+      Si esa Deny no existiera, seguiríamos: ¿la SCP de su OU permite <code>s3:DeleteObject</code>? ¿Tiene Ana un Allow explícito en su identity policy? ¿Su permission boundary también lo permite? Solo si las CUATRO preguntas dan verde, se ejecuta el borrado.
+    </div>
+
     <h2 id="roles-sts">IAM Roles &amp; AWS STS</h2>
     <p class="lede">Un Role es una identidad con políticas de permisos que NO tiene credenciales permanentes: se "asume" y genera credenciales temporales vía AWS STS (Security Token Service).</p>
 
@@ -200,6 +208,15 @@
     <p class="code-label">Generar una presigned URL vía CLI (expira en 300s)</p>
     <pre><code>aws s3 presign s3://reports-bucket/2026/audit-final.pdf --expires-in 300</code></pre>
 
+    <div class="callout azure">
+      <b>Si vienes de Azure</b>
+      <table>
+        <tr><th>Azure</th><th>AWS</th><th>Diferencia clave</th></tr>
+        <tr><td><strong>Managed Identity</strong> (system/user-assigned) en una VM/Function App</td><td><strong>Instance Profile</strong> (EC2) / execution role (Lambda, ECS)</td><td>Prácticamente igual: el SDK obtiene credenciales automáticamente, tu código nunca las gestiona ni las ve.</td></tr>
+        <tr><td><strong>Service Principal</strong> + client secret/certificate, token vía MSAL</td><td><strong>sts:AssumeRole</strong> manual (con o sin ExternalId)</td><td>Aquí sí llamas tú explícitamente a la API para intercambiar una identidad por un token/credencial temporal.</td></tr>
+      </table>
+    </div>
+
     <h2 id="cross-account">Acceso cross-account &amp; confused deputy</h2>
     <p class="lede">El patrón más preguntado del examen: un usuario en la Cuenta A necesita operar recursos en la Cuenta B.</p>
 
@@ -248,6 +265,16 @@
       <p class="diagram-note">Flujo de AssumeRole cross-account (requiere permiso de salida Y trust policy de entrada)</p>
     </div>
 
+    <div class="callout plain">
+      <b>Ejemplo: por qué existe ExternalId</b>
+      Contratas a "DataSync Corp" (SaaS de terceros) para hacer backups de tu bucket S3. Les das el ARN de un rol en tu cuenta con una trust policy que confía en la Cuenta AWS de DataSync Corp. Problema: DataSync Corp tiene <em>cientos</em> de clientes, y su trust policy genérica podría permitir que asuman ese rol usando las mismas credenciales de su cuenta. Si otro cliente de DataSync Corp (malicioso o por error de configuración de la propia DataSync Corp) logra que el servicio asuma TU rol en vez del suyo, accede a tus datos sin que tú se lo hayas dado a él directamente — ese es el "confused deputy" (DataSync Corp es el "diputado confundido"). Al exigir un <code>sts:ExternalId</code> único que solo tú y DataSync Corp conocéis, tu trust policy solo confía en la combinación exacta cuenta+ExternalId, cerrando ese hueco.
+    </div>
+
+    <div class="callout azure">
+      <b>Si vienes de Azure</b>
+      Lo más parecido a esto es <strong>Azure Lighthouse</strong>: permite a un tenant de gestión (ej. un MSP) operar recursos dentro de tu tenant sin cambiar de contexto. La diferencia importante para el examen: en Azure Lighthouse la delegación es <em>persistente y visible</em> directamente en el portal del tenant gestor (no hay un "assume" explícito en cada operación); en AWS, el acceso cross-account es <em>siempre</em> una llamada explícita a <code>sts:AssumeRole</code> que genera credenciales temporales con caducidad — un modelo más parecido, de hecho, a pedir un token para un Service Principal con permisos delegados en tu tenant vía Azure AD.
+    </div>
+
     <h2 id="identity-center">IAM Identity Center</h2>
     <p class="lede">Sucesor de AWS SSO. Es la forma recomendada por AWS de gestionar acceso humano multi-cuenta en 2026, por encima de crear IAM Users individuales.</p>
     <ul>
@@ -256,6 +283,16 @@
       <li><strong>Attribute-based access control (ABAC) integrado</strong>: Identity Center puede pasar atributos del usuario (departamento, coste center) como session tags al asumir el permission set.</li>
       <li>Sustituye el patrón antiguo de "un IAM User por persona + credenciales de larga duración" — reduce drásticamente el riesgo de access keys filtradas.</li>
     </ul>
+
+    <div class="callout azure">
+      <b>Si vienes de Azure</b>
+      <table>
+        <tr><th>Azure</th><th>AWS</th><th>Diferencia clave</th></tr>
+        <tr><td><strong>Microsoft Entra ID</strong> (tenant)</td><td><strong>AWS Organization + IAM Identity Center</strong></td><td>En Azure el tenant de Entra ID ES tu identidad central. En AWS son dos cosas separadas: la Organization agrupa CUENTAS (equivalente más a "subscriptions"), e Identity Center es la capa de identidad que se conecta por encima.</td></tr>
+        <tr><td>Grupo de Entra ID + asignación de rol Azure RBAC (scope: subscription/RG)</td><td>Grupo asignado a un <strong>Permission Set</strong> sobre una o varias cuentas</td><td>Conceptualmente casi idéntico: grupo + rol + alcance.</td></tr>
+        <tr><td>Enterprise Applications (SSO federado)</td><td>Apps federadas vía SAML/OIDC en Identity Center</td><td>Mismo concepto, distinta consola.</td></tr>
+      </table>
+    </div>
 
     <h2 id="cognito-directory">Amazon Cognito &amp; AWS Directory Service</h2>
     <p class="lede">Skill 4.1.1 agrupa explícitamente IAM Identity Center, Cognito y MFA como las tres piezas para autenticar humanos, aplicaciones y sistemas. Identity Center cubre acceso humano a cuentas AWS; Cognito cubre usuarios finales de tus propias aplicaciones.</p>
@@ -270,6 +307,11 @@
     <div class="callout exam">
       <b>Cómo distinguirlos en el examen</b>
       "Usuarios finales de mi app web/móvil hacen login" → <strong>Cognito</strong>. "Empleados de la empresa acceden a la consola/CLI de AWS con su cuenta corporativa" → <strong>IAM Identity Center</strong> (posiblemente federado contra AD vía Directory Service). "Quiero exponer un AD on-premises existente a servicios AWS sin migrarlo" → <strong>AD Connector</strong>.
+    </div>
+
+    <div class="callout azure">
+      <b>Si vienes de Azure</b>
+      <strong>Cognito User Pools</strong> es el equivalente a <strong>Azure AD B2C / Microsoft Entra External ID</strong>: gestión de identidad para clientes/usuarios finales de TU aplicación, separada del tenant corporativo. <strong>Cognito Identity Pools</strong> no tiene un análogo tan directo en Azure — la forma habitual allí de dar acceso a recursos a un usuario externo autenticado es a través de un token validado por tu propio backend, que luego usa SU PROPIA identidad (Managed Identity o Service Principal) para tocar los recursos, en vez de "cambiar" el token del usuario final por credenciales de la nube como hace Cognito Identity Pools.
     </div>
 
     <h2 id="roles-anywhere">IAM Roles Anywhere</h2>
@@ -314,6 +356,11 @@
       "Permitir que los desarrolladores creen sus propios roles IAM, pero sin que puedan auto-otorgarse permisos de administrador" → adjuntar un permission boundary obligatorio en la política que les permite <code>iam:CreateRole</code>, usando la condición <code>iam:PermissionsBoundary</code>.
     </div>
 
+    <div class="callout plain">
+      <b>Ejemplo llano — sin equivalente directo en Azure</b>
+      Imagina que le das a un becario el rol <strong>Contributor</strong> sobre un resource group en Azure. Si mañana alguien (por error o de forma malintencionada) le asigna además el rol <strong>Owner</strong>, no hay ningún mecanismo nativo de Azure RBAC que diga "da igual qué rol le asignen después, este becario JAMÁS podrá superar el techo X". Cada asignación de rol es independiente. <strong>En AWS sí existe ese techo estructural</strong>: si el becario tiene un permission boundary que solo permite S3/DynamoDB, aunque alguien le adjunte por error <code>AdministratorAccess</code> como identity policy, sus permisos reales siguen acotados a S3/DynamoDB — el boundary manda siempre. Es el motivo por el que el examen lo pregunta tanto: es un concepto genuinamente distinto a "asignar un rol con más o menos permisos".
+    </div>
+
     <h3>IAM paths — organizar y acotar identidades por prefijo</h3>
     <p>Todo User y Role IAM tiene un <strong>path</strong> opcional (por defecto <code>/</code>) que forma parte de su ARN: <code>arn:aws:iam::111122223333:role/division_abc/subdivision_xyz/mi-rol</code>. Skill 4.2.1 lo lista junto a resource policies y trust policies como mecanismo de control de autorización.</p>
     <ul>
@@ -345,6 +392,11 @@
       <li>Ideal para entornos multi-equipo donde el número de recursos crece constantemente — evita mantener cientos de políticas específicas.</li>
     </ul>
 
+    <div class="callout azure">
+      <b>Si vienes de Azure</b>
+      Azure también tiene <strong>ABAC</strong>, pero con un alcance mucho más limitado: en Azure, las condiciones de rol basadas en atributos solo se soportan sobre <strong>Blob Storage y algunos tipos de recursos concretos</strong> (ej. "solo lectura de blobs con tag Project=Finance"). En AWS, ABAC funciona de forma transversal en la mayoría de servicios (EC2, S3, KMS, Secrets Manager...) porque se implementa directamente como condiciones dentro de cualquier política IAM, no como una capacidad aparte de un servicio concreto.
+    </div>
+
     <h2 id="verified-permissions">Amazon Verified Permissions</h2>
     <p class="lede">Todo lo anterior (identity-based, resource-based, ABAC) autoriza acceso a la API de AWS. Amazon Verified Permissions resuelve un problema distinto: <strong>autorización fina dentro de TUS propias aplicaciones</strong> (¿puede este usuario ver este documento? ¿puede editar este pedido?), fuera del control plane de AWS.</p>
     <ul>
@@ -369,6 +421,11 @@
     <div class="callout">
       <b>Cómo distinguirlos en el examen</b>
       Si la pregunta dice "queremos que ninguna cuenta pueda desactivar el cifrado por defecto de EBS, pase lo que pase" → <strong>Declarative Policy</strong>. Si dice "queremos que nadie en la organización pueda usar la región eu-west-1" → <strong>SCP</strong>. Si dice "queremos que ningún bucket S3 de la organización pueda compartirse con cuentas fuera de la organización, ni con condiciones de política a nivel de bucket" → <strong>RCP</strong>.
+    </div>
+
+    <div class="callout warn">
+      <b>Cuidado si vienes de Azure — trampa de nombres</b>
+      "Service Control Policy" suena a <strong>Azure Policy</strong>, pero NO son lo mismo. Azure Policy audita/fuerza principalmente la <em>configuración</em> de los recursos que se crean (ej. "todo storage account debe tener HTTPS obligatorio") — eso se parece mucho más a las <strong>Declarative Policies</strong> de AWS o a las Config Rules. Una SCP, en cambio, es un techo de <em>permisos de IAM</em> (qué acciones puede ejecutar una identidad), y su equivalente más cercano en Azure son las <strong>deny assignments</strong> (usadas en Blueprints/Landing Zones), que bloquean acciones a nivel de Management Group sin importar qué rol RBAC tenga asignado el usuario. Si en el examen ves "SCP", piensa en permisos denegados, no en compliance de configuración.
     </div>
 
     <h2 id="access-analyzer">IAM Access Analyzer &amp; Policy Simulator</h2>
@@ -416,6 +473,11 @@
     "BoolIfExists": { "aws:MultiFactorAuthPresent": "false" }
   }
 }</code></pre>
+
+    <div class="callout azure">
+      <b>Si vienes de Azure</b>
+      Aquí el salto es al revés de lo habitual: en Azure, <strong>Conditional Access</strong> es un motor centralizado que evalúa señales (ubicación, riesgo del usuario, cumplimiento del dispositivo...) y decide en un solo sitio si exige MFA, bloquea el acceso o fuerza un dispositivo gestionado, aplicable de forma uniforme a todo el tenant. AWS <strong>no tiene un motor equivalente centralizado</strong>: la condición <code>aws:MultiFactorAuthPresent</code> hay que añadirla política por política (o de forma centralizada vía SCP/RCP, pero sigue siendo una condición de "sí/no", no un motor de riesgo adaptativo). Si en el examen una pregunta suena a "políticas de acceso condicional adaptativas basadas en riesgo", probablemente la respuesta correcta combine varios servicios (IAM + GuardDuty + Identity Center), no un único servicio equivalente a Conditional Access.
+    </div>
 
     <h2 id="perimeter">Data perimeter</h2>
     <p class="lede">Concepto transversal muy presente en el examen 2026: garantizar que los datos nunca salgan de tu organización, incluso con credenciales válidas comprometidas.</p>

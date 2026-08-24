@@ -234,10 +234,16 @@ a:hover { text-decoration: underline; }
 }
 .callout.exam { border-left-color: var(--accent); background: var(--accent-soft); }
 .callout.warn { border-left-color: var(--red); background: var(--red-soft); }
+.callout.azure { border-left-color: #0078d4; background: rgba(0, 120, 212, 0.10); }
+.callout.plain { border-left-color: var(--green); background: var(--green-soft); }
 .callout b { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; opacity: 0.85; }
 .callout.exam b { color: var(--accent); }
 .callout.warn b { color: var(--red); }
-.callout:not(.exam):not(.warn) b { color: var(--blue); }
+.callout.azure b { color: #0078d4; }
+.callout.plain b { color: var(--green); }
+.callout:not(.exam):not(.warn):not(.azure):not(.plain) b { color: var(--blue); }
+.callout table { margin: 8px 0 0; }
+.callout table th, .callout table td { padding: 7px 10px; }
 
 /* ---- code blocks ---- */
 pre {
