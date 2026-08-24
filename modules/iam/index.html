@@ -31,21 +31,24 @@
     <h4>Fundamentos</h4>
     <a href="#fundamentos">Tipos de políticas</a>
     <a href="#evaluacion">Evaluación de políticas</a>
-    <h4>Roles &amp; Federación</h4>
-    <a href="#roles-sts">Roles &amp; STS</a>
+    <h4>4.1 Autenticación</h4>
+    <a href="#roles-sts">Roles, STS &amp; presigned URLs</a>
     <a href="#cross-account">Acceso cross-account</a>
     <a href="#identity-center">IAM Identity Center</a>
+    <a href="#cognito-directory">Cognito &amp; Directory Service</a>
     <a href="#roles-anywhere">IAM Roles Anywhere</a>
-    <h4>Control granular</h4>
-    <a href="#boundaries">Permission boundaries</a>
-    <a href="#abac">ABAC (tags)</a>
+    <a href="#auth-troubleshooting">Troubleshooting de auth</a>
+    <h4>4.2 Autorización</h4>
+    <a href="#boundaries">Boundaries, sessions &amp; IAM paths</a>
+    <a href="#abac">ABAC &amp; RBAC</a>
+    <a href="#verified-permissions">Amazon Verified Permissions</a>
     <a href="#org-guardrails">SCP / RCP / Declarative</a>
     <h4>Auditoría &amp; hardening</h4>
-    <a href="#access-analyzer">IAM Access Analyzer</a>
+    <a href="#access-analyzer">Access Analyzer &amp; Policy Simulator</a>
     <a href="#root">Root user &amp; MFA</a>
     <a href="#perimeter">Data perimeter</a>
     <h4>Práctica</h4>
-    <a href="#quiz">Quiz (20 preguntas)</a>
+    <a href="#quiz">Quiz (26 preguntas)</a>
   </aside>
 
   <main class="content">
@@ -187,6 +190,16 @@
       <code>sts:ExternalId</code> es obligatorio cuando un tercero (proveedor SaaS, auditor externo) asume tu rol, para mitigar el <em>confused deputy problem</em>. Combínalo siempre con <code>aws:SourceArn</code>/<code>aws:SourceAccount</code> cuando quien asume es un servicio de AWS actuando en nombre de otro cliente.
     </div>
 
+    <h3>Amazon S3 presigned URLs — la otra forma de dar acceso temporal</h3>
+    <p>El exam guide de SCS-C03 agrupa STS y los <strong>presigned URLs de S3</strong> bajo el mismo skill: "mecanismos para emitir credenciales temporales". No son lo mismo, y el examen distingue cuándo usar cada uno:</p>
+    <ul>
+      <li>Un presigned URL no genera credenciales nuevas: <strong>firma una URL con las credenciales de quien la genera</strong> (usuario o rol), delegando acceso a UNA acción sobre UN objeto concreto durante un tiempo limitado (hasta 7 días con SigV4 y credenciales de IAM Role, o hasta 12h si se firma con las credenciales temporales de un rol).</li>
+      <li>Ideal para que un cliente sin credenciales de AWS (un navegador, una app externa) suba o descargue UN objeto S3 puntual, sin exponerle nunca access keys ni necesitar que asuma un rol.</li>
+      <li>Si el que genera la URL pierde el permiso subyacente (se revoca su rol/policy) antes de que expire, la URL deja de funcionar — sigue evaluándose contra IAM en cada uso.</li>
+    </ul>
+    <p class="code-label">Generar una presigned URL vía CLI (expira en 300s)</p>
+    <pre><code>aws s3 presign s3://reports-bucket/2026/audit-final.pdf --expires-in 300</code></pre>
+
     <h2 id="cross-account">Acceso cross-account &amp; confused deputy</h2>
     <p class="lede">El patrón más preguntado del examen: un usuario en la Cuenta A necesita operar recursos en la Cuenta B.</p>
 
@@ -244,6 +257,21 @@
       <li>Sustituye el patrón antiguo de "un IAM User por persona + credenciales de larga duración" — reduce drásticamente el riesgo de access keys filtradas.</li>
     </ul>
 
+    <h2 id="cognito-directory">Amazon Cognito &amp; AWS Directory Service</h2>
+    <p class="lede">Skill 4.1.1 agrupa explícitamente IAM Identity Center, Cognito y MFA como las tres piezas para autenticar humanos, aplicaciones y sistemas. Identity Center cubre acceso humano a cuentas AWS; Cognito cubre usuarios finales de tus propias aplicaciones.</p>
+
+    <table>
+      <tr><th>Componente</th><th>Para qué sirve</th><th>Detalle clave</th></tr>
+      <tr><td><strong>Cognito User Pools</strong></td><td>Directorio de usuarios de TU aplicación (sign-up/sign-in, MFA, verificación de email/SMS)</td><td>Devuelve JSON Web Tokens (ID, Access, Refresh) tras el login. No da credenciales de AWS por sí solo.</td></tr>
+      <tr><td><strong>Cognito Identity Pools</strong></td><td>Intercambia una identidad ya autenticada (de un User Pool, Google, SAML...) por <strong>credenciales temporales de AWS</strong></td><td>Es la capa recomendada sobre <code>AssumeRoleWithWebIdentity</code> — gestiona el intercambio de forma segura sin exponer secretos en el cliente.</td></tr>
+      <tr><td><strong>AWS Directory Service</strong></td><td>Directorios Active Directory gestionados para autenticación empresarial on-prem/híbrida</td><td>3 modos: <strong>AWS Managed Microsoft AD</strong> (AD real, gestionado, soporta trusts), <strong>AD Connector</strong> (proxy hacia un AD on-premises existente, sin replicar datos) y <strong>Simple AD</strong> (compatible con Samba, funcionalidad reducida).</td></tr>
+    </table>
+
+    <div class="callout exam">
+      <b>Cómo distinguirlos en el examen</b>
+      "Usuarios finales de mi app web/móvil hacen login" → <strong>Cognito</strong>. "Empleados de la empresa acceden a la consola/CLI de AWS con su cuenta corporativa" → <strong>IAM Identity Center</strong> (posiblemente federado contra AD vía Directory Service). "Quiero exponer un AD on-premises existente a servicios AWS sin migrarlo" → <strong>AD Connector</strong>.
+    </div>
+
     <h2 id="roles-anywhere">IAM Roles Anywhere</h2>
     <p class="lede">Extiende los roles de IAM a cargas de trabajo que corren FUERA de AWS: servidores on-premises, otros proveedores cloud, dispositivos edge.</p>
     <ul>
@@ -252,7 +280,16 @@
       <li>Elimina la necesidad de access keys de larga duración distribuidas manualmente en servidores fuera de AWS.</li>
     </ul>
 
-    <h2 id="boundaries">Permission boundaries &amp; session policies</h2>
+    <h2 id="auth-troubleshooting">Troubleshooting de autenticación</h2>
+    <p class="lede">Skill 4.1.3, explícito en el exam guide: saber dónde mirar cuando alguien "no puede iniciar sesión" es tan examinable como configurarlo.</p>
+    <ul>
+      <li><strong>CloudTrail</strong>: primer sitio para ver el evento <code>AssumeRole</code>/<code>ConsoleLogin</code> fallido y el motivo exacto (<code>errorCode</code>, <code>errorMessage</code>) — incluye intentos denegados por trust policy, MFA ausente o SCP.</li>
+      <li><strong>Cognito</strong>: revisar los logs de Advanced Security Features y los eventos de User Pool (fallos de verificación, throttling, triggers Lambda que bloquean el login).</li>
+      <li><strong>IAM Identity Center permission sets</strong>: un permission set editado no se re-provisiona automáticamente en las cuentas — hay que reaplicarlo, causa común de "le quité el permiso pero sigue teniendo acceso" o al revés.</li>
+      <li><strong>AWS Directory Service</strong>: problemas de conectividad de red (Security Groups, NACLs) entre la VPC y los DCs on-premises son la causa más común de fallos con AD Connector.</li>
+    </ul>
+
+    <h2 id="boundaries">Permission boundaries, session policies &amp; IAM paths</h2>
     <p class="lede">Ambos mecanismos comparten la misma regla: <strong>nunca amplían permisos, solo los acotan</strong> mediante intersección con la identity/resource policy.</p>
 
     <p class="code-label">Permission boundary — un desarrollador solo puede tocar S3 y DynamoDB, nunca IAM</p>
@@ -277,8 +314,15 @@
       "Permitir que los desarrolladores creen sus propios roles IAM, pero sin que puedan auto-otorgarse permisos de administrador" → adjuntar un permission boundary obligatorio en la política que les permite <code>iam:CreateRole</code>, usando la condición <code>iam:PermissionsBoundary</code>.
     </div>
 
-    <h2 id="abac">ABAC — Control de acceso basado en atributos</h2>
-    <p class="lede">En vez de escribir una política por recurso (RBAC clásico), ABAC compara tags del principal con tags del recurso — escala sin reescribir políticas.</p>
+    <h3>IAM paths — organizar y acotar identidades por prefijo</h3>
+    <p>Todo User y Role IAM tiene un <strong>path</strong> opcional (por defecto <code>/</code>) que forma parte de su ARN: <code>arn:aws:iam::111122223333:role/division_abc/subdivision_xyz/mi-rol</code>. Skill 4.2.1 lo lista junto a resource policies y trust policies como mecanismo de control de autorización.</p>
+    <ul>
+      <li>Sirve para <strong>agrupar identidades por equipo/proyecto</strong> y luego escribir políticas de administración que solo permitan gestionar roles/usuarios bajo un path concreto, usando condiciones como <code>iam:ResourceTag</code> o restringiendo el <code>Resource</code> con wildcard sobre el path (<code>arn:aws:iam::*:role/division_abc/*</code>).</li>
+      <li>Un caso de examen típico: delegar a un equipo de plataforma la creación de roles solo dentro de su propio path, combinado con un permission boundary obligatorio — doble control de mínimo privilegio.</li>
+    </ul>
+
+    <h2 id="abac">ABAC &amp; RBAC — control de acceso basado en atributos o en roles</h2>
+    <p class="lede">RBAC (role-based) es el modelo clásico: una política por rol/función de negocio. ABAC (attribute-based) compara tags del principal con tags del recurso — escala sin reescribir políticas cuando el número de recursos crece.</p>
 
     <p class="code-label">Política ABAC: solo acceso a recursos del mismo "project" que el usuario</p>
     <pre><code>{
@@ -301,6 +345,18 @@
       <li>Ideal para entornos multi-equipo donde el número de recursos crece constantemente — evita mantener cientos de políticas específicas.</li>
     </ul>
 
+    <h2 id="verified-permissions">Amazon Verified Permissions</h2>
+    <p class="lede">Todo lo anterior (identity-based, resource-based, ABAC) autoriza acceso a la API de AWS. Amazon Verified Permissions resuelve un problema distinto: <strong>autorización fina dentro de TUS propias aplicaciones</strong> (¿puede este usuario ver este documento? ¿puede editar este pedido?), fuera del control plane de AWS.</p>
+    <ul>
+      <li>Motor de autorización gestionado basado en <strong>Cedar</strong>, el lenguaje de políticas open-source de AWS: políticas legibles tipo <code>permit(principal == User::"ana", action == Action::"viewDocument", resource in Folder::"finance")</code>.</li>
+      <li>Se integra en el código de la aplicación vía SDK/API (<code>IsAuthorized</code>) — la app le pregunta a Verified Permissions en cada request si esa acción concreta está permitida, en vez de tener la lógica de autorización hardcodeada.</li>
+      <li>Soporta RBAC y ABAC dentro del propio modelo Cedar, y se integra de forma nativa con Cognito para usar los grupos/atributos del usuario autenticado.</li>
+    </ul>
+    <div class="callout">
+      <b>Cómo distinguirlo en el examen</b>
+      Si la pregunta habla de permisos sobre <strong>llamadas a la API de AWS</strong> (S3, EC2, IAM...) → política IAM clásica. Si habla de <strong>lógica de negocio dentro de tu aplicación</strong> ("qué documentos puede ver este usuario de mi SaaS") → Amazon Verified Permissions.
+    </div>
+
     <h2 id="org-guardrails">Guardrails de organización: SCP, RCP y Declarative Policies</h2>
 
     <table>
@@ -315,8 +371,8 @@
       Si la pregunta dice "queremos que ninguna cuenta pueda desactivar el cifrado por defecto de EBS, pase lo que pase" → <strong>Declarative Policy</strong>. Si dice "queremos que nadie en la organización pueda usar la región eu-west-1" → <strong>SCP</strong>. Si dice "queremos que ningún bucket S3 de la organización pueda compartirse con cuentas fuera de la organización, ni con condiciones de política a nivel de bucket" → <strong>RCP</strong>.
     </div>
 
-    <h2 id="access-analyzer">IAM Access Analyzer</h2>
-    <p class="lede">Tres capacidades distintas bajo el mismo servicio — el examen las pregunta por separado.</p>
+    <h2 id="access-analyzer">IAM Access Analyzer &amp; Policy Simulator</h2>
+    <p class="lede">Skill 4.2.4 nombra explícitamente ambas herramientas para analizar fallos de autorización — resuelven preguntas distintas.</p>
     <ul>
       <li><strong>External access findings</strong>: detecta recursos (buckets, roles, KMS keys, snapshots...) accesibles desde fuera de tu "zona de confianza" (cuenta u organización). Se define un analizador con el scope deseado.</li>
       <li><strong>Unused access findings</strong>: identifica roles no usados, permisos no ejercidos y access keys inactivas — soporte directo al principio de mínimo privilegio.</li>
@@ -327,6 +383,21 @@
     <pre><code>aws accessanalyzer list-findings-v2 \
   --analyzer-arn "arn:aws:access-analyzer:eu-west-1:111122223333:analyzer/org-analyzer" \
   --filter '{"findingType": {"eq": ["ExternalAccess"]}}'</code></pre>
+
+    <h3>IAM Policy Simulator</h3>
+    <p>Herramienta distinta y complementaria: en vez de analizar la postura real de la cuenta (como Access Analyzer), <strong>simula si una política concreta permitiría o denegaría una acción específica</strong> ANTES de aplicar ningún cambio real — sin generar llamadas reales a la API ni dejar rastro en CloudTrail.</p>
+    <table>
+      <tr><th></th><th>IAM Policy Simulator</th><th>IAM Access Analyzer</th></tr>
+      <tr><td><strong>Responde</strong></td><td>"¿Esta política permitiría esta acción concreta?"</td><td>"¿Qué acceso EXTERNO/NO USADO existe ahora mismo en la cuenta?"</td></tr>
+      <tr><td><strong>Cuándo se usa</strong></td><td>Antes de desplegar/depurar una política puntual</td><td>Auditoría continua de la postura real de permisos</td></tr>
+      <tr><td><strong>Genera tráfico real</strong></td><td>No</td><td>No (analiza metadatos de políticas)</td></tr>
+    </table>
+
+    <p class="code-label">Simular una acción vía CLI</p>
+    <pre><code>aws iam simulate-principal-policy \
+  --policy-source-arn "arn:aws:iam::111122223333:role/DevRole" \
+  --action-names "s3:DeleteBucket" \
+  --resource-arns "arn:aws:s3:::prod-critical-bucket"</code></pre>
 
     <h2 id="root">Root user &amp; MFA</h2>
     <ul>
@@ -356,7 +427,7 @@
     </table>
 
     <h2 id="quiz">Quiz de práctica — IAM</h2>
-    <p class="lede">20 preguntas estilo examen. Elige una opción para ver si es correcta y por qué.</p>
+    <p class="lede">26 preguntas estilo examen. Elige una opción para ver si es correcta y por qué.</p>
     <div id="quiz-root"></div>
 
   </main>
