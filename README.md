@@ -1,6 +1,8 @@
-# AWS Certified Security — Specialty (SCS-C02) — Guía interactiva
+# AWS Certified Security — Specialty (SCS-C03) — Guía interactiva
 
 Guía de estudio personal para el examen **AWS Certified Security — Specialty**, organizada por los dominios oficiales del examen. Cada módulo combina teoría estructurada, diagramas interactivos, comandos CLI/JSON reales y un quiz de práctica.
+
+> **Nota de versión:** el examen SCS-C02 se retiró el 1 dic. 2025. Desde el 2 dic. 2025 el único examen vigente es **SCS-C03** ([exam guide oficial](https://docs.aws.amazon.com/aws-certification/latest/security-specialty-03/security-specialty-03.html)), con dominios reestructurados respecto a SCS-C02. Esta guía sigue la numeración y pesos de SCS-C03.
 
 Sin frameworks ni build step: HTML/CSS/JS plano. Clona el repo y abre `index.html` en el navegador.
 
@@ -22,12 +24,12 @@ python3 -m http.server 8000
 
 | Dominio | Peso examen | Estado |
 |---|---|---|
-| 1. IAM & Gestión de Identidades | ~16% | ✅ Completo |
-| 2. Threat Detection & Incident Response | ~22% | ⏳ Pendiente |
-| 3. Security Logging & Monitoring | ~18% | ⏳ Pendiente |
-| 4. Infrastructure Security | ~24% | ⏳ Pendiente |
-| 5. Data Protection | ~18% | ⏳ Pendiente |
-| 6. Management & Security Governance | ~2% | ⏳ Pendiente |
+| 1. Detection | 16% | ⏳ Pendiente |
+| 2. Incident Response | 14% | ⏳ Pendiente |
+| 3. Infrastructure Security | 18% | ⏳ Pendiente |
+| 4. Identity and Access Management | 20% | ✅ Completo |
+| 5. Data Protection | 18% | ⏳ Pendiente |
+| 6. Security Foundations & Governance | 14% | ⏳ Pendiente |
 
 ## Estructura
 

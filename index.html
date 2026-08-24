@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AWS Security Specialist (SCS-C02) — Guía de Estudio</title>
+<title>AWS Security Specialist (SCS-C03) — Guía de Estudio</title>
 <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
@@ -13,61 +13,65 @@
     <div class="brand"><span class="dot">●</span> AWS Security Specialist</div>
     <nav class="topnav">
       <a href="index.html" class="active">Dominios</a>
-      <a href="https://aws.amazon.com/certification/certified-security-specialty/" target="_blank" rel="noopener">Exam guide oficial ↗</a>
+      <a href="https://docs.aws.amazon.com/aws-certification/latest/security-specialty-03/security-specialty-03.html" target="_blank" rel="noopener">Exam guide oficial ↗</a>
     </nav>
   </div>
 </header>
 
 <div class="wrap">
   <section class="hero">
-    <span class="badge">SCS-C02 · Actualizado 2026</span>
+    <span class="badge">SCS-C03 · vigente desde dic. 2025</span>
     <h1>Guía interactiva AWS Certified Security — Specialty</h1>
     <p>Repaso por dominios del examen: teoría estructurada, diagramas interactivos, comandos CLI/JSON reales y quizzes tipo examen. Contenido que se va ampliando módulo a módulo.</p>
+    <div class="callout warn" style="max-width:640px;">
+      <b>Nota de versión</b>
+      El examen <strong>SCS-C02 se retiró el 1 dic. 2025</strong>. Desde el 2 dic. 2025 el único examen vigente es <strong>SCS-C03</strong>, con dominios reestructurados (Detection e Incident Response separados, IAM sube a 20%). Esta guía sigue la numeración y pesos oficiales de SCS-C03.
+    </div>
   </section>
 
   <div class="grid">
 
+    <div class="card disabled">
+      <span class="status soon">Próximamente</span>
+      <div class="num">DOMINIO 1 · 16%</div>
+      <h3>Detection</h3>
+      <p>Monitoring y alerting a nivel cuenta/organización, diseño de logging (CloudTrail, Config, VPC Flow Logs), GuardDuty, Security Hub.</p>
+    </div>
+
+    <div class="card disabled">
+      <span class="status soon">Próximamente</span>
+      <div class="num">DOMINIO 2 · 14%</div>
+      <h3>Incident Response</h3>
+      <p>Diseño y test de un plan de respuesta a incidentes, respuesta a eventos de seguridad, forense en AWS.</p>
+    </div>
+
+    <div class="card disabled">
+      <span class="status soon">Próximamente</span>
+      <div class="num">DOMINIO 3 · 18%</div>
+      <h3>Infrastructure Security</h3>
+      <p>Edge services, controles de red (VPC, SG, NACLs, WAF, Shield, Network Firewall), seguridad de compute workloads.</p>
+    </div>
+
     <a class="card enabled" href="modules/iam/index.html">
       <div class="card-link" aria-hidden="true"></div>
       <span class="status ready">Listo</span>
-      <div class="num">DOMINIO 1 · ~16%</div>
-      <h3>IAM &amp; Gestión de Identidades</h3>
+      <div class="num">DOMINIO 4 · 20%</div>
+      <h3>Identity and Access Management</h3>
       <p>Policies, roles, IAM Identity Center, STS, Access Analyzer, permission boundaries, SCPs/RCPs, data perimeter.</p>
     </a>
 
     <div class="card disabled">
       <span class="status soon">Próximamente</span>
-      <div class="num">DOMINIO 2 · ~22%</div>
-      <h3>Threat Detection &amp; Incident Response</h3>
-      <p>GuardDuty, Security Hub, Detective, respuesta a incidentes, forense en AWS.</p>
-    </div>
-
-    <div class="card disabled">
-      <span class="status soon">Próximamente</span>
-      <div class="num">DOMINIO 3 · ~18%</div>
-      <h3>Security Logging &amp; Monitoring</h3>
-      <p>CloudTrail, CloudWatch, Config, VPC Flow Logs, análisis y alertas.</p>
-    </div>
-
-    <div class="card disabled">
-      <span class="status soon">Próximamente</span>
-      <div class="num">DOMINIO 4 · ~24%</div>
-      <h3>Infrastructure Security</h3>
-      <p>VPC, Security Groups, NACLs, WAF, Shield, Network Firewall, edge security.</p>
-    </div>
-
-    <div class="card disabled">
-      <span class="status soon">Próximamente</span>
-      <div class="num">DOMINIO 5 · ~18%</div>
+      <div class="num">DOMINIO 5 · 18%</div>
       <h3>Data Protection</h3>
-      <p>KMS, cifrado en tránsito/reposo, Secrets Manager, gestión de claves.</p>
+      <p>KMS, cifrado en tránsito/reposo, Secrets Manager, gestión de claves y certificados.</p>
     </div>
 
     <div class="card disabled">
       <span class="status soon">Próximamente</span>
-      <div class="num">DOMINIO 6 · ~2%</div>
-      <h3>Management &amp; Security Governance</h3>
-      <p>Organizations, Control Tower, multi-cuenta, estrategias de governance.</p>
+      <div class="num">DOMINIO 6 · 14%</div>
+      <h3>Security Foundations &amp; Governance</h3>
+      <p>Organizations, Control Tower, multi-cuenta, despliegue seguro y consistente, evaluación de compliance.</p>
     </div>
 
   </div>
