@@ -1,0 +1,507 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IAM & Identity Management — AWS Security Specialist (SCS-C03)</title>
+<link rel="stylesheet" href="../../../assets/css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="dot">●</span> AWS Security Specialist</div>
+    <nav class="topnav">
+      <a href="../../index.html">← Domains</a>
+      <span class="lang-switch"><a href="../../../modules/iam/index.html">ES</a><span class="current">EN</span></span>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero" style="padding-top:40px;">
+    <span class="badge">SCS-C03 · Domain 4 · 20% of the exam</span>
+    <h1>IAM &amp; Identity Management</h1>
+    <p>Identity and Access Management is the heaviest-weighted domain on the SCS-C03 exam (up from 16% to 20% compared to the retired SCS-C02 version): almost any question from other domains assumes you have mastered policy evaluation logic. This module covers the syllabus as updated for 2026, including RCPs, Declarative Policies, IAM Roles Anywhere, and Centralized Root Access Management.</p>
+  </section>
+</div>
+
+<div class="wrap module-layout">
+
+  <aside class="sidebar">
+    <h4>Fundamentals</h4>
+    <a href="#fundamentos">Policy types</a>
+    <a href="#evaluacion">Policy evaluation</a>
+    <h4>4.1 Authentication</h4>
+    <a href="#roles-sts">Roles, STS &amp; presigned URLs</a>
+    <a href="#cross-account">Cross-account access</a>
+    <a href="#identity-center">IAM Identity Center</a>
+    <a href="#cognito-directory">Cognito &amp; Directory Service</a>
+    <a href="#roles-anywhere">IAM Roles Anywhere</a>
+    <a href="#auth-troubleshooting">Auth troubleshooting</a>
+    <h4>4.2 Authorization</h4>
+    <a href="#boundaries">Boundaries, sessions &amp; IAM paths</a>
+    <a href="#abac">ABAC &amp; RBAC</a>
+    <a href="#verified-permissions">Amazon Verified Permissions</a>
+    <a href="#org-guardrails">SCP / RCP / Declarative</a>
+    <h4>Auditing &amp; hardening</h4>
+    <a href="#access-analyzer">Access Analyzer &amp; Policy Simulator</a>
+    <a href="#root">Root user &amp; MFA</a>
+    <a href="#perimeter">Data perimeter</a>
+    <h4>Practice</h4>
+    <a href="#quiz">Quiz (26 questions)</a>
+  </aside>
+
+  <main class="content">
+
+    <h2 id="fundamentos">Policy types in IAM</h2>
+    <p class="lede">Everything in IAM revolves around JSON policy documents evaluated against three questions: who (Principal)? what action? on what resource?</p>
+
+    <table>
+      <tr><th>Type</th><th>Attaches to</th><th>Key exam notes</th></tr>
+      <tr><td><strong>Identity-based (managed)</strong></td><td>Users, Groups, Roles</td><td>AWS managed (predefined by AWS) or Customer managed (created by you). Reusable and versioned.</td></tr>
+      <tr><td><strong>Identity-based (inline)</strong></td><td>A single User, Group, or Role</td><td>1:1 relationship, not reusable. Useful only for very specific edge cases; poor practice at scale.</td></tr>
+      <tr><td><strong>Resource-based</strong></td><td>The resource itself (S3, KMS, SQS, SNS, Lambda, Secrets Manager…)</td><td>The only type that can specify a <code>Principal</code> from ANOTHER account directly, enabling cross-account access without AssumeRole.</td></tr>
+      <tr><td><strong>Permission boundary</strong></td><td>Users or Roles</td><td>Grants no permissions on its own; it sets the maximum ceiling. The effective permission is the intersection.</td></tr>
+      <tr><td><strong>Organizations SCP</strong></td><td>Accounts / OUs</td><td>Guardrail that limits identities WITHIN the organization. Never grants permissions by itself.</td></tr>
+      <tr><td><strong>Organizations RCP</strong></td><td>Accounts / OUs</td><td>Guardrail that limits access to RESOURCES, including external/anonymous principals. Complements SCPs.</td></tr>
+      <tr><td><strong>Session policy</strong></td><td>Passed in when calling AssumeRole/GetFederationToken</td><td>Just like a boundary: it can only narrow, never widen, the role's permissions.</td></tr>
+    </table>
+
+    <div class="callout exam">
+      <b>Exam tip</b>
+      If a question describes "I want to cap what a developer can do even though their role has broad permissions" → <strong>permission boundary</strong>. If it describes "I want a guardrail that applies to an entire OU no matter what policy each user has" → <strong>SCP</strong> (identities) or <strong>RCP</strong> (resources).
+    </div>
+
+    <h2 id="evaluacion">Policy evaluation logic</h2>
+    <p class="lede">A near-guaranteed exam question. Click each step of the diagram to see the detail.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 700 560" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#7c8aa0"></path>
+          </marker>
+          <marker id="arrow-deny" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#ff6b6b"></path>
+          </marker>
+        </defs>
+
+        <!-- vertical connectors -->
+        <line class="dline" x1="230" y1="60" x2="230" y2="90" marker-end="url(#arrow)"></line>
+        <line class="dline" x1="230" y1="160" x2="230" y2="180" marker-end="url(#arrow)"></line>
+        <line class="dline" x1="230" y1="250" x2="230" y2="270" marker-end="url(#arrow)"></line>
+        <line class="dline" x1="230" y1="340" x2="230" y2="360" marker-end="url(#arrow)"></line>
+        <line class="dline" x1="230" y1="430" x2="230" y2="450" marker-end="url(#arrow)"></line>
+
+        <!-- deny branch lines -->
+        <line class="dline-deny" x1="420" y1="125" x2="530" y2="230" marker-end="url(#arrow-deny)"></line>
+        <line class="dline-deny" x1="420" y1="215" x2="530" y2="240" marker-end="url(#arrow-deny)"></line>
+        <line class="dline-deny" x1="420" y1="305" x2="530" y2="250" marker-end="url(#arrow-deny)"></line>
+        <line class="dline-deny" x1="420" y1="395" x2="530" y2="260" marker-end="url(#arrow-deny)"></line>
+        <text x="450" y="180" class="dlabel-deny">Fails →</text>
+
+        <!-- Step 1 -->
+        <g class="dstep" data-label="1. The request arrives." data-explain="A principal (user, role, or service) requests an action on a resource. AWS gathers ALL applicable policies — identity-based, resource-based, SCPs, RCPs, permission boundaries, and session policies — before deciding.">
+          <rect class="dbox" x="40" y="10" width="380" height="50" rx="8"></rect>
+          <text x="60" y="40" class="dtitle">1. The request arrives (Principal + Action + Resource)</text>
+        </g>
+
+        <!-- Step 2 -->
+        <g class="dstep" data-label="2. Explicit Deny?" data-explain="AWS checks ALL applicable policies for an explicit Deny. If even one exists — in an identity, resource, SCP, RCP, boundary, or session policy — the request is denied immediately. An explicit Deny always beats any Allow.">
+          <rect class="dbox" x="40" y="90" width="380" height="70" rx="8"></rect>
+          <text x="60" y="118" class="dtitle">2. Is there an explicit Deny in any</text>
+          <text x="60" y="136" class="dtitle">applicable policy?</text>
+        </g>
+
+        <!-- Step 3 -->
+        <g class="dstep" data-label="3. Do the organization's SCP / RCP allow it?" data-explain="If the account belongs to an Organization, the SCP must allow the action for that identity and the RCP must allow access to that resource. If no SCP/RCP is attached, the default is FullAWSAccess (allow) — they don't block anything by themselves when absent.">
+          <rect class="dbox" x="40" y="180" width="380" height="70" rx="8"></rect>
+          <text x="60" y="208" class="dtitle">3. Do the organization's SCP and RCP</text>
+          <text x="60" y="226" class="dtitle">allow the action?</text>
+        </g>
+
+        <!-- Step 4 -->
+        <g class="dstep" data-label="4. Explicit Allow?" data-explain="At least one explicit Allow is needed: in the principal's identity-based policy, OR in the resource's resource-based policy (if supported: S3, KMS, SQS...). With no explicit Allow anywhere, the default result is an implicit Deny.">
+          <rect class="dbox" x="40" y="270" width="380" height="70" rx="8"></rect>
+          <text x="60" y="298" class="dtitle">4. Is there an explicit Allow (identity-based</text>
+          <text x="60" y="316" class="dtitle">OR resource-based)?</text>
+        </g>
+
+        <!-- Step 5 -->
+        <g class="dstep" data-label="5. Do the boundary / session policy also allow it?" data-explain="If a permission boundary exists on the identity, or a session policy was passed when assuming the role, the final permission is the INTERSECTION: both the identity/resource policy AND the boundary/session policy must allow it.">
+          <rect class="dbox" x="40" y="360" width="380" height="70" rx="8"></rect>
+          <text x="60" y="388" class="dtitle">5. Do the permission boundary and session</text>
+          <text x="60" y="406" class="dtitle">policy (if any) also allow it?</text>
+        </g>
+
+        <!-- Step 6 ALLOW -->
+        <g class="dstep" data-label="6. ALLOW." data-explain="The action is allowed. Summarized order: explicit Deny &gt; SCP/RCP &gt; explicit Allow (identity or resource) &gt; intersection with boundary/session policy &gt; implicit Deny by default if nothing matches.">
+          <rect class="dbox dbox-allow" x="40" y="450" width="380" height="50" rx="8"></rect>
+          <text x="60" y="480" class="dtitle">6. ALLOW — the action is executed</text>
+        </g>
+
+        <!-- DENY box -->
+        <g class="dstep" data-label="DENY." data-explain="Any failure in steps 2 through 5 ends here: the request is denied. Remember IAM's default state is 'implicit deny' — everything is forbidden unless explicitly allowed.">
+          <rect class="dbox dbox-deny" x="530" y="220" width="130" height="60" rx="8"></rect>
+          <text x="558" y="256" class="dtitle">DENY</text>
+        </g>
+      </svg>
+      <div class="dexplain">Click any step of the diagram to see the detailed explanation.</div>
+      <p class="diagram-note">IAM policy evaluation order (updated with RCP, 2024+)</p>
+    </div>
+
+    <div class="callout plain">
+      <b>Step-by-step example</b>
+      Ana (a developer) tries to delete an object from the <code>finance-reports</code> bucket using <code>s3:DeleteObject</code>.<br><br>
+      <strong>1.</strong> The request arrives: Principal = Ana, Action = <code>s3:DeleteObject</code>, Resource = the object.<br>
+      <strong>2.</strong> Explicit Deny? The bucket policy for <code>finance-reports</code> has an explicit Deny for <code>s3:DeleteObject</code> except for the <code>FinanceAdmin</code> role. Ana isn't that role → <strong>immediate DENY</strong>, evaluation ends. It doesn't matter that her identity policy grants her <code>s3:*</code>: the explicit Deny in a third document (the bucket policy) still wins.<br><br>
+      If that Deny didn't exist, we'd keep going: does her OU's SCP allow <code>s3:DeleteObject</code>? Does Ana have an explicit Allow in her identity policy? Does her permission boundary also allow it? Only if all FOUR questions come back green does the delete go through.
+    </div>
+
+    <h2 id="roles-sts">IAM Roles &amp; AWS STS</h2>
+    <p class="lede">A Role is an identity with permission policies that has NO permanent credentials: it is "assumed" and generates temporary credentials via AWS STS (Security Token Service).</p>
+
+    <table>
+      <tr><th>STS API</th><th>When to use it</th></tr>
+      <tr><td><code>AssumeRole</code></td><td>General case: an IAM User or Role (same account or cross-account) assumes another role.</td></tr>
+      <tr><td><code>AssumeRoleWithSAML</code></td><td>Enterprise federation with a SAML 2.0 IdP (ADFS, Okta, Azure AD/Entra ID) without IAM users.</td></tr>
+      <tr><td><code>AssumeRoleWithWebIdentity</code></td><td>Mobile/web apps with OIDC login (Google, Facebook, Amazon Cognito). In production, better done via Cognito Identity Pools.</td></tr>
+      <tr><td><code>GetFederationToken</code></td><td>Legacy federation to grant limited access to users without an IAM identity, using the calling user's own credentials.</td></tr>
+      <tr><td><code>GetSessionToken</code></td><td>Temporary credentials for an existing IAM User, typically to enforce MFA on API calls.</td></tr>
+      <tr><td><code>DecodeAuthorizationMessage</code></td><td>Decodes the encoded error message when a call was denied (troubleshooting).</td></tr>
+    </table>
+
+    <p class="code-label">Trust policy (assume role policy document) for a role</p>
+    <pre><code>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": { "AWS": "arn:aws:iam::111122223333:root" },
+      "Action": "sts:AssumeRole",
+      "Condition": {
+        "StringEquals": { "sts:ExternalId": "unique-partner-id-2026" }
+      }
+    }
+  ]
+}</code></pre>
+
+    <p class="code-label">Assuming the role via AWS CLI</p>
+    <pre><code>aws sts assume-role \
+  --role-arn "arn:aws:iam::444455556666:role/CrossAccountAuditRole" \
+  --role-session-name "juan-audit-session" \
+  --external-id "unique-partner-id-2026" \
+  --duration-seconds 3600</code></pre>
+
+    <div class="callout warn">
+      <b>Watch out</b>
+      <code>sts:ExternalId</code> is mandatory when a third party (a SaaS provider, an external auditor) assumes your role, to mitigate the <em>confused deputy problem</em>. Always combine it with <code>aws:SourceArn</code>/<code>aws:SourceAccount</code> when the one assuming is an AWS service acting on behalf of another customer.
+    </div>
+
+    <h3>Amazon S3 presigned URLs — the other way to grant temporary access</h3>
+    <p>The SCS-C03 exam guide groups STS and <strong>S3 presigned URLs</strong> under the same skill: "mechanisms for issuing temporary credentials." They are not the same thing, and the exam distinguishes when to use each:</p>
+    <ul>
+      <li>A presigned URL doesn't generate new credentials: it <strong>signs a URL with the credentials of whoever generates it</strong> (user or role), delegating access to ONE action on ONE specific object for a limited time (up to 7 days with SigV4 and IAM Role credentials, or up to 12h if signed with a role's temporary credentials).</li>
+      <li>Ideal for letting a client without AWS credentials (a browser, an external app) upload or download a single S3 object, without ever exposing access keys or requiring it to assume a role.</li>
+      <li>If whoever generated the URL loses the underlying permission (their role/policy is revoked) before it expires, the URL stops working — it's still evaluated against IAM on every use.</li>
+    </ul>
+    <p class="code-label">Generating a presigned URL via CLI (expires in 300s)</p>
+    <pre><code>aws s3 presign s3://reports-bucket/2026/audit-final.pdf --expires-in 300</code></pre>
+
+    <div class="callout azure">
+      <b>Coming from Azure</b>
+      <table>
+        <tr><th>Azure</th><th>AWS</th><th>Key difference</th></tr>
+        <tr><td><strong>Managed Identity</strong> (system/user-assigned) on a VM/Function App</td><td><strong>Instance Profile</strong> (EC2) / execution role (Lambda, ECS)</td><td>Practically identical: the SDK fetches credentials automatically, your code never manages or sees them.</td></tr>
+        <tr><td><strong>Service Principal</strong> + client secret/certificate, token via MSAL</td><td>Manual <strong>sts:AssumeRole</strong> (with or without ExternalId)</td><td>Here you explicitly call the API yourself to exchange an identity for a temporary token/credential.</td></tr>
+      </table>
+    </div>
+
+    <h2 id="cross-account">Cross-account access &amp; confused deputy</h2>
+    <p class="lede">The most-tested pattern on the exam: a user in Account A needs to operate on resources in Account B.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 700 470" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#7c8aa0"></path>
+          </marker>
+        </defs>
+
+        <line class="dline" x1="230" y1="60" x2="230" y2="90" marker-end="url(#arrow2)"></line>
+        <line class="dline" x1="230" y1="160" x2="230" y2="190" marker-end="url(#arrow2)"></line>
+        <line class="dline" x1="230" y1="260" x2="230" y2="290" marker-end="url(#arrow2)"></line>
+        <line class="dline" x1="230" y1="360" x2="230" y2="390" marker-end="url(#arrow2)"></line>
+
+        <g class="dstep" data-label="1. Account A — source User/Role." data-explain="An IAM User or Role in Account A (for example a platform engineer) needs to temporarily operate on resources that live in Account B (for example the production account).">
+          <rect class="dbox" x="40" y="10" width="380" height="50" rx="8"></rect>
+          <text x="60" y="40" class="dtitle">1. Account A: source User/Role</text>
+        </g>
+
+        <g class="dstep" data-label="2. Outbound permission in Account A." data-explain="The user/role's identity policy in Account A must explicitly allow the sts:AssumeRole action on the target role's ARN in Account B. Without this 'outbound' permission, the AssumeRole fails even if Account B authorizes it.">
+          <rect class="dbox" x="40" y="90" width="380" height="70" rx="8"></rect>
+          <text x="60" y="118" class="dtitle">2. Identity policy in Account A allows</text>
+          <text x="60" y="136" class="dtitle">sts:AssumeRole on the Account B role</text>
+        </g>
+
+        <g class="dstep" data-label="3. Trust policy in Account B." data-explain="The IAM Role in Account B has a trust policy (assume role policy document) whose Principal references Account A (or a specific ARN). STS validates this trust policy — it's the 'inbound' permission. Both sides (2 and 3) are mandatory.">
+          <rect class="dbox" x="40" y="190" width="380" height="70" rx="8"></rect>
+          <text x="60" y="218" class="dtitle">3. The Role's trust policy in Account B</text>
+          <text x="60" y="236" class="dtitle">authorizes Account A as Principal</text>
+        </g>
+
+        <g class="dstep" data-label="4. STS returns temporary credentials." data-explain="If both permissions (outbound + trust policy) are valid, STS returns an AccessKeyId, SecretAccessKey, and SessionToken, valid for between 15 minutes and 12 hours depending on the role's configuration (MaxSessionDuration).">
+          <rect class="dbox" x="40" y="290" width="380" height="70" rx="8"></rect>
+          <text x="60" y="318" class="dtitle">4. STS returns temporary credentials</text>
+          <text x="60" y="336" class="dtitle">(AccessKey + SecretKey + SessionToken)</text>
+        </g>
+
+        <g class="dstep" data-label="5. Access to the resource in Account B." data-explain="The original user uses the temporary credentials to operate on resources in Account B, with whatever permissions are attached to the assumed role (never more than that, and less if a session policy was used).">
+          <rect class="dbox dbox-allow" x="40" y="390" width="380" height="50" rx="8"></rect>
+          <text x="60" y="420" class="dtitle">5. The resource in Account B is accessed</text>
+        </g>
+      </svg>
+      <div class="dexplain">Click any step of the diagram to see the detailed explanation.</div>
+      <p class="diagram-note">Cross-account AssumeRole flow (requires outbound permission AND inbound trust policy)</p>
+    </div>
+
+    <div class="callout plain">
+      <b>Example: why ExternalId exists</b>
+      You hire "DataSync Corp" (a third-party SaaS) to back up your S3 bucket. You give them the ARN of a role in your account with a trust policy that trusts DataSync Corp's AWS account. Problem: DataSync Corp has <em>hundreds</em> of customers, and their generic trust policy could let them assume that role using the same account credentials for anyone. If another DataSync Corp customer (maliciously, or due to a misconfiguration on DataSync Corp's own side) manages to get the service to assume YOUR role instead of theirs, they access your data without you ever having granted it to them directly — that's the "confused deputy" (DataSync Corp is the "confused deputy"). By requiring a unique <code>sts:ExternalId</code> known only to you and DataSync Corp, your trust policy only trusts the exact account+ExternalId combination, closing that gap.
+    </div>
+
+    <div class="callout azure">
+      <b>Coming from Azure</b>
+      The closest equivalent here is <strong>Azure Lighthouse</strong>: it lets a management tenant (e.g. an MSP) operate resources within your tenant without switching context. The important difference for the exam: in Azure Lighthouse the delegation is <em>persistent and visible</em> directly in the managing tenant's portal (there's no explicit "assume" on every operation); in AWS, cross-account access is <em>always</em> an explicit call to <code>sts:AssumeRole</code> that generates temporary, expiring credentials — a model actually closer to requesting a token for a Service Principal with permissions delegated in your tenant via Azure AD.
+    </div>
+
+    <h2 id="identity-center">IAM Identity Center</h2>
+    <p class="lede">Successor to AWS SSO. It's AWS's recommended way to manage multi-account human access in 2026, over creating individual IAM Users.</p>
+    <ul>
+      <li><strong>Permission Sets</strong>: permission templates (managed or customer policies + permission boundaries) defined once and assigned to accounts/groups. Identity Center automatically provisions the underlying IAM Roles in each account.</li>
+      <li><strong>Identity source</strong>: can use Identity Center's internal directory, or federate with an external IdP (Okta, Azure AD/Entra ID, Google Workspace, Ping) via SAML/SCIM to sync users and groups automatically.</li>
+      <li><strong>Built-in attribute-based access control (ABAC)</strong>: Identity Center can pass user attributes (department, cost center) as session tags when assuming the permission set.</li>
+      <li>Replaces the old pattern of "one IAM User per person + long-lived credentials" — drastically reducing the risk of leaked access keys.</li>
+    </ul>
+
+    <div class="callout azure">
+      <b>Coming from Azure</b>
+      <table>
+        <tr><th>Azure</th><th>AWS</th><th>Key difference</th></tr>
+        <tr><td><strong>Microsoft Entra ID</strong> (tenant)</td><td><strong>AWS Organization + IAM Identity Center</strong></td><td>In Azure the Entra ID tenant IS your central identity. In AWS these are two separate things: the Organization groups ACCOUNTS (closer to "subscriptions"), and Identity Center is the identity layer that connects on top of it.</td></tr>
+        <tr><td>Entra ID group + Azure RBAC role assignment (scope: subscription/RG)</td><td>Group assigned to a <strong>Permission Set</strong> over one or more accounts</td><td>Conceptually almost identical: group + role + scope.</td></tr>
+        <tr><td>Enterprise Applications (federated SSO)</td><td>Apps federated via SAML/OIDC in Identity Center</td><td>Same concept, different console.</td></tr>
+      </table>
+    </div>
+
+    <h2 id="cognito-directory">Amazon Cognito &amp; AWS Directory Service</h2>
+    <p class="lede">Skill 4.1.1 explicitly groups IAM Identity Center, Cognito, and MFA as the three pieces for authenticating humans, applications, and systems. Identity Center covers human access to AWS accounts; Cognito covers end users of your own applications.</p>
+
+    <table>
+      <tr><th>Component</th><th>What it's for</th><th>Key detail</th></tr>
+      <tr><td><strong>Cognito User Pools</strong></td><td>User directory for YOUR application (sign-up/sign-in, MFA, email/SMS verification)</td><td>Returns JSON Web Tokens (ID, Access, Refresh) after login. Does not grant AWS credentials by itself.</td></tr>
+      <tr><td><strong>Cognito Identity Pools</strong></td><td>Exchanges an already-authenticated identity (from a User Pool, Google, SAML...) for <strong>temporary AWS credentials</strong></td><td>The recommended layer over <code>AssumeRoleWithWebIdentity</code> — it manages the exchange securely without exposing secrets on the client.</td></tr>
+      <tr><td><strong>AWS Directory Service</strong></td><td>Managed Active Directory directories for on-prem/hybrid enterprise authentication</td><td>3 modes: <strong>AWS Managed Microsoft AD</strong> (a real, managed AD, supports trusts), <strong>AD Connector</strong> (a proxy to an existing on-premises AD, without replicating data), and <strong>Simple AD</strong> (Samba-compatible, reduced functionality).</td></tr>
+    </table>
+
+    <div class="callout exam">
+      <b>How to tell them apart on the exam</b>
+      "End users of my web/mobile app log in" → <strong>Cognito</strong>. "Company employees access the AWS console/CLI with their corporate account" → <strong>IAM Identity Center</strong> (possibly federated against AD via Directory Service). "I want to expose an existing on-premises AD to AWS services without migrating it" → <strong>AD Connector</strong>.
+    </div>
+
+    <div class="callout azure">
+      <b>Coming from Azure</b>
+      <strong>Cognito User Pools</strong> is the equivalent of <strong>Azure AD B2C / Microsoft Entra External ID</strong>: identity management for customers/end users of YOUR application, separate from the corporate tenant. <strong>Cognito Identity Pools</strong> has no direct analog in Azure — the usual way there to grant an authenticated external user access to resources is through a token validated by your own backend, which then uses ITS OWN identity (Managed Identity or Service Principal) to touch the resources, rather than "swapping" the end user's token for cloud credentials the way Cognito Identity Pools does.
+    </div>
+
+    <h2 id="roles-anywhere">IAM Roles Anywhere</h2>
+    <p class="lede">Extends IAM roles to workloads running OUTSIDE of AWS: on-premises servers, other cloud providers, edge devices.</p>
+    <ul>
+      <li>Requires a <strong>trusted private CA</strong> (ACM Private CA or another CA registered as a trust anchor) that issues X.509 certificates to each server/workload.</li>
+      <li>The workload presents its certificate to the Roles Anywhere endpoint, which validates it and exchanges it for temporary AWS credentials via STS — the same principle as AssumeRoleWithSAML but with certificates instead of SAML assertions.</li>
+      <li>Removes the need for long-lived access keys manually distributed to servers outside AWS.</li>
+    </ul>
+
+    <h2 id="auth-troubleshooting">Authentication troubleshooting</h2>
+    <p class="lede">Skill 4.1.3, explicit in the exam guide: knowing where to look when someone "can't log in" is just as testable as configuring it.</p>
+    <ul>
+      <li><strong>CloudTrail</strong>: the first place to check for a failed <code>AssumeRole</code>/<code>ConsoleLogin</code> event and its exact reason (<code>errorCode</code>, <code>errorMessage</code>) — includes attempts denied by trust policy, missing MFA, or an SCP.</li>
+      <li><strong>Cognito</strong>: review Advanced Security Features logs and User Pool events (verification failures, throttling, Lambda triggers blocking login).</li>
+      <li><strong>IAM Identity Center permission sets</strong>: an edited permission set doesn't auto-reprovision in accounts — it has to be reapplied, a common cause of "I removed the permission but they still have access" or the reverse.</li>
+      <li><strong>AWS Directory Service</strong>: network connectivity issues (Security Groups, NACLs) between the VPC and on-premises DCs are the most common cause of AD Connector failures.</li>
+    </ul>
+
+    <h2 id="boundaries">Permission boundaries, session policies &amp; IAM paths</h2>
+    <p class="lede">Both mechanisms share the same rule: <strong>they never widen permissions, only narrow them</strong> via intersection with the identity/resource policy.</p>
+
+    <p class="code-label">Permission boundary — a developer can only touch S3 and DynamoDB, never IAM</p>
+    <pre><code>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:*", "dynamodb:*"],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Deny",
+      "Action": ["iam:*"],
+      "Resource": "*"
+    }
+  ]
+}</code></pre>
+
+    <div class="callout exam">
+      <b>Typical exam use case</b>
+      "Allow developers to create their own IAM roles, but without letting them grant themselves admin permissions" → attach a mandatory permission boundary in the policy that grants them <code>iam:CreateRole</code>, using the <code>iam:PermissionsBoundary</code> condition.
+    </div>
+
+    <div class="callout plain">
+      <b>Plain-language example — no direct Azure equivalent</b>
+      Imagine you give an intern the <strong>Contributor</strong> role over a resource group in Azure. If tomorrow someone (by mistake or maliciously) also assigns them the <strong>Owner</strong> role, there's no native Azure RBAC mechanism that says "no matter what role gets assigned afterward, this intern can NEVER exceed ceiling X." Every role assignment is independent. <strong>In AWS that structural ceiling does exist</strong>: if the intern has a permission boundary that only allows S3/DynamoDB, even if someone mistakenly attaches <code>AdministratorAccess</code> as their identity policy, their real permissions stay capped at S3/DynamoDB — the boundary always wins. That's why the exam asks about it so much: it's a genuinely different concept from "assigning a role with more or fewer permissions."
+    </div>
+
+    <h3>IAM paths — organizing and scoping identities by prefix</h3>
+    <p>Every IAM User and Role has an optional <strong>path</strong> (default <code>/</code>) that's part of its ARN: <code>arn:aws:iam::111122223333:role/division_abc/subdivision_xyz/my-role</code>. Skill 4.2.1 lists it alongside resource policies and trust policies as an authorization control mechanism.</p>
+    <ul>
+      <li>Useful for <strong>grouping identities by team/project</strong> and then writing administration policies that only allow managing roles/users under a specific path, using conditions like <code>iam:ResourceTag</code> or restricting the <code>Resource</code> with a wildcard over the path (<code>arn:aws:iam::*:role/division_abc/*</code>).</li>
+      <li>A typical exam scenario: delegating role creation to a platform team scoped only to their own path, combined with a mandatory permission boundary — a double least-privilege control.</li>
+    </ul>
+
+    <h2 id="abac">ABAC &amp; RBAC — attribute-based vs. role-based access control</h2>
+    <p class="lede">RBAC (role-based) is the classic model: one policy per business role/function. ABAC (attribute-based) compares tags on the principal with tags on the resource — scaling without rewriting policies as the number of resources grows.</p>
+
+    <p class="code-label">ABAC policy: access only to resources with the same "project" as the user</p>
+    <pre><code>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["ec2:StartInstances", "ec2:StopInstances"],
+      "Resource": "arn:aws:ec2:*:*:instance/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceTag/project": "${aws:PrincipalTag/project}"
+        }
+      }
+    }
+  ]
+}</code></pre>
+    <ul>
+      <li>Requires enabling <strong>tag-based access control</strong> and consistently tagging both identities (via Identity Center session tags or IAM Role tags) and resources.</li>
+      <li>Ideal for multi-team environments where the number of resources keeps growing — avoids maintaining hundreds of specific policies.</li>
+    </ul>
+
+    <div class="callout azure">
+      <b>Coming from Azure</b>
+      Azure also has <strong>ABAC</strong>, but with much narrower scope: in Azure, attribute-based role conditions are only supported on <strong>Blob Storage and a handful of specific resource types</strong> (e.g. "read-only access to blobs tagged Project=Finance"). In AWS, ABAC works across most services (EC2, S3, KMS, Secrets Manager...) because it's implemented directly as conditions within any IAM policy, rather than as a separate capability of one particular service.
+    </div>
+
+    <h2 id="verified-permissions">Amazon Verified Permissions</h2>
+    <p class="lede">Everything above (identity-based, resource-based, ABAC) authorizes access to the AWS API. Amazon Verified Permissions solves a different problem: <strong>fine-grained authorization inside YOUR OWN applications</strong> (can this user view this document? can they edit this order?), outside the AWS control plane.</p>
+    <ul>
+      <li>A managed authorization engine based on <strong>Cedar</strong>, AWS's open-source policy language: readable policies like <code>permit(principal == User::"ana", action == Action::"viewDocument", resource in Folder::"finance")</code>.</li>
+      <li>Integrates into your application code via SDK/API (<code>IsAuthorized</code>) — the app asks Verified Permissions on every request whether that specific action is allowed, instead of hardcoding authorization logic.</li>
+      <li>Supports RBAC and ABAC within the Cedar model itself, and integrates natively with Cognito to use the authenticated user's groups/attributes.</li>
+    </ul>
+    <div class="callout">
+      <b>How to tell it apart on the exam</b>
+      If the question is about permissions on <strong>calls to the AWS API</strong> (S3, EC2, IAM...) → classic IAM policy. If it's about <strong>business logic inside your application</strong> ("which documents can this user of my SaaS see") → Amazon Verified Permissions.
+    </div>
+
+    <h2 id="org-guardrails">Organization guardrails: SCP, RCP, and Declarative Policies</h2>
+
+    <table>
+      <tr><th>Mechanism</th><th>What it limits</th><th>Applies to</th></tr>
+      <tr><td><strong>Service Control Policy (SCP)</strong></td><td>The maximum permission the account's IDENTITIES can use (even if IAM says yes, if the SCP doesn't allow it, it's denied)</td><td>Accounts / OUs within the Organization</td></tr>
+      <tr><td><strong>Resource Control Policy (RCP)</strong></td><td>Who can access the account's RESOURCES, including external and anonymous principals — closes the gap SCPs don't cover</td><td>Supported resources (S3, STS, KMS, SQS, Secrets Manager…) in accounts / OUs</td></tr>
+      <tr><td><strong>Declarative Policies</strong></td><td>Enforces a desired configuration state for specific service attributes (e.g. requiring IMDSv2, blocking public ports by default) — it's not API allow/deny, it's "this is how it must always be configured"</td><td>Specific supported attributes, at account / OU level</td></tr>
+    </table>
+
+    <div class="callout">
+      <b>How to tell them apart on the exam</b>
+      If the question says "we want no account to be able to disable EBS default encryption, no matter what" → <strong>Declarative Policy</strong>. If it says "we want no one in the organization to be able to use the eu-west-1 region" → <strong>SCP</strong>. If it says "we want no S3 bucket in the organization to be shareable with accounts outside the organization, even with bucket-level policy conditions" → <strong>RCP</strong>.
+    </div>
+
+    <div class="callout warn">
+      <b>Watch out if you're coming from Azure — a naming trap</b>
+      "Service Control Policy" sounds like <strong>Azure Policy</strong>, but they are NOT the same thing. Azure Policy mainly audits/enforces the <em>configuration</em> of resources as they're created (e.g. "every storage account must require HTTPS") — that's actually much closer to AWS <strong>Declarative Policies</strong> or Config Rules. An SCP, by contrast, is a ceiling on <em>IAM permissions</em> (what actions an identity can execute), and its closest Azure equivalent is <strong>deny assignments</strong> (used in Blueprints/Landing Zones), which block actions at the Management Group level regardless of what RBAC role the user has been assigned. If you see "SCP" on the exam, think denied permissions, not configuration compliance.
+    </div>
+
+    <h2 id="access-analyzer">IAM Access Analyzer &amp; Policy Simulator</h2>
+    <p class="lede">Skill 4.2.4 explicitly names both tools for analyzing authorization failures — they answer different questions.</p>
+    <ul>
+      <li><strong>External access findings</strong>: detects resources (buckets, roles, KMS keys, snapshots...) accessible from outside your "zone of trust" (account or organization). An analyzer is defined with the desired scope.</li>
+      <li><strong>Unused access findings</strong>: identifies unused roles, unexercised permissions, and inactive access keys — direct support for the least-privilege principle.</li>
+      <li><strong>Policy validation &amp; custom policy checks</strong>: validates syntax and best practices as you write policies in the console/CLI, and even lets you check whether a policy change introduces new external access before deploying it (<code>CheckNoNewAccess</code> / <code>CheckAccessNotGranted</code>).</li>
+    </ul>
+
+    <p class="code-label">Listing external access findings via CLI</p>
+    <pre><code>aws accessanalyzer list-findings-v2 \
+  --analyzer-arn "arn:aws:access-analyzer:eu-west-1:111122223333:analyzer/org-analyzer" \
+  --filter '{"findingType": {"eq": ["ExternalAccess"]}}'</code></pre>
+
+    <h3>IAM Policy Simulator</h3>
+    <p>A distinct, complementary tool: instead of analyzing the account's real posture (like Access Analyzer), it <strong>simulates whether a specific policy would allow or deny a given action</strong> BEFORE any real change is applied — without generating real API calls or leaving a trace in CloudTrail.</p>
+    <table>
+      <tr><th></th><th>IAM Policy Simulator</th><th>IAM Access Analyzer</th></tr>
+      <tr><td><strong>Answers</strong></td><td>"Would this policy allow this specific action?"</td><td>"What EXTERNAL/UNUSED access exists right now in the account?"</td></tr>
+      <tr><td><strong>When to use it</strong></td><td>Before deploying/debugging a specific policy</td><td>Continuous auditing of the account's real permission posture</td></tr>
+      <tr><td><strong>Generates real traffic</strong></td><td>No</td><td>No (analyzes policy metadata)</td></tr>
+    </table>
+
+    <p class="code-label">Simulating an action via CLI</p>
+    <pre><code>aws iam simulate-principal-policy \
+  --policy-source-arn "arn:aws:iam::111122223333:role/DevRole" \
+  --action-names "s3:DeleteBucket" \
+  --resource-arns "arn:aws:s3:::prod-critical-bucket"</code></pre>
+
+    <h2 id="root">Root user &amp; MFA</h2>
+    <ul>
+      <li><strong>Never use the root user</strong> for day-to-day tasks. Enable MFA (preferably FIDO2/hardware security key) and never generate access keys for root.</li>
+      <li><strong>Centralized Root Access Management</strong> (Organizations, 2023+): lets you centrally manage member accounts' root credentials and invoke a scoped set of privileged root actions without repeating the password-recovery process account by account.</li>
+      <li><code>aws:MultiFactorAuthPresent</code> condition to require MFA on API calls; combine it with <code>aws:MultiFactorAuthAge</code> to cap the maximum age of the MFA session.</li>
+      <li><strong>IAM credential report</strong> (whole account) vs <strong>Access Advisor</strong> (per user/role, which services were used and when) — both key for periodic audits.</li>
+    </ul>
+
+    <p class="code-label">Requiring MFA for any action on EC2</p>
+    <pre><code>{
+  "Effect": "Deny",
+  "Action": "ec2:*",
+  "Resource": "*",
+  "Condition": {
+    "BoolIfExists": { "aws:MultiFactorAuthPresent": "false" }
+  }
+}</code></pre>
+
+    <div class="callout azure">
+      <b>Coming from Azure</b>
+      Here the gap runs the opposite way from usual: in Azure, <strong>Conditional Access</strong> is a centralized engine that evaluates signals (location, user risk, device compliance...) and decides in one place whether to require MFA, block access, or force a managed device, applied uniformly across the whole tenant. AWS <strong>has no equivalent centralized engine</strong>: the <code>aws:MultiFactorAuthPresent</code> condition has to be added policy by policy (or centrally via SCP/RCP, but it's still a yes/no condition, not an adaptive risk engine). If an exam question sounds like "adaptive, risk-based conditional access policies," the correct answer probably combines several services (IAM + GuardDuty + Identity Center), not a single service equivalent to Conditional Access.
+    </div>
+
+    <h2 id="perimeter">Data perimeter</h2>
+    <p class="lede">A cross-cutting concept heavily featured on the 2026 exam: guaranteeing that data never leaves your organization, even with valid, compromised credentials.</p>
+    <table>
+      <tr><th>Perimeter</th><th>Question it answers</th><th>Typical controls</th></tr>
+      <tr><td>Identity</td><td>Who can access?</td><td>SCP/RCP with <code>aws:PrincipalOrgID</code></td></tr>
+      <tr><td>Resource</td><td>Which resources are trusted?</td><td>RCP/SCP with <code>aws:ResourceOrgID</code>, restrictive resource policies</td></tr>
+      <tr><td>Network</td><td>What network is the access coming from?</td><td>VPC endpoint policies + <code>aws:SourceVpce</code> / <code>aws:SourceIp</code></td></tr>
+    </table>
+
+    <h2 id="quiz">Practice quiz — IAM</h2>
+    <p class="lede">26 exam-style questions. Pick an option to see if it's correct and why.</p>
+    <div id="quiz-root"></div>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">Personal study guide — not official AWS material. Content reviewed as of 2026.</div>
+</footer>
+
+<script src="quiz-data.js"></script>
+<script src="../../../assets/js/quiz.en.js"></script>
+<script src="../../../assets/js/app.js"></script>
+</body>
+</html>

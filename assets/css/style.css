@@ -90,9 +90,30 @@ a:hover { text-decoration: underline; }
   color: var(--text);
 }
 .brand .dot { color: var(--accent); }
-.topnav { display: flex; gap: 18px; font-size: 14px; }
+.topnav { display: flex; gap: 18px; font-size: 14px; align-items: center; }
 .topnav a { color: var(--text-dim); }
 .topnav a:hover, .topnav a.active { color: var(--accent); text-decoration: none; }
+
+.lang-switch {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 2px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.lang-switch a, .lang-switch span {
+  padding: 3px 9px;
+  border-radius: 999px;
+  color: var(--text-faint);
+}
+.lang-switch a:hover { color: var(--text); text-decoration: none; }
+.lang-switch .current {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
 
 /* ---- hero ---- */
 .hero {
