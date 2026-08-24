@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IAM & Gestión de Identidades — AWS Security Specialist</title>
+<link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="dot">●</span> AWS Security Specialist</div>
+    <nav class="topnav">
+      <a href="../../index.html">← Dominios</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero" style="padding-top:40px;">
+    <span class="badge">Dominio 1 · ~16% del examen</span>
+    <h1>IAM &amp; Gestión de Identidades</h1>
+    <p>Identity and Access Management es la base de todo el examen: casi cualquier pregunta de otros dominios asume que dominas la lógica de evaluación de políticas. Este módulo cubre el temario actualizado a 2026, incluyendo RCPs, Declarative Policies, IAM Roles Anywhere y Centralized Root Access Management.</p>
+  </section>
+</div>
+
+<div class="wrap module-layout">
+
+  <aside class="sidebar">
+    <h4>Fundamentos</h4>
+    <a href="#fundamentos">Tipos de políticas</a>
+    <a href="#evaluacion">Evaluación de políticas</a>
+    <h4>Roles &amp; Federación</h4>
+    <a href="#roles-sts">Roles &amp; STS</a>
+    <a href="#cross-account">Acceso cross-account</a>
+    <a href="#identity-center">IAM Identity Center</a>
+    <a href="#roles-anywhere">IAM Roles Anywhere</a>
+    <h4>Control granular</h4>
+    <a href="#boundaries">Permission boundaries</a>
+    <a href="#abac">ABAC (tags)</a>
+    <a href="#org-guardrails">SCP / RCP / Declarative</a>
+    <h4>Auditoría &amp; hardening</h4>
+    <a href="#access-analyzer">IAM Access Analyzer</a>
+    <a href="#root">Root user &amp; MFA</a>
+    <a href="#perimeter">Data perimeter</a>
+    <h4>Práctica</h4>
+    <a href="#quiz">Quiz (20 preguntas)</a>
+  </aside>
+
+  <main class="content">
+
+    <h2 id="fundamentos">Tipos de políticas en IAM</h2>
+    <p class="lede">Todo en IAM gira en torno a documentos de política en JSON evaluados sobre tres preguntas: ¿quién (Principal)?, ¿qué acción?, ¿sobre qué recurso?</p>
+
+    <table>
+      <tr><th>Tipo</th><th>Se adjunta a</th><th>Notas clave para el examen</th></tr>
+      <tr><td><strong>Identity-based (managed)</strong></td><td>Users, Groups, Roles</td><td>AWS managed (predefinidas por AWS) o Customer managed (creadas por ti). Reutilizables y versionadas.</td></tr>
+      <tr><td><strong>Identity-based (inline)</strong></td><td>Un único User, Group o Role</td><td>Relación 1:1, no reutilizable. Útil solo para casos muy puntuales; mala práctica a escala.</td></tr>
+      <tr><td><strong>Resource-based</strong></td><td>El propio recurso (S3, KMS, SQS, SNS, Lambda, Secrets Manager…)</td><td>Único tipo que puede especificar un <code>Principal</code> de OTRA cuenta directamente, habilitando acceso cross-account sin AssumeRole.</td></tr>
+      <tr><td><strong>Permission boundary</strong></td><td>Users o Roles</td><td>No otorga permisos; define el techo máximo. El efectivo es la intersección.</td></tr>
+      <tr><td><strong>Organizations SCP</strong></td><td>Cuentas / OUs</td><td>Guardrail que limita identidades DENTRO de la organización. Nunca otorga permisos por sí sola.</td></tr>
+      <tr><td><strong>Organizations RCP</strong></td><td>Cuentas / OUs</td><td>Guardrail que limita el acceso a los RECURSOS, incluyendo principals externos/anónimos. Complementa a SCP.</td></tr>
+      <tr><td><strong>Session policy</strong></td><td>Se pasa al hacer AssumeRole/GetFederationToken</td><td>Igual que un boundary: solo puede acotar, nunca ampliar, los permisos del rol.</td></tr>
+    </table>
+
+    <div class="callout exam">
+      <b>Tip de examen</b>
+      Si una pregunta describe "quiero limitar lo máximo que un desarrollador puede hacer aunque su rol tenga permisos amplios" → <strong>permission boundary</strong>. Si describe "quiero un guardrail que aplique a toda una OU sin importar qué política tenga cada usuario" → <strong>SCP</strong> (identidades) o <strong>RCP</strong> (recursos).
+    </div>
+
+    <h2 id="evaluacion">Lógica de evaluación de políticas</h2>
+    <p class="lede">Pregunta casi garantizada en el examen. Haz clic en cada paso del diagrama para ver el detalle.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 700 560" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#7c8aa0"></path>
+          </marker>
+          <marker id="arrow-deny" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#ff6b6b"></path>
+          </marker>
+        </defs>
+
+        <!-- vertical connectors -->
+        <line class="dline" x1="230" y1="60" x2="230" y2="90" marker-end="url(#arrow)"></line>
+        <line class="dline" x1="230" y1="160" x2="230" y2="180" marker-end="url(#arrow)"></line>
+        <line class="dline" x1="230" y1="250" x2="230" y2="270" marker-end="url(#arrow)"></line>
+        <line class="dline" x1="230" y1="340" x2="230" y2="360" marker-end="url(#arrow)"></line>
+        <line class="dline" x1="230" y1="430" x2="230" y2="450" marker-end="url(#arrow)"></line>
+
+        <!-- deny branch lines -->
+        <line class="dline-deny" x1="420" y1="125" x2="530" y2="230" marker-end="url(#arrow-deny)"></line>
+        <line class="dline-deny" x1="420" y1="215" x2="530" y2="240" marker-end="url(#arrow-deny)"></line>
+        <line class="dline-deny" x1="420" y1="305" x2="530" y2="250" marker-end="url(#arrow-deny)"></line>
+        <line class="dline-deny" x1="420" y1="395" x2="530" y2="260" marker-end="url(#arrow-deny)"></line>
+        <text x="450" y="180" class="dlabel-deny">No cumple →</text>
+
+        <!-- Step 1 -->
+        <g class="dstep" data-label="1. Llega la petición." data-explain="Un principal (usuario, rol o servicio) solicita una acción sobre un recurso. AWS reúne TODAS las políticas aplicables: identity-based, resource-based, SCPs, RCPs, permission boundaries y session policies antes de decidir.">
+          <rect class="dbox" x="40" y="10" width="380" height="50" rx="8"></rect>
+          <text x="60" y="40" class="dtitle">1. Llega la petición (Principal + Acción + Recurso)</text>
+        </g>
+
+        <!-- Step 2 -->
+        <g class="dstep" data-label="2. ¿Deny explícito?" data-explain="AWS revisa TODAS las políticas aplicables buscando un Deny explícito. Si existe uno solo — en identity, resource, SCP, RCP, boundary o session policy — la petición se deniega de inmediato. Un Deny explícito siempre gana sobre cualquier Allow.">
+          <rect class="dbox" x="40" y="90" width="380" height="70" rx="8"></rect>
+          <text x="60" y="118" class="dtitle">2. ¿Hay un Deny explícito en alguna</text>
+          <text x="60" y="136" class="dtitle">política aplicable?</text>
+        </g>
+
+        <!-- Step 3 -->
+        <g class="dstep" data-label="3. ¿SCP / RCP de la organización lo permiten?" data-explain="Si la cuenta pertenece a una Organization, la SCP debe permitir la acción para esa identidad y la RCP debe permitir el acceso a ese recurso. Si no hay SCP/RCP adjuntas, el default es FullAWSAccess (permitir) — no bloquean nada por sí solas cuando no existen.">
+          <rect class="dbox" x="40" y="180" width="380" height="70" rx="8"></rect>
+          <text x="60" y="208" class="dtitle">3. ¿SCP y RCP de la organización</text>
+          <text x="60" y="226" class="dtitle">permiten la acción?</text>
+        </g>
+
+        <!-- Step 4 -->
+        <g class="dstep" data-label="4. ¿Allow explícito?" data-explain="Se necesita al menos un Allow explícito: en la identity-based policy del principal, O en la resource-based policy del recurso (si lo soporta: S3, KMS, SQS...). Sin ningún Allow explícito en ningún lado, el resultado por defecto es Deny implícito.">
+          <rect class="dbox" x="40" y="270" width="380" height="70" rx="8"></rect>
+          <text x="60" y="298" class="dtitle">4. ¿Hay Allow explícito (identity-based</text>
+          <text x="60" y="316" class="dtitle">O resource-based)?</text>
+        </g>
+
+        <!-- Step 5 -->
+        <g class="dstep" data-label="5. ¿Boundary / session policy también permiten?" data-explain="Si existe un permission boundary en la identidad, o se pasó una session policy al asumir el rol, el permiso final es la INTERSECCIÓN: deben permitir tanto la identity/resource policy como el boundary/session policy.">
+          <rect class="dbox" x="40" y="360" width="380" height="70" rx="8"></rect>
+          <text x="60" y="388" class="dtitle">5. ¿El permission boundary y la session</text>
+          <text x="60" y="406" class="dtitle">policy (si existen) también permiten?</text>
+        </g>
+
+        <!-- Step 6 ALLOW -->
+        <g class="dstep" data-label="6. ALLOW." data-explain="La acción se permite. Orden resumido: Deny explícito &gt; SCP/RCP &gt; Allow explícito (identity o resource) &gt; intersección con boundary/session policy &gt; Deny implícito por defecto si nada coincide.">
+          <rect class="dbox dbox-allow" x="40" y="450" width="380" height="50" rx="8"></rect>
+          <text x="60" y="480" class="dtitle">6. ALLOW — se ejecuta la acción</text>
+        </g>
+
+        <!-- DENY box -->
+        <g class="dstep" data-label="DENY." data-explain="Cualquier fallo en los pasos 2 a 5 termina aquí: la petición se deniega. Recuerda que el estado por defecto de IAM es 'deny implícito' — todo está prohibido salvo lo explícitamente permitido.">
+          <rect class="dbox dbox-deny" x="530" y="220" width="130" height="60" rx="8"></rect>
+          <text x="558" y="256" class="dtitle">DENY</text>
+        </g>
+      </svg>
+      <div class="dexplain">Haz clic en cualquier paso del diagrama para ver la explicación detallada.</div>
+      <p class="diagram-note">Orden de evaluación de políticas IAM (actualizado con RCP, 2024+)</p>
+    </div>
+
+    <h2 id="roles-sts">IAM Roles &amp; AWS STS</h2>
+    <p class="lede">Un Role es una identidad con políticas de permisos que NO tiene credenciales permanentes: se "asume" y genera credenciales temporales vía AWS STS (Security Token Service).</p>
+
+    <table>
+      <tr><th>API de STS</th><th>Cuándo usarla</th></tr>
+      <tr><td><code>AssumeRole</code></td><td>Caso general: un IAM User o Role (misma cuenta o cross-account) asume otro rol.</td></tr>
+      <tr><td><code>AssumeRoleWithSAML</code></td><td>Federación empresarial con IdP SAML 2.0 (ADFS, Okta, Azure AD/Entra ID) sin usuarios IAM.</td></tr>
+      <tr><td><code>AssumeRoleWithWebIdentity</code></td><td>Apps móviles/web con login OIDC (Google, Facebook, Amazon Cognito). En producción, mejor vía Cognito Identity Pools.</td></tr>
+      <tr><td><code>GetFederationToken</code></td><td>Federación legacy para dar acceso limitado a usuarios sin identidad IAM, usando las credenciales del usuario que llama.</td></tr>
+      <tr><td><code>GetSessionToken</code></td><td>Credenciales temporales para un IAM User existente, típicamente para forzar MFA en llamadas a la API.</td></tr>
+      <tr><td><code>DecodeAuthorizationMessage</code></td><td>Descifra el mensaje de error codificado cuando una llamada fue denegada (troubleshooting).</td></tr>
+    </table>
+
+    <p class="code-label">Trust policy (assume role policy document) de un rol</p>
+    <pre><code>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": { "AWS": "arn:aws:iam::111122223333:root" },
+      "Action": "sts:AssumeRole",
+      "Condition": {
+        "StringEquals": { "sts:ExternalId": "unique-partner-id-2026" }
+      }
+    }
+  ]
+}</code></pre>
+
+    <p class="code-label">Asumir el rol vía AWS CLI</p>
+    <pre><code>aws sts assume-role \
+  --role-arn "arn:aws:iam::444455556666:role/CrossAccountAuditRole" \
+  --role-session-name "juan-audit-session" \
+  --external-id "unique-partner-id-2026" \
+  --duration-seconds 3600</code></pre>
+
+    <div class="callout warn">
+      <b>Cuidado</b>
+      <code>sts:ExternalId</code> es obligatorio cuando un tercero (proveedor SaaS, auditor externo) asume tu rol, para mitigar el <em>confused deputy problem</em>. Combínalo siempre con <code>aws:SourceArn</code>/<code>aws:SourceAccount</code> cuando quien asume es un servicio de AWS actuando en nombre de otro cliente.
+    </div>
+
+    <h2 id="cross-account">Acceso cross-account &amp; confused deputy</h2>
+    <p class="lede">El patrón más preguntado del examen: un usuario en la Cuenta A necesita operar recursos en la Cuenta B.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 700 470" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="arrow2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#7c8aa0"></path>
+          </marker>
+        </defs>
+
+        <line class="dline" x1="230" y1="60" x2="230" y2="90" marker-end="url(#arrow2)"></line>
+        <line class="dline" x1="230" y1="160" x2="230" y2="190" marker-end="url(#arrow2)"></line>
+        <line class="dline" x1="230" y1="260" x2="230" y2="290" marker-end="url(#arrow2)"></line>
+        <line class="dline" x1="230" y1="360" x2="230" y2="390" marker-end="url(#arrow2)"></line>
+
+        <g class="dstep" data-label="1. Cuenta A — Usuario/Rol origen." data-explain="Un IAM User o Role en la Cuenta A (por ejemplo un ingeniero de plataforma) necesita operar temporalmente sobre recursos que viven en la Cuenta B (por ejemplo la cuenta de producción).">
+          <rect class="dbox" x="40" y="10" width="380" height="50" rx="8"></rect>
+          <text x="60" y="40" class="dtitle">1. Cuenta A: Usuario/Rol origen</text>
+        </g>
+
+        <g class="dstep" data-label="2. Permiso de salida en Cuenta A." data-explain="La identity policy del usuario/rol en la Cuenta A debe permitir explícitamente la acción sts:AssumeRole sobre el ARN del rol destino en la Cuenta B. Sin este permiso 'de salida', el AssumeRole falla aunque la Cuenta B lo autorice.">
+          <rect class="dbox" x="40" y="90" width="380" height="70" rx="8"></rect>
+          <text x="60" y="118" class="dtitle">2. Identity policy en Cuenta A permite</text>
+          <text x="60" y="136" class="dtitle">sts:AssumeRole sobre el rol de Cuenta B</text>
+        </g>
+
+        <g class="dstep" data-label="3. Trust policy en Cuenta B." data-explain="El IAM Role en la Cuenta B tiene una trust policy (assume role policy document) cuyo Principal referencia la Cuenta A (o un ARN concreto). STS valida esta trust policy — es el permiso 'de entrada'. Ambos lados (2 y 3) son obligatorios.">
+          <rect class="dbox" x="40" y="190" width="380" height="70" rx="8"></rect>
+          <text x="60" y="218" class="dtitle">3. Trust policy del Role en Cuenta B</text>
+          <text x="60" y="236" class="dtitle">autoriza a la Cuenta A como Principal</text>
+        </g>
+
+        <g class="dstep" data-label="4. STS devuelve credenciales temporales." data-explain="Si ambos permisos (salida + trust policy) son válidos, STS devuelve AccessKeyId, SecretAccessKey y SessionToken, con validez entre 15 minutos y 12 horas según la configuración del rol (MaxSessionDuration).">
+          <rect class="dbox" x="40" y="290" width="380" height="70" rx="8"></rect>
+          <text x="60" y="318" class="dtitle">4. STS devuelve credenciales temporales</text>
+          <text x="60" y="336" class="dtitle">(AccessKey + SecretKey + SessionToken)</text>
+        </g>
+
+        <g class="dstep" data-label="5. Acceso al recurso en Cuenta B." data-explain="El usuario original usa las credenciales temporales para operar sobre recursos en la Cuenta B, con los permisos que tenga adjuntos el rol asumido (nunca más que eso, y menos si hubo session policy).">
+          <rect class="dbox dbox-allow" x="40" y="390" width="380" height="50" rx="8"></rect>
+          <text x="60" y="420" class="dtitle">5. Se opera sobre el recurso en Cuenta B</text>
+        </g>
+      </svg>
+      <div class="dexplain">Haz clic en cualquier paso del diagrama para ver la explicación detallada.</div>
+      <p class="diagram-note">Flujo de AssumeRole cross-account (requiere permiso de salida Y trust policy de entrada)</p>
+    </div>
+
+    <h2 id="identity-center">IAM Identity Center</h2>
+    <p class="lede">Sucesor de AWS SSO. Es la forma recomendada por AWS de gestionar acceso humano multi-cuenta en 2026, por encima de crear IAM Users individuales.</p>
+    <ul>
+      <li><strong>Permission Sets</strong>: plantillas de permisos (managed o customer policies + permission boundaries) definidas una vez y asignadas a cuentas/grupos. Identity Center provisiona automáticamente los IAM Roles subyacentes en cada cuenta.</li>
+      <li><strong>Fuente de identidad</strong>: puede usar el directorio interno de Identity Center, o federar con un IdP externo (Okta, Azure AD/Entra ID, Google Workspace, Ping) vía SAML/SCIM para sincronizar usuarios y grupos automáticamente.</li>
+      <li><strong>Attribute-based access control (ABAC) integrado</strong>: Identity Center puede pasar atributos del usuario (departamento, coste center) como session tags al asumir el permission set.</li>
+      <li>Sustituye el patrón antiguo de "un IAM User por persona + credenciales de larga duración" — reduce drásticamente el riesgo de access keys filtradas.</li>
+    </ul>
+
+    <h2 id="roles-anywhere">IAM Roles Anywhere</h2>
+    <p class="lede">Extiende los roles de IAM a cargas de trabajo que corren FUERA de AWS: servidores on-premises, otros proveedores cloud, dispositivos edge.</p>
+    <ul>
+      <li>Requiere una <strong>CA privada de confianza</strong> (ACM Private CA u otra CA registrada como trust anchor) que emite certificados X.509 a cada servidor/workload.</li>
+      <li>El workload presenta su certificado al endpoint de Roles Anywhere, que lo valida y lo intercambia por credenciales temporales de AWS vía STS — mismo principio que AssumeRoleWithSAML pero con certificados en vez de aserciones SAML.</li>
+      <li>Elimina la necesidad de access keys de larga duración distribuidas manualmente en servidores fuera de AWS.</li>
+    </ul>
+
+    <h2 id="boundaries">Permission boundaries &amp; session policies</h2>
+    <p class="lede">Ambos mecanismos comparten la misma regla: <strong>nunca amplían permisos, solo los acotan</strong> mediante intersección con la identity/resource policy.</p>
+
+    <p class="code-label">Permission boundary — un desarrollador solo puede tocar S3 y DynamoDB, nunca IAM</p>
+    <pre><code>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["s3:*", "dynamodb:*"],
+      "Resource": "*"
+    },
+    {
+      "Effect": "Deny",
+      "Action": ["iam:*"],
+      "Resource": "*"
+    }
+  ]
+}</code></pre>
+
+    <div class="callout exam">
+      <b>Caso de uso típico en el examen</b>
+      "Permitir que los desarrolladores creen sus propios roles IAM, pero sin que puedan auto-otorgarse permisos de administrador" → adjuntar un permission boundary obligatorio en la política que les permite <code>iam:CreateRole</code>, usando la condición <code>iam:PermissionsBoundary</code>.
+    </div>
+
+    <h2 id="abac">ABAC — Control de acceso basado en atributos</h2>
+    <p class="lede">En vez de escribir una política por recurso (RBAC clásico), ABAC compara tags del principal con tags del recurso — escala sin reescribir políticas.</p>
+
+    <p class="code-label">Política ABAC: solo acceso a recursos del mismo "project" que el usuario</p>
+    <pre><code>{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": ["ec2:StartInstances", "ec2:StopInstances"],
+      "Resource": "arn:aws:ec2:*:*:instance/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:ResourceTag/project": "${aws:PrincipalTag/project}"
+        }
+      }
+    }
+  ]
+}</code></pre>
+    <ul>
+      <li>Requiere activar <strong>tag-based access control</strong> y etiquetar consistentemente tanto identidades (vía Identity Center session tags o tags del IAM Role) como recursos.</li>
+      <li>Ideal para entornos multi-equipo donde el número de recursos crece constantemente — evita mantener cientos de políticas específicas.</li>
+    </ul>
+
+    <h2 id="org-guardrails">Guardrails de organización: SCP, RCP y Declarative Policies</h2>
+
+    <table>
+      <tr><th>Mecanismo</th><th>Qué limita</th><th>Aplica a</th></tr>
+      <tr><td><strong>Service Control Policy (SCP)</strong></td><td>El máximo permiso que las IDENTIDADES de la cuenta pueden usar (aunque IAM diga que sí, si la SCP no lo permite, se deniega)</td><td>Cuentas / OUs dentro de la Organization</td></tr>
+      <tr><td><strong>Resource Control Policy (RCP)</strong></td><td>Quién puede acceder a los RECURSOS de la cuenta, incluyendo principals externos y anónimos — cierra el hueco que las SCP no cubren</td><td>Recursos soportados (S3, STS, KMS, SQS, Secrets Manager…) en cuentas / OUs</td></tr>
+      <tr><td><strong>Declarative Policies</strong></td><td>Fuerza un estado de configuración deseado para atributos específicos de servicio (ej. exigir IMDSv2, bloquear puertos públicos por defecto) — no es allow/deny de API, es "así debe estar configurado siempre"</td><td>Atributos concretos soportados, a nivel de cuenta / OU</td></tr>
+    </table>
+
+    <div class="callout">
+      <b>Cómo distinguirlos en el examen</b>
+      Si la pregunta dice "queremos que ninguna cuenta pueda desactivar el cifrado por defecto de EBS, pase lo que pase" → <strong>Declarative Policy</strong>. Si dice "queremos que nadie en la organización pueda usar la región eu-west-1" → <strong>SCP</strong>. Si dice "queremos que ningún bucket S3 de la organización pueda compartirse con cuentas fuera de la organización, ni con condiciones de política a nivel de bucket" → <strong>RCP</strong>.
+    </div>
+
+    <h2 id="access-analyzer">IAM Access Analyzer</h2>
+    <p class="lede">Tres capacidades distintas bajo el mismo servicio — el examen las pregunta por separado.</p>
+    <ul>
+      <li><strong>External access findings</strong>: detecta recursos (buckets, roles, KMS keys, snapshots...) accesibles desde fuera de tu "zona de confianza" (cuenta u organización). Se define un analizador con el scope deseado.</li>
+      <li><strong>Unused access findings</strong>: identifica roles no usados, permisos no ejercidos y access keys inactivas — soporte directo al principio de mínimo privilegio.</li>
+      <li><strong>Policy validation &amp; custom policy checks</strong>: valida sintaxis y buenas prácticas mientras escribes políticas en la consola/CLI, e incluso permite comprobar si un cambio de política introduce nuevo acceso externo antes de desplegarlo (<code>CheckNoNewAccess</code> / <code>CheckAccessNotGranted</code>).</li>
+    </ul>
+
+    <p class="code-label">Listar hallazgos de acceso externo vía CLI</p>
+    <pre><code>aws accessanalyzer list-findings-v2 \
+  --analyzer-arn "arn:aws:access-analyzer:eu-west-1:111122223333:analyzer/org-analyzer" \
+  --filter '{"findingType": {"eq": ["ExternalAccess"]}}'</code></pre>
+
+    <h2 id="root">Root user &amp; MFA</h2>
+    <ul>
+      <li><strong>Nunca uses el root</strong> para tareas del día a día. Aplica MFA (preferiblemente FIDO2/hardware security key) y no generes access keys para el root.</li>
+      <li><strong>Centralized Root Access Management</strong> (Organizations, 2023+): permite gestionar de forma centralizada las credenciales root de las cuentas miembro e invocar un set acotado de acciones privilegiadas de root sin repetir el proceso de recuperación de contraseña cuenta por cuenta.</li>
+      <li>Condición <code>aws:MultiFactorAuthPresent</code> para exigir MFA en llamadas a la API; combínala con <code>aws:MultiFactorAuthAge</code> para limitar la antigüedad máxima de la sesión MFA.</li>
+      <li><strong>IAM credential report</strong> (cuenta completa) vs <strong>Access Advisor</strong> (por usuario/rol, qué servicios se usaron y cuándo) — ambos clave para auditorías periódicas.</li>
+    </ul>
+
+    <p class="code-label">Exigir MFA para cualquier acción sobre EC2</p>
+    <pre><code>{
+  "Effect": "Deny",
+  "Action": "ec2:*",
+  "Resource": "*",
+  "Condition": {
+    "BoolIfExists": { "aws:MultiFactorAuthPresent": "false" }
+  }
+}</code></pre>
+
+    <h2 id="perimeter">Data perimeter</h2>
+    <p class="lede">Concepto transversal muy presente en el examen 2026: garantizar que los datos nunca salgan de tu organización, incluso con credenciales válidas comprometidas.</p>
+    <table>
+      <tr><th>Perímetro</th><th>Pregunta que responde</th><th>Controles típicos</th></tr>
+      <tr><td>Identidad</td><td>¿Quién puede acceder?</td><td>SCP/RCP con <code>aws:PrincipalOrgID</code></td></tr>
+      <tr><td>Recurso</td><td>¿Qué recursos son de confianza?</td><td>RCP/SCP con <code>aws:ResourceOrgID</code>, resource policies restrictivas</td></tr>
+      <tr><td>Red</td><td>¿Desde qué red se accede?</td><td>VPC endpoint policies + <code>aws:SourceVpce</code> / <code>aws:SourceIp</code></td></tr>
+    </table>
+
+    <h2 id="quiz">Quiz de práctica — IAM</h2>
+    <p class="lede">20 preguntas estilo examen. Elige una opción para ver si es correcta y por qué.</p>
+    <div id="quiz-root"></div>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">Guía de estudio personal — no es material oficial de AWS. Contenido revisado a fecha de 2026.</div>
+</footer>
+
+<script src="quiz-data.js"></script>
+<script src="../../assets/js/quiz.js"></script>
+<script src="../../assets/js/app.js"></script>
+</body>
+</html>
