@@ -25,7 +25,7 @@ python3 -m http.server 8000
 | Dominio | Peso examen | Estado |
 |---|---|---|
 | 1. Detection | 16% | ✅ Completo |
-| 2. Incident Response | 14% | ⏳ Pendiente |
+| 2. Incident Response | 14% | ✅ Completo |
 | 3. Infrastructure Security | 18% | ✅ Completo |
 | 4. Identity and Access Management | 20% | ✅ Completo |
 | 5. Data Protection | 18% | ✅ Completo |
