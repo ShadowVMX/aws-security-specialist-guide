@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Security Foundations &amp; Governance — AWS Security Specialist (SCS-C03)</title>
+<link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="dot">●</span> AWS Security Specialist</div>
+    <nav class="topnav">
+      <a href="../../index.html">← Dominios</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero" style="padding-top:40px;">
+    <span class="badge">SCS-C03 · Dominio 6 · 14% del examen</span>
+    <h1>Security Foundations &amp; Governance</h1>
+    <p>El dominio que ata todo lo demás: cómo estructurar decenas o cientos de cuentas para que los guardrails de IAM, Detection e Incident Response se apliquen de forma consistente y automática, en vez de cuenta por cuenta.</p>
+  </section>
+</div>
+
+<div class="wrap module-layout">
+
+  <aside class="sidebar">
+    <h4>6.1 Gestión centralizada de cuentas</h4>
+    <a href="#org-structure">Organizations &amp; Control Tower</a>
+    <a href="#org-policies">SCP / RCP / Declarative / AI opt-out</a>
+    <a href="#delegated-admin">Delegated administrator</a>
+    <a href="#root-management">Root user &amp; break-glass</a>
+    <h4>6.2 Despliegue seguro y consistente</h4>
+    <a href="#iac">Infrastructure as Code a escala</a>
+    <a href="#tagging">Estrategia de tagging</a>
+    <a href="#firewall-manager">Firewall Manager</a>
+    <a href="#sharing">Compartir recursos: RAM &amp; Service Catalog</a>
+    <h4>6.3 Evaluar compliance</h4>
+    <a href="#config-aggregator">Config aggregators &amp; remediación</a>
+    <a href="#audit">Audit Manager &amp; AWS Artifact</a>
+    <a href="#well-architected">Well-Architected Tool</a>
+    <h4>Práctica</h4>
+    <a href="#quiz">Quiz (19 preguntas)</a>
+  </aside>
+
+  <main class="content">
+
+    <h2 id="org-structure">AWS Organizations &amp; Control Tower (6.1.1 / 6.1.2)</h2>
+    <p class="lede">Así se estructura una organización real. Haz clic en cada capa del diagrama.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 700 470" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="gv-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#7c8aa0"></path>
+          </marker>
+        </defs>
+        <line class="dline" x1="230" y1="60" x2="230" y2="90" marker-end="url(#gv-arrow)"></line>
+        <line class="dline" x1="230" y1="160" x2="230" y2="190" marker-end="url(#gv-arrow)"></line>
+        <line class="dline" x1="230" y1="260" x2="230" y2="290" marker-end="url(#gv-arrow)"></line>
+        <line class="dline" x1="230" y1="360" x2="230" y2="390" marker-end="url(#gv-arrow)"></line>
+
+        <g class="dstep" data-label="1. Cuenta de management." data-explain="Crea la Organization. Uso operativo MÍNIMO: casi todo lo demás (seguridad, workloads) se delega a otras cuentas. Comprometer esta cuenta compromete potencialmente toda la organización.">
+          <rect class="dbox" x="40" y="10" width="380" height="50" rx="8"></rect>
+          <text x="60" y="40" class="dtitle">1. Cuenta de management (uso mínimo)</text>
+        </g>
+
+        <g class="dstep" data-label="2. Control Tower despliega la landing zone." data-explain="Automatiza la estructura de OUs (Security, Workloads, Sandbox...), crea las cuentas Log Archive y Audit ya configuradas, y activa guardrails preventivos/detectivos preconfigurados.">
+          <rect class="dbox" x="40" y="90" width="380" height="70" rx="8"></rect>
+          <text x="60" y="118" class="dtitle">2. Control Tower: OUs + cuentas base +</text>
+          <text x="60" y="136" class="dtitle">guardrails preventivos/detectivos</text>
+        </g>
+
+        <g class="dstep" data-label="3. Guardrails heredados por OU." data-explain="SCP, RCP, Declarative Policies y AI opt-out policies se adjuntan a nivel de OU y se heredan automáticamente por TODAS las cuentas dentro — nadie tiene que configurarlos cuenta por cuenta.">
+          <rect class="dbox" x="40" y="190" width="380" height="70" rx="8"></rect>
+          <text x="60" y="218" class="dtitle">3. SCP/RCP/Declarative/AI opt-out</text>
+          <text x="60" y="236" class="dtitle">aplicados a nivel de OU, heredados</text>
+        </g>
+
+        <g class="dstep" data-label="4. Delegated administrator para seguridad." data-explain="GuardDuty, Security Hub, IAM Access Analyzer y Config se administran desde la cuenta Audit/Security Tooling (delegated admin), NO desde management.">
+          <rect class="dbox" x="40" y="290" width="380" height="70" rx="8"></rect>
+          <text x="60" y="318" class="dtitle">4. Servicios de seguridad gestionados desde</text>
+          <text x="60" y="336" class="dtitle">la cuenta delegated administrator</text>
+        </g>
+
+        <g class="dstep" data-label="5. Cuentas de carga de trabajo, ya conformes." data-explain="Cada cuenta nueva (Prod, Non-prod...) nace ya con los guardrails de su OU aplicados desde el primer minuto, vía Account Factory de Control Tower o StackSets.">
+          <rect class="dbox dbox-allow" x="40" y="390" width="380" height="50" rx="8"></rect>
+          <text x="60" y="420" class="dtitle">5. Cuentas de workload: conformes desde el minuto 1</text>
+        </g>
+      </svg>
+      <div class="dexplain">Haz clic en cualquier capa del diagrama para ver la explicación detallada.</div>
+      <p class="diagram-note">Estructura de gobierno multi-cuenta con Control Tower</p>
+    </div>
+
+    <table>
+      <tr><th></th><th>Control preventivo</th><th>Control detectivo</th></tr>
+      <tr><td><strong>Qué hace</strong></td><td>IMPIDE que la acción no conforme ocurra</td><td>IDENTIFICA recursos ya no conformes, para remediar después</td></tr>
+      <tr><td><strong>Se implementa como</strong></td><td>SCP (deniega la llamada a la API)</td><td>Config Rule (marca NON_COMPLIANT)</td></tr>
+    </table>
+
+    <div class="callout azure">
+      <b>Si vienes de Azure</b>
+      <strong>AWS Organizations</strong> ↔ <strong>Management Groups + Subscriptions</strong> de Azure. <strong>Control Tower</strong> es lo más parecido a desplegar una <strong>Azure Landing Zone (enterprise-scale)</strong> — con un matiz importante: Control Tower es un producto "un clic" que AWS mantiene por ti; en Azure, una landing zone equivalente normalmente se construye y mantiene con plantillas Bicep/Terraform del catálogo de referencia de Microsoft, no es un servicio gestionado único con el mismo nivel de automatización turnkey.
+    </div>
+
+    <h2 id="org-policies">Los 4 tipos de política de organización (6.1.3)</h2>
+    <p class="lede">SCP y RCP ya se cubrieron en profundidad en el módulo de <a href="../iam/index.html">IAM</a>. Aquí el repaso rápido más los dos que faltaban.</p>
+    <table>
+      <tr><th>Tipo</th><th>Controla</th></tr>
+      <tr><td><strong>Service Control Policy (SCP)</strong></td><td>Techo de PERMISOS de identidad — qué acciones de API puede hacer una identidad de la cuenta.</td></tr>
+      <tr><td><strong>Resource Control Policy (RCP)</strong></td><td>Quién puede acceder a los RECURSOS, incluidos principals externos/anónimos.</td></tr>
+      <tr><td><strong>Declarative Policy</strong></td><td>Fuerza un estado de CONFIGURACIÓN concreto (ej. IMDSv2 obligatorio) — no es allow/deny de API.</td></tr>
+      <tr><td><strong>AI services opt-out policy</strong></td><td>Controla si los servicios de IA de AWS pueden usar el contenido de tus cuentas para entrenar/mejorar sus modelos.</td></tr>
+    </table>
+
+    <h2 id="delegated-admin">Delegated administrator (6.1.4)</h2>
+    <div class="callout plain">
+      <b>Ejemplo llano</b>
+      Piensa en la cuenta de management como la caja fuerte del banco: existe, es crítica, pero nadie debería estar entrando y saliendo de ella todos los días. Designar la cuenta "Audit" como delegated administrator de GuardDuty/Security Hub/Access Analyzer es como darle al equipo de seguridad las llaves de la sala de vigilancia (ven todo, actúan sobre todo lo relacionado con seguridad) sin darles las llaves de la caja fuerte en sí.
+    </div>
+
+    <h2 id="root-management">Root user: MFA, break-glass &amp; gestión centralizada (6.1.5)</h2>
+    <ul>
+      <li><strong>Break-glass procedure</strong>: proceso documentado y auditado de acceso de EMERGENCIA a root (MFA hardware bajo custodia controlada), nunca usado para operación normal.</li>
+      <li><strong>Centralized root access management</strong>: permite a la cuenta de management invocar ciertas acciones root en cuentas miembro sin necesitar recuperar contraseñas individualmente, reduciendo el número de credenciales root realmente utilizables.</li>
+      <li>MFA obligatorio en TODAS las cuentas root, verificable de forma centralizada.</li>
+    </ul>
+
+    <div class="callout azure">
+      <b>Si vienes de Azure</b>
+      "Break-glass" es prácticamente el mismo término y concepto que las <strong>cuentas de acceso de emergencia (emergency access accounts)</strong> de Microsoft Entra ID: cuentas excluidas de Conditional Access, con credenciales guardadas físicamente, monitorizadas con alertas si se usan alguna vez. Uno de los mapeos más directos (hasta en el nombre coloquial) de todo el examen.
+    </div>
+
+    <h2 id="iac">Infrastructure as Code a escala (6.2.1)</h2>
+    <table>
+      <tr><th>Herramienta</th><th>Para qué</th></tr>
+      <tr><td><strong>CloudFormation StackSets</strong></td><td>Despliega/actualiza el MISMO stack en cientos de cuentas/regiones centralizadamente; integrable con Organizations para nuevas cuentas automáticamente.</td></tr>
+      <tr><td><strong>cfn-lint</strong></td><td>Linter: sintaxis y buenas prácticas generales de la plantilla.</td></tr>
+      <tr><td><strong>CloudFormation Guard</strong></td><td>Policy-as-code: reglas de negocio/seguridad PERSONALIZADAS que la plantilla debe cumplir antes de desplegar (shift-left).</td></tr>
+    </table>
+
+    <p class="code-label">Desplegar un StackSet a toda una OU (integrado con Organizations)</p>
+    <pre><code>aws cloudformation create-stack-set \
+  --stack-set-name "baseline-security-config" \
+  --template-url "https://s3.eu-west-1.amazonaws.com/templates/baseline.yaml" \
+  --permission-model SERVICE_MANAGED \
+  --auto-deployment Enabled=true,RetainStacksOnAccountRemoval=false</code></pre>
+
+    <h2 id="tagging">Estrategia de tagging (6.2.2)</h2>
+    <p class="lede">No es solo FinOps: es la base de ABAC, conformance packs condicionales, y respuesta rápida en incidentes ("¿qué es producción?", "¿quién es el owner?").</p>
+
+    <h2 id="firewall-manager">AWS Firewall Manager (6.2.3)</h2>
+    <p>Aplica y MANTIENE políticas de WAF, Shield Advanced, Security Groups y Network Firewall de forma centralizada en toda la organización — incluso sobre cuentas y recursos que se creen en el futuro, sin intervención manual repetida.</p>
+    <div class="callout azure">
+      <b>Si vienes de Azure</b>
+      <strong>AWS Firewall Manager</strong> ↔ <strong>Azure Firewall Manager</strong>: mapeo casi literal hasta en el nombre. Ambos centralizan políticas de firewall/WAF a escala de Management Group/Organization.
+    </div>
+
+    <h2 id="sharing">Compartir recursos entre cuentas (6.2.4)</h2>
+    <table>
+      <tr><th>Servicio</th><th>Comparte</th></tr>
+      <tr><td><strong>AWS Resource Access Manager (RAM)</strong></td><td>Recursos concretos (subnets de una VPC compartida, Transit Gateway, reglas de Firewall Manager) directamente entre cuentas, sin duplicarlos.</td></tr>
+      <tr><td><strong>AWS Service Catalog</strong></td><td>Plantillas de IaC PRE-APROBADAS como "productos" autoservicio, dando autonomía a los equipos sin ceder permisos amplios de creación de recursos.</td></tr>
+    </table>
+    <div class="callout azure">
+      <b>Si vienes de Azure</b>
+      <strong>AWS RAM</strong> se parece a compartir una VNet vía <strong>Azure Lighthouse / delegated resource management</strong>, aunque el caso de uso más común de RAM (compartir subnets entre cuentas, "shared VPC") se parece más al patrón de <strong>hub-spoke con VNet peering gestionado centralmente</strong> que a Lighthouse en sí — no fuerces la comparación con Lighthouse más allá de "delegación de gestión entre tenants/cuentas".
+    </div>
+
+    <h2 id="config-aggregator">Config aggregators &amp; remediación automática (6.3.1)</h2>
+    <p>Un Config Aggregator consolida el estado de compliance de múltiples cuentas/regiones en una vista única. Patrón estándar de respuesta:</p>
+    <p class="code-label">Config detecta → EventBridge → SNS (notifica) + Systems Manager Automation (remedia)</p>
+    <pre><code>aws configservice put-remediation-configurations \
+  --remediation-configurations '[{
+    "ConfigRuleName": "s3-bucket-public-read-prohibited",
+    "TargetType": "SSM_DOCUMENT",
+    "TargetId": "AWSConfigRemediation-RemoveS3BucketPublicReadAccess",
+    "Automatic": true,
+    "MaximumAutomaticAttempts": 3
+  }]'</code></pre>
+
+    <h2 id="audit">AWS Audit Manager vs AWS Artifact (6.3.2)</h2>
+    <table>
+      <tr><th></th><th>Recopila</th><th>Para qué</th></tr>
+      <tr><td><strong>Audit Manager</strong></td><td>Evidencia continua de TU propia cuenta (config, logs, políticas)</td><td>Preparar TUS auditorías, mapeado contra un framework (PCI-DSS, HIPAA...)</td></tr>
+      <tr><td><strong>AWS Artifact</strong></td><td>Informes de compliance de AWS COMO PROVEEDOR (SOC 2, ISO 27001)</td><td>Demostrar que la infraestructura subyacente de AWS cumple esos estándares; también gestiona la aceptación de acuerdos como el BAA</td></tr>
+    </table>
+    <div class="callout azure">
+      <b>Si vienes de Azure</b>
+      <strong>AWS Artifact</strong> ↔ <strong>Microsoft Service Trust Portal</strong> (informes de compliance del proveedor). <strong>Audit Manager</strong> ↔ <strong>Microsoft Purview Compliance Manager</strong> (recopilación de evidencia de tu propio entorno).
+    </div>
+
+    <h2 id="well-architected">AWS Well-Architected Tool (6.3.3)</h2>
+    <p>Evalúa una carga de trabajo frente a los 6 pilares del framework (incluido Security), identificando riesgos y generando un plan de mejora priorizado — normalmente vía un workshop estructurado con el equipo dueño de la carga de trabajo.</p>
+    <div class="callout azure">
+      <b>Si vienes de Azure</b>
+      Microsoft tiene un equivalente casi directo: la <strong>Azure Well-Architected Review</strong>, estructurada también en pilares (incluyendo Security). Uno de los mapeos más limpios del examen — incluso comparten filosofía de "framework de pilares + herramienta de autoevaluación".
+    </div>
+
+    <h2 id="quiz">Quiz de práctica — Security Foundations &amp; Governance</h2>
+    <p class="lede">19 preguntas estilo examen. Elige una opción para ver si es correcta y por qué.</p>
+    <div id="quiz-root"></div>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">Guía de estudio personal — no es material oficial de AWS. Contenido revisado a fecha de 2026.</div>
+</footer>
+
+<script src="quiz-data.js"></script>
+<script src="../../assets/js/quiz.js"></script>
+<script src="../../assets/js/app.js"></script>
+</body>
+</html>
