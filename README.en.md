@@ -5,7 +5,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/exam-SCS--C03-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white" alt="SCS-C03">
   <img src="https://img.shields.io/badge/domains-6%2F6%20complete-3ECF8E?style=for-the-badge" alt="6/6 domains complete">
-  <img src="https://img.shields.io/badge/practice%20questions-127-B892FF?style=for-the-badge" alt="127 practice questions">
+  <img src="https://img.shields.io/badge/practice%20questions-237-B892FF?style=for-the-badge" alt="237 practice questions">
   <img src="https://img.shields.io/badge/languages-ES%20%7C%20EN-4FA8FF?style=for-the-badge" alt="ES | EN">
   <img src="https://img.shields.io/badge/contributions-issue%20required-FF6B6B?style=for-the-badge" alt="Contributions require an issue">
   <img src="https://img.shields.io/badge/stack-HTML%2FCSS%2FJS-0b1220?style=for-the-badge" alt="Plain HTML/CSS/JS">
@@ -19,7 +19,7 @@
 
 <p align="center">
   An <b>interactive</b> study guide for the <b>AWS Certified Security — Specialty (SCS-C03)</b> exam.<br>
-  Structured theory, clickable diagrams, real CLI/JSON commands, Azure comparisons, and 127 practice questions. No build step: plain HTML/CSS/JS.
+  Structured theory, clickable diagrams, real CLI/JSON commands, Azure comparisons, and 237 practice questions. No build step: plain HTML/CSS/JS.
 </p>
 
 <br>
