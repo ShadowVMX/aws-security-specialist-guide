@@ -75,6 +75,23 @@ node tools/audit-questions.js
 # External links still alive (needs unproxied internet access).
 ./tools/check-links.sh
 ```
+
+### Al escribir preguntas / When writing questions
+
+El auditor vigila dos sesgos que hacen que un banco enseñe el hábito
+equivocado. Tenlos en cuenta al redactar / The auditor watches for two biases
+that make a bank train the wrong habit. Keep them in mind when writing:
+
+- **Posición**: no dejes que la respuesta correcta caiga siempre en la misma
+  letra. El auditor falla si el reparto se desequilibra. / **Position**: don't
+  let the correct answer always land on the same letter.
+- **Longitud**: si la opción correcta es sistemáticamente la más larga, se
+  puede acertar midiendo caracteres. Escribe los distractores como frases
+  completas y plausibles, no como muñones de tres palabras, y deja el
+  razonamiento en `explain`, no dentro de la opción. / **Length**: if the
+  correct option is systematically the longest, you can score by counting
+  characters. Write distractors as complete, plausible sentences, and keep the
+  reasoning in `explain`, not inside the option.
 bash
 # Syntax of any quiz-data.js you touched
 node -c modules/<module>/quiz-data.js

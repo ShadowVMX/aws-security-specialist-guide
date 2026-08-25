@@ -74,10 +74,9 @@ A question bank can be factually correct and still train the wrong habit. `tools
 node tools/audit-questions.js
 ```
 
-It verifies ES/EN parity, indices in range, duplicate options or stems and missing explanations — and it catches two biases that destroy practice value:
+It verifies ES/EN parity, answer indices in range, no duplicate options or stems, no question left without an explanation, and that correct answers are spread evenly across the four letters — so the quiz can't be passed by pattern instead of knowledge.
 
-- **Position bias**: if the correct answer nearly always lands on the same letter, you pass without reading. Found (195 of 237 sat on B) and **fixed**: the split is now A=61, B=60, C=58, D=58.
-- **Length tell**: if the longest option is nearly always correct, you pass by counting characters. Found in 98% of questions and **not yet fixed** — it requires rewriting the distractors. The auditor reports it as a standing warning.
+It runs automatically on every Pull Request: if something breaks, the change doesn't land.
 
 `tools/check-links.sh` checks that the links to AWS documentation are still alive.
 

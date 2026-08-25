@@ -3,7 +3,7 @@ var QUIZ_DATA = [
     tag: "GuardDuty",
     q: "¿Sobre qué fuentes de datos analiza Amazon GuardDuty el comportamiento para detectar amenazas, sin que tengas que activar logging manualmente en cada cuenta?",
     options: [
-      "CloudTrail (eventos de gestión y de datos), VPC Flow Logs, DNS logs, y opcionalmente EKS audit logs y runtime monitoring — GuardDuty consume estas fuentes internamente sin que tengas que habilitarlas ni pagarlas tú por separado",
+      "CloudTrail (eventos de gestión y de datos), VPC Flow Logs, DNS logs, y opcionalmente EKS audit logs y runtime monitoring",
       "Solo CloudTrail",
       "Solo métricas de CloudWatch",
       "Solo logs de aplicación que tú le envíes manualmente",
@@ -42,7 +42,7 @@ var QUIZ_DATA = [
       "Config Rules individuales en cada cuenta, replicadas manualmente",
       "Una SCP con el mismo efecto",
       "Amazon Inspector",
-      "AWS Config Conformance Packs desplegados a nivel de organización — un paquete de reglas + remediaciones desplegado de forma centralizada a todas las cuentas de una OU",
+      "AWS Config Conformance Packs desplegados a nivel de organización",
     ],
     correct: 3,
     explain: "Los Conformance Packs empaquetan un conjunto de Config Rules (y acciones de remediación opcionales) como una única plantilla desplegable de forma centralizada a nivel de organización, evitando configurar regla por regla en cada cuenta — parte del skill 1.1.5 sobre automatizar evaluaciones regulares.",
@@ -64,7 +64,7 @@ var QUIZ_DATA = [
     q: "¿Por qué la mejor práctica es enviar los logs de seguridad (CloudTrail, VPC Flow Logs...) a una CUENTA dedicada de logging, separada de las cuentas de carga de trabajo?",
     options: [
       "Es un requisito técnico obligatorio de CloudTrail",
-      "Aísla los logs de un posible compromiso de la cuenta de carga de trabajo: si un atacante compromete la cuenta de producción, no puede alcanzar ni alterar los logs (que ya viven en otra cuenta con permisos mínimos y distintos)",
+      "Aísla los logs de un posible compromiso de la cuenta de carga de trabajo",
       "Reduce el coste de almacenamiento a la mitad",
       "Permite evitar el uso de KMS",
     ],
@@ -112,7 +112,7 @@ var QUIZ_DATA = [
     q: "¿Qué información capturan los VPC Flow Logs?",
     options: [
       "El contenido completo (payload) de cada paquete de red",
-      "Metadatos de las conexiones IP (origen, destino, puertos, protocolo, bytes, acción ACCEPT/REJECT) a nivel de ENI, subnet o VPC — NO el contenido/payload del tráfico",
+      "Metadatos de las conexiones IP (origen, destino, puertos, protocolo, bytes, acción ACCEPT/REJECT) a nivel de ENI, subnet o VPC",
       "Solo el tráfico HTTP/HTTPS",
       "Solo los intentos de conexión bloqueados por Security Groups",
     ],
@@ -125,7 +125,7 @@ var QUIZ_DATA = [
     options: [
       "Ninguna, son redundantes",
       "Solo registran fallos de resolución DNS",
-      "Capturan las consultas DNS realizadas desde recursos dentro de la VPC (qué dominio se resolvió, respuesta, quién preguntó) — clave para detectar comunicación con dominios de C2 (Command & Control) o técnicas de exfiltración vía DNS tunneling",
+      "Capturan las consultas DNS realizadas desde recursos dentro de la VPC (qué dominio se resolvió, respuesta, quién preguntó)",
       "Solo funcionan si se usa Route 53 como registrador del dominio",
     ],
     correct: 2,
@@ -160,7 +160,7 @@ var QUIZ_DATA = [
     q: "¿Qué tipo de logging hay que activar explícitamente en Amazon API Gateway para capturar el cuerpo (body) de las peticiones y respuestas, útil para depurar problemas de autorización?",
     options: [
       "Execution logging por defecto ya lo incluye siempre",
-      "Data trace logging (a nivel de stage), que además de los logs de ejecución estándar registra el detalle de request/response — debe activarse explícitamente porque puede exponer datos sensibles",
+      "Data trace logging (a nivel de stage), que además de los logs de ejecución estándar registra el detalle de request/response",
       "AWS X-Ray automáticamente sin configuración",
       "No es posible capturar el body en ningún caso",
     ],
@@ -195,7 +195,7 @@ var QUIZ_DATA = [
     tag: "Análisis de workloads",
     q: "Antes de diseñar una estrategia de monitorización para una nueva carga de trabajo, ¿qué debes analizar primero según el skill 1.1.1?",
     options: [
-      "Los requisitos de monitorización de la carga de trabajo: qué activos existen, qué eventos son críticos de detectar, qué nivel de latencia de alerta se necesita y qué compliance aplica",
+      "Los requisitos de monitorización de la carga de trabajo",
       "El coste mensual estimado de la carga de trabajo únicamente",
       "El nombre que se le va a dar a la carga de trabajo",
       "El proveedor de CI/CD que se usará",
@@ -243,7 +243,7 @@ var QUIZ_DATA = [
     tag: "GuardDuty Malware Protection for S3",
     q: "Una aplicación permite a usuarios externos subir archivos directamente a un bucket S3 antes de que un pipeline los procese. El equipo de seguridad quiere escanear automáticamente cada objeto nuevo en busca de malware ANTES de que el pipeline lo consuma, sin desplegar ni mantener su propia infraestructura de escaneo. ¿Qué solución nativa de AWS cumple este requisito?",
     options: [
-      "GuardDuty Malware Protection for S3: escanea automáticamente los objetos recién subidos a los buckets configurados usando motores de escaneo gestionados por AWS y de terceros, y genera un finding o etiqueta el objeto si detecta malware",
+      "GuardDuty Malware Protection for S3",
       "Activar Amazon Inspector sobre el bucket S3",
       "Configurar Macie con un job de clasificación en el bucket",
       "Habilitar cifrado SSE-KMS en el bucket, que bloquea automáticamente archivos maliciosos",
@@ -317,7 +317,7 @@ var QUIZ_DATA = [
     options: [
       "Sustituye la necesidad de tener GuardDuty o Inspector activados",
       "Elimina el uso de ASFF/OCSF como formato de findings",
-      "Correlación y priorización de riesgo casi en tiempo real: combina automáticamente hallazgos de Security Hub CSPM (configuración), Inspector (vulnerabilidades) y GuardDuty (amenazas) para generar 'exposure findings' que identifican, por ejemplo, un recurso expuesto públicamente con una vulnerabilidad crítica y acceso a datos sensibles",
+      "Correlación y priorización de riesgo casi en tiempo real",
       "Solo añade un dashboard de costes de seguridad, sin cambios funcionales",
     ],
     correct: 2,
@@ -330,7 +330,7 @@ var QUIZ_DATA = [
       "VPC Flow Logs, que ya capturan el detalle de la API invocada",
       "Amazon Detective, que reconstruye automáticamente esas llamadas",
       "GuardDuty, activando la fuente de datos S3",
-      "CloudTrail network activity events for VPC endpoints: una clase de evento opt-in que registra la actividad de API (plano de control y de datos) que atraviesa un VPC endpoint para los servicios soportados (ej. S3, EC2, KMS, Secrets Manager), incluida la generada por servicios de AWS actuando en tu nombre",
+      "CloudTrail network activity events for VPC endpoints",
     ],
     correct: 3,
     explain: "CloudTrail network activity events for VPC endpoints (GA febrero 2025) es un nuevo TIPO de evento, distinto de los management/data events tradicionales, que da visibilidad sobre la actividad de API que pasa a través de un VPC endpoint para los servicios soportados — incluyendo llamadas hechas por servicios de AWS en tu nombre. VPC Flow Logs solo ven metadatos de red (IP/puerto), no qué API se invocó.",
@@ -365,7 +365,7 @@ var QUIZ_DATA = [
     options: [
       "Un sensitive data discovery job programado para ejecutarse diariamente sobre el 100% de los objetos",
       "Amazon Inspector, aplicado a los buckets S3 de la cuenta",
-      "Automated sensitive data discovery: evalúa el inventario de S3 diariamente y analiza una MUESTRA REPRESENTATIVA de objetos (sampling inteligente) en cada bucket para mantener un perfil de sensibilidad de datos actualizado, con un coste muy inferior a escanear el 100% del contenido",
+      "Automated sensitive data discovery",
       "GuardDuty S3 Protection, que ya incluye clasificación de contenido",
     ],
     correct: 2,
@@ -378,7 +378,7 @@ var QUIZ_DATA = [
       "AWS Trusted Advisor",
       "AWS Config, mediante una remediación automática",
       "Amazon Detective, activando un supuesto 'modo incident response'",
-      "AWS Security Incident Response: ingesta y triagea automáticamente findings de GuardDuty y Security Hub CSPM (incluidos de terceros integrados vía Security Hub), permite colaborar en la contención y da acceso directo al equipo AWS Customer Incident Response Team (CIRT)",
+      "AWS Security Incident Response",
     ],
     correct: 3,
     explain: "AWS Security Incident Response (GA diciembre 2024) es un servicio dedicado que ingesta y triagea automáticamente findings de GuardDuty y de Security Hub CSPM (incluyendo integraciones de terceros vía Security Hub), ofrece herramientas de colaboración para la respuesta, puede tomar acciones de contención con tu permiso, y da acceso directo 24/7 al AWS Customer Incident Response Team — no es una funcionalidad de Trusted Advisor, Detective ni Config.",
@@ -400,7 +400,7 @@ var QUIZ_DATA = [
     q: "El equipo de seguridad quiere ver, desde una única cuenta central de monitorización, las métricas, logs de CloudWatch Logs y trazas de X-Ray generados en decenas de cuentas de carga de trabajo de la organización, SIN copiar ni duplicar esos datos entre cuentas. ¿Qué mecanismo de AWS permite esto?",
     options: [
       "Copiar los log groups de cada cuenta miembro mediante suscripciones de CloudWatch Logs hacia la cuenta central",
-      "CloudWatch cross-account observability mediante Observability Access Manager (OAM): se configuran enlaces (links) entre las cuentas origen y una cuenta de monitorización central, que puede consultar y visualizar la telemetría de las cuentas origen sin que los datos se dupliquen ni salgan de su cuenta de origen",
+      "CloudWatch cross-account observability mediante Observability Access Manager (OAM)",
       "Amazon Security Lake, que ya centraliza automáticamente todas las métricas de CloudWatch",
       "Una organization trail de CloudTrail configurada para incluir métricas de CloudWatch",
     ],
@@ -413,7 +413,7 @@ var QUIZ_DATA = [
     options: [
       "Un organization trail de CloudTrail apuntando a esa cuenta",
       "Un conformance pack, que por sí solo ya centraliza la visualización sin necesidad de un aggregator",
-      "Un AWS Config aggregator a nivel de organización: recopila datos de configuración y de cumplimiento de reglas de todas las cuentas miembro (y regiones) de la Organization en una única cuenta, sin necesidad de replicar la configuración de Config Rules manualmente en cada cuenta",
+      "Un AWS Config aggregator a nivel de organización",
       "Amazon Security Lake, redirigiendo únicamente los datos de AWS Config",
     ],
     correct: 2,

@@ -77,7 +77,7 @@ var QUIZ_DATA = [
     options: [
       "Continuous vulnerability scanning with Inspector",
       "IAM credential rotation",
-      "The entire forensics workflow for a compromised EC2 instance: network isolation (quarantine SG), EBS snapshot and memory capture, tagging for chain of custody, and notifying the IR team — without manual intervention at each step",
+      "The entire forensics workflow for a compromised EC2 instance",
       "Patch deployment across the whole fleet",
     ],
     correct: 2,
@@ -99,7 +99,7 @@ var QUIZ_DATA = [
     tag: "Capturing forensic evidence",
     q: "When capturing forensic evidence from a compromised EC2 instance for later analysis, which TWO artifacts are most valuable to capture before any other action?",
     options: [
-      "A snapshot of the EBS volume (disk state) and a memory (RAM) capture of the instance — memory contains volatile evidence (running processes, active connections, in-memory keys) that's lost once the instance is powered off",
+      "A snapshot of the EBS volume (disk state) and a memory (RAM) capture of the instance",
       "Only the account's CloudTrail logs",
       "Only CloudWatch CPU metrics",
       "The account's billing history",
@@ -208,7 +208,7 @@ var QUIZ_DATA = [
     q: "Why is it important to tag and document (timestamp, who, what action) each forensic artifact captured during an incident (snapshots, memory dumps, exported logs)?",
     options: [
       "Just for visual organization — it has no real impact",
-      "To maintain chain of custody: if the incident ends up in a legal/regulatory action, you can demonstrate the evidence wasn't altered and who had access to it at each point in time",
+      "To maintain chain of custody",
       "Because AWS bills differently if it's tagged",
       "It's not relevant to the exam",
     ],
@@ -234,7 +234,7 @@ var QUIZ_DATA = [
       "AWS Trusted Advisor",
       "Amazon Detective",
       "AWS Systems Manager Incident Manager",
-      "AWS Security Incident Response (Security IR): automatically monitors and triages GuardDuty findings (via Security Hub), opens proactive cases when it confirms a genuine threat, and gives direct 24/7 access to the AWS Customer Incident Response Team (CIRT)",
+      "AWS Security Incident Response (Security IR)",
     ],
     correct: 3,
     explain: "Security IR (GA December 2024) combines automated monitoring and triage of GuardDuty/Security Hub findings, AI-assisted investigation tools, and direct 24/7 access to the AWS CIRT. Detective helps investigate but doesn't provide access to a human AWS team; Incident Manager manages the operational process but no longer accepts new customers (retired for new sign-ups since Nov 2025); Trusted Advisor only provides best-practice recommendations.",
@@ -243,7 +243,7 @@ var QUIZ_DATA = [
     tag: "Security IR: proactive vs. reactive cases",
     q: "After enabling AWS Security Incident Response in your organization, what distinguishes a 'reactive' case from a proactive case (prefixed '[Proactive case]')?",
     options: [
-      "A reactive case is opened by the customer themselves when they need help (e.g. they suspect a compromise); a proactive case is opened AUTOMATICALLY by the service when its triage process — which automatically filters out more than 99% of incoming findings — determines that a GuardDuty/Security Hub finding is a true positive requiring attention",
+      "A reactive case is opened by the customer themselves when they need help (e.g. they suspect a compromise)",
       "There's no real difference — both terms are synonyms in the console",
       "Proactive cases are only generated for Windows EC2 instances",
       "Reactive cases are free and proactive cases carry an extra per-finding cost",
@@ -291,7 +291,7 @@ var QUIZ_DATA = [
     tag: "AWS Backup: logically air-gapped vault",
     q: "Your security team wants a backup copy that not even an attacker with compromised root administrator credentials inside the workload account can delete or modify. Which AWS Backup solution meets this requirement with the strongest guarantee?",
     options: [
-      "An AWS Backup logically air-gapped vault: it stores immutable copies in an AWS-owned account (outside your workload account), locked by default, with deletion protection that no principal — not even the owning account's root user — can bypass within the retention period",
+      "An AWS Backup logically air-gapped vault",
       "Standard EBS snapshots, with no additional configuration",
       "A standard S3 bucket with versioning enabled, without Object Lock",
       "AWS Backup Vault Lock in governance mode",
@@ -304,7 +304,7 @@ var QUIZ_DATA = [
     q: "A ransomware attack leaves the workload's AWS account completely inaccessible (root credentials were compromised and rotated by the attacker). Which recent AWS Backup capability lets you recover the backups stored in a logically air-gapped vault in this extreme scenario?",
     options: [
       "Restore directly using the compromised root credentials",
-      "Multi-party approval for logically air-gapped vaults in AWS Organizations: it lets approved accounts authorize access to and restoration of backups even when the original owning account became inaccessible due to an accidental or malicious event, without depending on that account",
+      "Multi-party approval for logically air-gapped vaults in AWS Organizations",
       "Open a support case on the Basic AWS Support plan",
       "It's not possible to recover the backups if the owning account is compromised",
     ],
@@ -317,7 +317,7 @@ var QUIZ_DATA = [
     options: [
       "Amazon Inspector, scanning the backup directly",
       "AWS Config, with a malware conformance pack",
-      "Amazon GuardDuty Malware Protection for AWS Backup (GA November 2025): automatically scans new EC2/EBS/S3 backups, allows on-demand scans of existing backups, verifies a backup is clean before restoring it, and identifies the last known clean backup using incremental scanning of only the data that changed",
+      "Amazon GuardDuty Malware Protection for AWS Backup (GA November 2025)",
       "Amazon Macie, scanning the backup's metadata",
     ],
     correct: 2,
@@ -400,7 +400,7 @@ var QUIZ_DATA = [
     q: "You configure an AWS Backup Vault Lock in COMPLIANCE mode with a 3-day 'cooling-off' grace period. What does this mean for the immutability of the backups in that vault?",
     options: [
       "It's identical to governance mode: any user with sufficient IAM permissions can remove the lock at any time",
-      "During the grace period you can still remove or modify the lock configuration; once that period elapses, the vault and its configuration become immutable and CANNOT be deleted or altered by any user — not even root or AWS itself — until every recovery point's retention period expires",
+      "During the grace period you can still remove or modify the lock configuration",
       "Compliance mode allows deleting individual recovery points at any time, without restriction",
       "The grace period only applies to vaults encrypted with a customer-managed KMS key",
     ],
@@ -435,7 +435,7 @@ var QUIZ_DATA = [
     tag: "S3 Object Lock for exported evidence",
     q: "After exporting analyzed memory dumps and snapshots to an S3 bucket as a long-term evidence repository (for possible litigation), which combination of S3 features guarantees those objects can't be overwritten or deleted by ANYONE, even if the configured retention period has already expired but the legal proceeding is still open?",
     options: [
-      "S3 Object Lock in COMPLIANCE mode combined with a Legal Hold: compliance mode prevents any user (including root) from modifying or deleting the object during the retention period, and the Legal Hold adds an independent restriction with no expiration date until it's explicitly removed",
+      "S3 Object Lock in COMPLIANCE mode combined with a Legal Hold",
       "S3 versioning alone, with no other configuration",
       "Server-Side Encryption with SSE-S3, with no other configuration",
       "A bucket policy that denies DeleteObject to every principal except the administrator",

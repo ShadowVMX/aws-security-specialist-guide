@@ -3,7 +3,7 @@ var QUIZ_DATA = [
     tag: "Security Groups vs NACLs",
     q: "What is the MOST important behavioral difference between a Security Group and a Network ACL?",
     options: [
-      "The Security Group is STATEFUL (return traffic is allowed automatically) and only supports Allow rules; the NACL is STATELESS (both directions must be explicitly allowed) and supports Allow and Deny rules evaluated in numeric order",
+      "The Security Group is STATEFUL (return traffic is allowed automatically) and only supports Allow rules",
       "The Security Group operates at the subnet level and the NACL at the instance level",
       "Both are identical, only where they're configured in the console differs",
       "The NACL only filters HTTP/HTTPS traffic",
@@ -29,7 +29,7 @@ var QUIZ_DATA = [
     options: [
       "SQL injection only",
       "Attacks that already passed through CloudFront",
-      "An anomalously high volume of requests from the same IP (or aggregation key) within a time window — for example, login brute-forcing or aggressive scraping",
+      "An anomalously high volume of requests from the same IP (or aggregation key) within a time window",
       "UDP traffic only",
     ],
     correct: 2,
@@ -90,7 +90,7 @@ var QUIZ_DATA = [
       "They are exact synonyms; either term can be used interchangeably in the API",
       "The Instance Profile removes the need for an IAM Role",
       "An Instance Profile can contain multiple IAM Roles simultaneously",
-      "The Instance Profile is the CONTAINER that associates an IAM Role with an EC2 instance — it's what actually gets attached to the instance (the console hides this by creating it automatically when you 'assign a role')",
+      "The Instance Profile is the CONTAINER that associates an IAM Role with an EC2 instance",
     ],
     correct: 3,
     explain: "Technically, you don't attach an IAM Role directly to an EC2 instance: you attach an Instance Profile, which in turn references a SINGLE IAM Role. The AWS console hides this distinction by creating the Instance Profile automatically, but the CLI/API exposes it (aws iam create-instance-profile + add-role-to-instance-profile).",
@@ -99,7 +99,7 @@ var QUIZ_DATA = [
     tag: "Amazon Inspector",
     q: "What types of resources can Amazon Inspector scan for known vulnerabilities (CVEs)?",
     options: [
-      "EC2 instances, container images in Amazon ECR, and Lambda functions (code and layers) — continuously, not just on demand",
+      "EC2 instances, container images in Amazon ECR, and Lambda functions (code and layers)",
       "EC2 instances only",
       "RDS databases only",
       "S3 buckets only",
@@ -125,7 +125,7 @@ var QUIZ_DATA = [
     options: [
       "EC2 Instance Connect with a public IP",
       "A traditional bastion host with a NAT Gateway",
-      "AWS Systems Manager Session Manager: creates a tunnel through the SSM agent, with no need for an open port 22, a bastion host, or SSH keys, and logs every command executed",
+      "AWS Systems Manager Session Manager",
       "Temporarily disable the Security Group",
     ],
     correct: 2,
@@ -221,7 +221,7 @@ var QUIZ_DATA = [
     options: [
       "AWS Config Rules alone",
       "Amazon Macie",
-      "Amazon Inspector Network Reachability (or VPC Network Access Analyzer) — analyzes the entire network configuration chain to detect unintended access paths",
+      "Amazon Inspector Network Reachability (or VPC Network Access Analyzer)",
       "AWS Trusted Advisor exclusively",
     ],
     correct: 2,
@@ -243,7 +243,7 @@ var QUIZ_DATA = [
     tag: "WAF Fraud Control – ATP",
     q: "Your security team detects a spike in login attempts using stolen credentials (credential stuffing) against your application's login endpoint, served behind CloudFront. Attackers are using email/password pairs leaked in other breaches, and many succeed because users reuse passwords. Which AWS WAF Fraud Control component specifically addresses this use case?",
     options: [
-      "Account Takeover Prevention (ATP): compares the credential pairs submitted at login against a regularly updated database of leaked credentials, and detects anomalous login patterns (brute force, credential stuffing) on that specific login page",
+      "Account Takeover Prevention (ATP)",
       "AWS WAF Bot Control, to block known bots",
       "A generic rate-based rule with no further configuration",
       "Account Creation Fraud Prevention (ACFP), designed for registration pages",
@@ -304,7 +304,7 @@ var QUIZ_DATA = [
     q: "You need AWS Network Firewall to inspect the content of outbound HTTPS connections from your VPC (not just the SNI) in order to apply IDS/IPS-style signature rules against the decrypted traffic. What do you need to configure?",
     options: [
       "Nothing extra: Network Firewall natively inspects the encrypted HTTPS payload with no configuration",
-      "A TLS Inspection Configuration: Network Firewall decrypts the traffic using a certificate it manages, inspects it in the clear, and re-encrypts it before forwarding — configurable for inbound (ingress) and/or outbound (egress) traffic",
+      "A TLS Inspection Configuration",
       "Enable only domain-based (FQDN) rules, which don't require decryption",
       "Replace Network Firewall with AWS WAF, which does natively inspect TLS",
     ],
@@ -317,7 +317,7 @@ var QUIZ_DATA = [
     options: [
       "Inspector Network Reachability, which analyzes network paths",
       "Amazon Inspector can only scan images already published to ECR, never source code",
-      "Amazon Inspector Code Security: natively integrates with GitHub and GitLab repositories to scan source code, dependencies, and IaC on every push/pull request or in the CI/CD pipeline, surfacing findings both in the Inspector console and in the source control platform itself",
+      "Amazon Inspector Code Security",
       "Amazon CodeGuru Reviewer, which replaced Inspector in 2025",
     ],
     correct: 2,
@@ -330,7 +330,7 @@ var QUIZ_DATA = [
       "A Service Control Policy (SCP) that blocks disabling Inspector",
       "You have to enable it manually in each member account; there is no centralized management",
       "AWS Config conformance packs alone",
-      "Amazon Inspector management through AWS Organizations policies: lets you centrally configure and enforce scan types (including Lambda Code Scanning and Code Security) across all accounts, selected OUs, or individual accounts in the organization",
+      "Amazon Inspector management through AWS Organizations policies",
     ],
     correct: 3,
     explain: "Amazon Inspector added support for centralized management via AWS Organizations policies, letting a delegated administrator define which scans (Lambda, EC2, ECR, Code Security) are enabled by default across the whole organization or in specific OUs, removing the need to enable it account by account.",
@@ -378,7 +378,7 @@ var QUIZ_DATA = [
       "Verified Access only supports HTTP(S) traffic; SSH/RDP requires Site-to-Site VPN",
       "It's only possible via a dedicated Direct Connect",
       "Those workloads must move to AWS Client VPN, the only service with SSH/RDP support",
-      "Verified Access support for non-HTTP(S) protocols (generic TCP, including SSH and RDP): extends the same identity- and device-posture-based access policies to resources like databases, git repositories, or EC2 instances over SSH/RDP",
+      "Verified Access support for non-HTTP(S) protocols (generic TCP, including SSH and RDP)",
     ],
     correct: 3,
     explain: "Since its general availability (GA, February 2025), Verified Access extends the Zero Trust model beyond HTTP(S) to generic TCP protocols like SSH and RDP, letting you centralize access policies (identity + device posture) for databases, code repositories, or administrative access to EC2 — without managing SSH credentials or exposing a full network tunnel.",
@@ -400,7 +400,7 @@ var QUIZ_DATA = [
     q: "You want to guarantee that only container images that genuinely came from your authorized CI/CD pipeline can be deployed to your cluster, protecting the software supply chain against tampered or unverified images. Which Amazon ECR capability helps with this?",
     options: [
       "ECR pull-through cache, which only caches images from public registries",
-      "ECR managed image signing, integrated with AWS Signer: automatically signs images when they're pushed to ECR, allowing the signature (provenance) to be verified before deployment, as part of software supply-chain security",
+      "ECR managed image signing, integrated with AWS Signer",
       "Enabling enhanced vulnerability scanning — that already guarantees provenance",
       "It's a feature exclusive to Docker Hub, not ECR",
     ],
@@ -413,7 +413,7 @@ var QUIZ_DATA = [
     options: [
       "A Service Control Policy (SCP) that denies the RunInstances action unless IMDSv2 is specified",
       "AWS Config with automatic remediation, which reverts the instance after it's created",
-      "An AWS Organizations Declarative Policy for EC2: centrally defines the desired state (IMDSv2 required) from the management account or a delegated admin, and AWS keeps that configuration persistently enforced without needing to rewrite the policy as new APIs or accounts appear",
+      "An AWS Organizations Declarative Policy for EC2",
       "Manually tagging every instance as 'IMDSv2-only'",
     ],
     correct: 2,
@@ -435,7 +435,7 @@ var QUIZ_DATA = [
     tag: "Route 53 Resolver DNS Firewall Advanced",
     q: "You suspect a compromised host inside your VPC is using a Domain Generation Algorithm (DGA) to generate pseudo-random domain names and communicate with command-and-control (C2) infrastructure, evading static domain blocklists. Which AWS service detects this specific pattern in real time?",
     options: [
-      "Route 53 Resolver DNS Firewall Advanced: analyzes anomalies in the domain names queried from your VPCs in real time to detect and block patterns associated with DGA (including dictionary-based variants) and DNS tunneling, which static domain lists can't cover",
+      "Route 53 Resolver DNS Firewall Advanced",
       "Route 53 Resolver DNS Firewall (the standard tier, based only on domain lists)",
       "AWS Network Firewall with domain (FQDN) rules only",
       "Amazon GuardDuty, which automatically blocks the traffic",

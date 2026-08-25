@@ -3,7 +3,7 @@ var QUIZ_DATA = [
     tag: "Envelope encryption",
     q: "Why does KMS use 'envelope encryption' (encrypting the data with a data key, and that data key with the CMK) instead of encrypting the data directly with the KMS key?",
     options: [
-      "Because KMS's APIs have a very small payload size limit (4KB for symmetric keys); wrapping lets you encrypt data of any size locally and only send the (small) data key to KMS",
+      "Because KMS's APIs have a very small payload size limit (4KB for symmetric keys)",
       "Because KMS keys can't encrypt data at all, only other keys",
       "Because it's exclusively a HIPAA compliance requirement",
       "Because it avoids paying for KMS API calls",
@@ -16,7 +16,7 @@ var QUIZ_DATA = [
     q: "After using GenerateDataKey to encrypt a large file locally, what should the application do with the plaintext data key once encryption is finished?",
     options: [
       "Store it alongside the encrypted file to decrypt faster later",
-      "Delete it from memory immediately; only the ENCRYPTED version of the data key (the 'encrypted blob') is kept alongside the data",
+      "Delete it from memory immediately",
       "Send it back to KMS so it can be stored securely",
       "Encrypt it with a second, different data key (double wrapping)",
     ],
@@ -77,7 +77,7 @@ var QUIZ_DATA = [
     options: [
       "They can't be used to encrypt data, only to sign",
       "They can only be used with S3, not with other services",
-      "They don't support AWS-managed automatic annual rotation; rotation, if desired, must be handled manually by re-importing new material",
+      "They don't support AWS-managed automatic annual rotation",
       "They can't have a custom key policy",
     ],
     correct: 2,
@@ -160,7 +160,7 @@ var QUIZ_DATA = [
     q: "Which statement correctly distinguishes AWS DataSync from AWS Backup?",
     options: [
       "They're the same service with different names",
-      "DataSync is designed to MIGRATE/SYNCHRONIZE large volumes of data between on-premises and AWS (or between AWS storage services); AWS Backup is designed to create and manage centralized, scheduled BACKUP copies of AWS resources",
+      "DataSync is designed to MIGRATE/SYNCHRONIZE large volumes of data between on-premises and AWS (or between AWS storage services)",
       "DataSync only works with relational databases",
       "AWS Backup doesn't support EFS or FSx",
     ],
@@ -195,7 +195,7 @@ var QUIZ_DATA = [
     tag: "Client VPN vs Verified Access",
     q: "How does AWS Verified Access differ from AWS Client VPN?",
     options: [
-      "Client VPN establishes a traditional network tunnel (the user 'enters' the VPC); Verified Access applies a Zero Trust model, evaluating identity + device posture on every request to a specific application, without exposing a full network tunnel",
+      "Client VPN establishes a traditional network tunnel (the user 'enters' the VPC)",
       "They're the same service; Verified Access is just the new name for Client VPN",
       "Verified Access only works with on-premises applications",
       "Client VPN doesn't support MFA",
@@ -221,7 +221,7 @@ var QUIZ_DATA = [
     options: [
       "Parameter Store can't encrypt values, Secrets Manager can",
       "Secrets Manager is free and Parameter Store isn't",
-      "Secrets Manager offers native AUTOMATIC ROTATION (with built-in Lambda functions for RDS, Redshift, DocumentDB) with no extra work; Parameter Store requires you to build the rotation logic yourself",
+      "Secrets Manager offers native AUTOMATIC ROTATION (with built-in Lambda functions for RDS, Redshift, DocumentDB) with no extra work",
       "Parameter Store doesn't support IAM-based access control",
     ],
     correct: 2,
@@ -243,7 +243,7 @@ var QUIZ_DATA = [
     tag: "ACM & certificates",
     q: "What's the key difference between a public certificate from AWS Certificate Manager (ACM) and one issued by AWS Private CA?",
     options: [
-      "ACM's public certificates are free and publicly trusted (verified by a public CA, valid in any browser); AWS Private CA certificates are PRIVATELY trusted (valid only within your organization, where you distribute the root certificate) and cost per active CA",
+      "ACM's public certificates are free and publicly trusted (verified by a public CA, valid in any browser)",
       "There's no difference, both are free and publicly trusted",
       "AWS Private CA can't issue TLS certificates, only sign code",
       "Public ACM requires you to manage renewal yourself",
@@ -256,7 +256,7 @@ var QUIZ_DATA = [
     q: "In 'client-side' encryption of an S3 object, where does the data encryption happen?",
     options: [
       "On the S3 server side, before writing to disk",
-      "On the client/application, BEFORE sending the data to S3 — S3 receives and stores only the already-encrypted object, never seeing the plaintext",
+      "On the client/application, BEFORE sending the data to S3",
       "In a KMS proxy managed by AWS",
       "It's identical to SSE-S3, only the name changes",
     ],
@@ -269,7 +269,7 @@ var QUIZ_DATA = [
     options: [
       "SSE-C doesn't require HTTPS",
       "SSE-C automatically uses KMS internally",
-      "SSE-C is more secure because AWS never sees the key; the client must send the encryption key on EVERY request (GET/PUT) over HTTPS, and AWS never stores it — if you lose the key, you lose the object forever",
+      "SSE-C is more secure because AWS never sees the key",
       "SSE-C is the default option if you don't configure anything",
     ],
     correct: 2,
@@ -330,7 +330,7 @@ var QUIZ_DATA = [
       "Standard SSE-KMS with S3 Bucket Keys enabled",
       "SSE-C",
       "Client-side encryption with the AWS Encryption SDK only",
-      "DSSE-KMS (dual-layer server-side encryption): applies two independent layers of AES-256 encryption — one with a data key generated by KMS, and another with an additional key managed by S3",
+      "DSSE-KMS (dual-layer server-side encryption)",
     ],
     correct: 3,
     explain: "DSSE-KMS encrypts the object twice, independently: one layer with a data key generated by KMS, and an additional layer with a key managed by S3, meeting dual-layer CNSA guidance for highly regulated workloads. It doesn't support S3 Bucket Keys and carries an extra per-GB cost compared to SSE-KMS.",
@@ -352,7 +352,7 @@ var QUIZ_DATA = [
     q: "An application processes highly sensitive data inside an AWS Nitro Enclave and needs KMS to decrypt data only for THAT specific enclave (identified by its image hash), not for any other process on the parent instance or any other enclave. What mechanism guarantees this?",
     options: [
       "A standard KMS grant with no additional conditions",
-      "KMS cryptographic attestation: the Decrypt/GenerateDataKey call includes an attestation document signed by the Nitro hypervisor, and the key policy uses the kms:RecipientAttestation:ImageSha384 condition to verify the PCR0 (image hash) before re-encrypting the response with the enclave's public key",
+      "KMS cryptographic attestation",
       "The Nitro System's automatic memory encryption",
       "KMS Multi-Region keys",
     ],
@@ -378,7 +378,7 @@ var QUIZ_DATA = [
       "A sensitive data discovery job scheduled against 100% of the objects in every bucket",
       "GuardDuty S3 Protection",
       "AWS Config rules only",
-      "Automated sensitive data discovery: Macie continuously evaluates your S3 bucket inventory and uses representative object sampling to give broad visibility and a sensitivity score per bucket, at lower cost than a full scan",
+      "Automated sensitive data discovery",
     ],
     correct: 3,
     explain: "Macie offers two modes: 'automated sensitive data discovery' (continuous evaluation and representative sampling across accounts/buckets for broad, low-cost visibility, with an interactive data map and a sensitivity score per bucket) and 'sensitive data discovery jobs' (targeted, deeper analysis of specific buckets or objects, more expensive because it reviews more objects).",
@@ -387,7 +387,7 @@ var QUIZ_DATA = [
     tag: "AWS Private CA — short-lived certificate mode",
     q: "A platform issues hundreds of thousands of very short-lived certificates (7 days or less) per month to authenticate ephemeral workloads, and the fixed monthly cost of a general-purpose mode CA is disproportionate. What option reduces the cost?",
     options: [
-      "Using AWS Private CA in short-lived certificate mode: a much lower fixed monthly CA cost than general-purpose mode, in exchange for issued certificates being capped at a maximum 7-day validity",
+      "Using AWS Private CA in short-lived certificate mode",
       "Migrating to public ACM",
       "Disabling OCSP revocation checking",
       "Using CloudHSM to issue the certificates directly",
@@ -400,7 +400,7 @@ var QUIZ_DATA = [
     q: "An application with readers in two regions needs low-latency access to the same database secret in both, and when the credential is rotated in the primary region, the new value should propagate automatically without managing rotation separately in each region. Which Secrets Manager feature do you use?",
     options: [
       "S3 Cross-Region Replication applied to an exported copy of the secret",
-      "Secrets Manager multi-Region secrets (ReplicateSecretToRegions): creates synchronized replicas in other regions; when the primary secret is rotated, the new value propagates automatically to all replicas",
+      "Secrets Manager multi-Region secrets (ReplicateSecretToRegions)",
       "Manually creating identical, independent secrets in each region",
       "KMS Multi-Region keys, which also replicate the secret's value automatically",
     ],
@@ -413,7 +413,7 @@ var QUIZ_DATA = [
     options: [
       "IAM access keys rotated manually every 90 days",
       "AWS Client VPN",
-      "IAM Roles Anywhere: register your CA (e.g. one issued by AWS Private CA, or your own PKI) as a trust anchor; the server presents an X.509 certificate in a CreateSession call and receives temporary credentials via STS by assuming an IAM role",
+      "IAM Roles Anywhere: register your CA (e.g. one issued by AWS Private CA, or your own PKI) as a trust anchor",
       "Amazon Cognito Identity Pools",
     ],
     correct: 2,
@@ -426,7 +426,7 @@ var QUIZ_DATA = [
       "They're automatically encrypted the next time they're attached to an instance",
       "They're automatically deleted for policy non-compliance",
       "They're automatically encrypted on the next scheduled snapshot",
-      "They're unaffected: the setting only applies to volumes and snapshot copies created AFTER it's turned on; existing ones remain unencrypted and can't be encrypted retroactively without creating a new volume or snapshot",
+      "They're unaffected: the setting only applies to volumes and snapshot copies created AFTER it's turned on",
     ],
     correct: 3,
     explain: "'EBS encryption by default' is a region-level setting that only affects volumes and snapshot copies created from that point forward. A volume or snapshot can only be encrypted at the moment of its creation — there's no way to retroactively encrypt an existing one without creating a new encrypted copy from it.",
@@ -435,7 +435,7 @@ var QUIZ_DATA = [
     tag: "RDS encryption at rest",
     q: "You have a production RDS instance that was created WITHOUT encryption at rest (storage encryption disabled). How can you enable encryption without losing the data?",
     options: [
-      "It's not possible to modify the encryption of an existing instance: you must create a snapshot, copy that snapshot with encryption enabled (using a KMS key), restore a new instance from the encrypted snapshot, and cut the application over to the new instance",
+      "It's not possible to modify the encryption of an existing instance",
       "Modifying the instance directly with 'aws rds modify-db-instance --storage-encrypted'",
       "Enabling SSE-KMS on the instance",
       "Turning on 'EBS encryption by default' in the region",
@@ -461,7 +461,7 @@ var QUIZ_DATA = [
     options: [
       "Manually configure Secrets Manager and a rotation Lambda after creating the instance",
       "Use Parameter Store SecureString with a rotation policy",
-      "Enable 'Manage master credentials in AWS Secrets Manager' when creating (or modifying) the instance: RDS generates the password, stores it directly in Secrets Manager (you never see it in plaintext) and manages automatic rotation (every 7 days by default) with no Lambda of your own",
+      "Enable 'Manage master credentials in AWS Secrets Manager' when creating (or modifying) the instance",
       "Disable password authentication and use only IAM database authentication",
     ],
     correct: 2,
@@ -474,7 +474,7 @@ var QUIZ_DATA = [
       "A retention period in Compliance mode with a far-future date (e.g. year 2099)",
       "Glacier Vault Lock",
       "S3 Versioning with MFA Delete",
-      "Legal Hold: applies the same WORM protection as a retention period but with NO expiration date; it stays in place until a principal with explicit permission removes it, and it's independent of Governance/Compliance mode",
+      "Legal Hold: applies the same WORM protection as a retention period but with NO expiration date",
     ],
     correct: 3,
     explain: "A Legal Hold provides the same WORM protection as a retention period, but with no expiration date: it stays in effect until someone with the s3:PutObjectLegalHold permission explicitly removes it. An object can have a retention period, a legal hold, both, or neither — they're independent mechanisms.",
@@ -520,7 +520,7 @@ var QUIZ_DATA = [
     q: "Which TWO statements correctly describe envelope encryption as AWS KMS implements it?",
     options: [
       "Data is encrypted with a data key, and that data key is itself encrypted with the KMS key",
-      "The plaintext data key is used in memory and then discarded; only its encrypted version is stored beside the data",
+      "The plaintext data key is used in memory and then discarded",
       "Data travels to KMS to be encrypted there, regardless of size",
       "The KMS key leaves the service to encrypt data on the client",
     ],
