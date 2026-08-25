@@ -39,8 +39,11 @@
   --dbox-stroke: rgba(255, 255, 255, 0.12);
 }
 
+/* Light palette. Applied when the system asks for it AND the reader hasn't
+   overridden it, or when the reader picks light explicitly. Keeping both in
+   one block means the two paths can never drift apart. */
 @media (prefers-color-scheme: light) {
-  :root {
+  :root:not([data-theme="dark"]) {
     --bg: #f6f7f9;
     --bg-elevated: #ffffff;
     --bg-card: #ffffff;
@@ -66,6 +69,33 @@
     --dbox-fill: rgba(23, 48, 92, 0.10);
     --dbox-stroke: rgba(23, 48, 92, 0.30);
   }
+}
+
+:root[data-theme="light"] {
+    --bg: #f6f7f9;
+    --bg-elevated: #ffffff;
+    --bg-card: #ffffff;
+    --border: #e2e6ec;
+    --text: #1b2430;
+    --text-dim: #4a5872;
+    --text-faint: #6a7889;
+    --accent: #b56b00;
+    --accent-dim: #935700;
+    --accent-soft: rgba(217, 127, 0, 0.14);
+    /* the dark palette's blue/green/red/purple are tuned for a dark
+       background and wash out on white — these are their light twins */
+    --blue: #1462c4;
+    --blue-soft: rgba(20, 98, 196, 0.12);
+    --green: #0f7a52;
+    --green-soft: rgba(15, 122, 82, 0.12);
+    --red: #c0362c;
+    --red-soft: rgba(192, 54, 44, 0.12);
+    --purple: #6b3fc0;
+    --purple-soft: rgba(107, 63, 192, 0.12);
+    --code-bg: #f0f2f5;
+    --shadow: 0 4px 20px rgba(20, 30, 50, 0.08);
+    --dbox-fill: rgba(23, 48, 92, 0.10);
+    --dbox-stroke: rgba(23, 48, 92, 0.30);
 }
 
 * { box-sizing: border-box; }
@@ -740,6 +770,44 @@ footer {
   font-size: 12.5px;
   color: var(--text-faint);
   margin: 14px 0 0;
+}
+
+.theme-switch {
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-dim);
+  border-radius: 999px;
+  width: 30px;
+  height: 30px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  font-family: inherit;
+}
+.theme-switch:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ---- print ---- */
+@media print {
+  /* chrome that costs paper and helps nobody on a printout */
+  .topbar, .sidebar, .mobile-toc, .to-top, .theme-switch,
+  .quiz-toolbar, .quiz-footer, .quiz-check, .exam-nav, .exam-actions,
+  .progress-reset, footer { display: none !important; }
+
+  body { background: #fff; color: #000; }
+  .wrap { max-width: none; padding: 0; }
+  .module-layout { display: block; padding: 0; }
+
+  /* answers and explanations are the point of printing a quiz */
+  .quiz-explain { display: block !important; }
+  .quiz-item, .callout, .diagram, pre { break-inside: avoid; page-break-inside: avoid; }
+  .content h2 { break-after: avoid; page-break-after: avoid; }
+
+  /* a printed link is useless unless its target is written out */
+  .content a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 10px;
+    word-break: break-all;
+  }
 }
 
 @media (max-width: 780px) {

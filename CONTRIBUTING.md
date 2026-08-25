@@ -92,6 +92,13 @@ that make a bank train the wrong habit. Keep them in mind when writing:
   correct option is systematically the longest, you can score by counting
   characters. Write distractors as complete, plausible sentences, and keep the
   reasoning in `explain`, not inside the option.
+- **Combinación en multi-respuesta**: si todas las preguntas de `choose TWO`
+  responden `[0, 1]`, marcar las dos primeras acierta siempre. Reparte las
+  combinaciones. / **Multiple-response combination**: if every `choose TWO`
+  question answers `[0, 1]`, ticking the first two always scores. Spread them.
+- **Fuente**: toda explicación termina con un enlace a la página de
+  docs.aws.amazon.com que zanja el punto. / **Source**: every explanation ends
+  with a link to the docs.aws.amazon.com page that settles it.
 bash
 # Syntax of any quiz-data.js you touched
 node -c modules/<module>/quiz-data.js
