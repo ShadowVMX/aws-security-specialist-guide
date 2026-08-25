@@ -44,6 +44,7 @@
     <a href="#config-aggregator">Config aggregators &amp; remediación</a>
     <a href="#audit">Audit Manager &amp; AWS Artifact</a>
     <a href="#well-architected">Well-Architected Tool</a>
+    <a href="#trampas">Trampas típicas</a>
     <h4>Práctica</h4>
     <a href="#quiz">Quiz (40 preguntas)</a>
   </aside>
@@ -201,6 +202,40 @@
       <b>Si vienes de Azure</b>
       Microsoft tiene un equivalente casi directo: la <strong>Azure Well-Architected Review</strong>, estructurada también en pilares (incluyendo Security). Uno de los mapeos más limpios del examen — incluso comparten filosofía de "framework de pilares + herramienta de autoevaluación".
     </div>
+
+    <h2 id="trampas">Trampas típicas del examen</h2>
+    <p class="lede">Los errores que más se repiten en este dominio. Si vas justo de tiempo antes del examen, repasa solo esto y el quiz.</p>
+
+    <div class="callout exam">
+      <b>La management account queda fuera de las SCP</b>
+      Ninguna SCP restringe a la management account de la organización. Por eso AWS recomienda <strong>no alojar cargas de trabajo</strong> en ella y usarla solo para gestionar la organización. Es de las trampas más repetidas del dominio.
+    </div>
+
+    <div class="callout exam">
+      <b>Los tres tipos de control de Control Tower</b>
+      <strong>Preventivos</strong> (SCP): impiden que la acción ocurra. <strong>Detectivos</strong> (reglas de Config): avisan de lo que ya se desvió. <strong>Proactivos</strong> (hooks de CloudFormation): validan la plantilla antes de desplegar. Si una opción dice que un control detectivo "bloquea", se contradice a sí misma.
+    </div>
+
+    <div class="callout exam">
+      <b>Config es regional y por cuenta</b>
+      Hay que habilitarlo <strong>donde estén los recursos</strong>: la cuenta de gestión no hereda el estado de las demás. Para la vista consolidada se usa un <strong>aggregator</strong>, y para aplicar el mismo conjunto de reglas en todas partes, conformance packs a nivel de organización.
+    </div>
+
+    <div class="callout exam">
+      <b>Las tag policies no obligan a etiquetar</b>
+      Una tag policy <strong>estandariza</strong> claves y valores permitidos y señala lo que no cumple, pero por sí sola no impide crear un recurso sin etiquetas. Para exigirlo de verdad hace falta una SCP con una condición sobre <code>aws:RequestTag</code>.
+    </div>
+
+    <div class="callout exam">
+      <b>Audit Manager no es Artifact</b>
+      <strong>AWS Artifact</strong> te entrega los informes de cumplimiento <em>de AWS</em> (SOC, ISO, PCI) para descargar. <strong>Audit Manager</strong> recoge evidencia continua de <em>tu</em> entorno frente a un marco. Uno documenta lo que hace AWS, el otro lo que haces tú.
+    </div>
+
+    <div class="callout exam">
+      <b>Delegar administración no es dar acceso root</b>
+      El <strong>delegated administrator</strong> permite gestionar un servicio concreto (GuardDuty, Security Hub, Config…) desde una cuenta que no es la de gestión, sin repartir credenciales privilegiadas. Es el patrón recomendado frente a operar todo desde la management account.
+    </div>
+
 
     <h2 id="quiz">Quiz de práctica — Security Foundations &amp; Governance</h2>
     <p class="lede">40 preguntas estilo examen. Elige una opción para ver si es correcta y por qué.</p>

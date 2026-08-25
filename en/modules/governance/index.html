@@ -44,6 +44,7 @@
     <a href="#config-aggregator">Config aggregators &amp; remediation</a>
     <a href="#audit">Audit Manager &amp; AWS Artifact</a>
     <a href="#well-architected">Well-Architected Tool</a>
+    <a href="#trampas">Classic traps</a>
     <h4>Practice</h4>
     <a href="#quiz">Quiz (40 questions)</a>
   </aside>
@@ -201,6 +202,40 @@
       <b>Coming from Azure</b>
       Microsoft has an almost direct equivalent: the <strong>Azure Well-Architected Review</strong>, also structured around pillars (including Security). One of the cleanest mappings in the exam — they even share the "pillar framework + self-assessment tool" philosophy.
     </div>
+
+    <h2 id="trampas">Classic exam traps</h2>
+    <p class="lede">The mistakes that repeat most in this domain. If you're short on time before the exam, review just this and the quiz.</p>
+
+    <div class="callout exam">
+      <b>The management account is outside SCP reach</b>
+      No SCP restricts the organization's management account. That's why AWS recommends <strong>not running workloads</strong> in it and using it only to manage the organization. It's one of the domain's most repeated traps.
+    </div>
+
+    <div class="callout exam">
+      <b>Control Tower's three control types</b>
+      <strong>Preventive</strong> (SCP): stop the action from happening. <strong>Detective</strong> (Config rules): flag what already drifted. <strong>Proactive</strong> (CloudFormation hooks): validate the template before deployment. If an option says a detective control "blocks", it contradicts itself.
+    </div>
+
+    <div class="callout exam">
+      <b>Config is regional and per-account</b>
+      It must be enabled <strong>where the resources are</strong>: the management account inherits nothing from the others. For the consolidated view you use an <strong>aggregator</strong>, and to apply the same rule set everywhere, organization-level conformance packs.
+    </div>
+
+    <div class="callout exam">
+      <b>Tag policies don't force tagging</b>
+      A tag policy <strong>standardizes</strong> allowed keys and values and flags what doesn't comply, but on its own it won't stop a resource being created untagged. To actually require it you need an SCP with a condition on <code>aws:RequestTag</code>.
+    </div>
+
+    <div class="callout exam">
+      <b>Audit Manager is not Artifact</b>
+      <strong>AWS Artifact</strong> hands you <em>AWS's own</em> compliance reports (SOC, ISO, PCI) to download. <strong>Audit Manager</strong> continuously collects evidence about <em>your</em> environment against a framework. One documents what AWS does, the other what you do.
+    </div>
+
+    <div class="callout exam">
+      <b>Delegating administration is not handing over root</b>
+      The <strong>delegated administrator</strong> lets you manage one specific service (GuardDuty, Security Hub, Config…) from an account that isn't the management one, without spreading privileged credentials. It's the recommended pattern versus operating everything from the management account.
+    </div>
+
 
     <h2 id="quiz">Practice quiz — Security Foundations &amp; Governance</h2>
     <p class="lede">40 exam-style questions. Pick an option to see if it's correct and why.</p>

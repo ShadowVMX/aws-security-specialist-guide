@@ -41,6 +41,7 @@
     <a href="#network-logs">VPC Flow Logs &amp; Route 53 Resolver</a>
     <h4>1.3 Troubleshooting</h4>
     <a href="#troubleshoot">Diagnosticar logging roto</a>
+    <a href="#trampas">Trampas típicas</a>
     <h4>Práctica</h4>
     <a href="#quiz">Quiz (40 preguntas)</a>
   </aside>
@@ -183,6 +184,40 @@
       <tr><td>API Gateway sin detalle de request/response</td><td>Falta activar explícitamente "data trace logging" a nivel de stage (el execution logging por defecto no incluye el body).</td></tr>
       <tr><td>CloudFront sin logs recientes</td><td>Confundir Standard logs (diferidos, a S3) con Real-time logs (Kinesis, segundos) — revisar cuál está realmente configurado.</td></tr>
     </table>
+
+    <h2 id="trampas">Trampas típicas del examen</h2>
+    <p class="lede">Los errores que más se repiten en este dominio. Si vas justo de tiempo antes del examen, repasa solo esto y el quiz.</p>
+
+    <div class="callout exam">
+      <b>Management events no son data events</b>
+      CloudTrail registra por defecto solo <strong>management events</strong> (plano de control: <code>CreateBucket</code>, <code>PutBucketPolicy</code>). Quién descargó un objeto concreto es un <strong>data event</strong>, está desactivado por defecto y hay que habilitarlo. Si el enunciado dice "no vemos quién accedió al objeto", la respuesta casi siempre es habilitar data events.
+    </div>
+
+    <div class="callout exam">
+      <b>GuardDuty no necesita que actives sus fuentes</b>
+      GuardDuty lee CloudTrail, VPC Flow Logs y DNS logs <strong>de forma independiente</strong>, mediante un service-linked role. No hace falta habilitar esos logs ni pagarlos para que GuardDuty funcione. Cualquier opción que diga "primero habilita VPC Flow Logs para que GuardDuty pueda analizarlos" es un distractor.
+    </div>
+
+    <div class="callout exam">
+      <b>Los cuatro servicios que siempre se confunden</b>
+      <strong>GuardDuty</strong> detecta amenazas y comportamiento malicioso. <strong>Inspector</strong> evalúa vulnerabilidades (CVEs) en instancias, contenedores y Lambda. <strong>Macie</strong> descubre datos sensibles en S3. <strong>Config</strong> evalúa el estado de configuración de los recursos. Ninguno hace el trabajo del otro, y el examen los intercambia constantemente.
+    </div>
+
+    <div class="callout exam">
+      <b>Multi-cuenta y multi-Región son ejes distintos</b>
+      En Security Hub, GuardDuty o Config, el <strong>delegated administrator</strong> resuelve la vista multi-cuenta y la <strong>agregación de Regiones</strong> resuelve la multi-Región. Son dos configuraciones separadas: si la pregunta pide ambas cosas, hacen falta las dos respuestas.
+    </div>
+
+    <div class="callout exam">
+      <b>Los logs no aparecen retroactivamente</b>
+      Ampliar la retención, crear un trail nuevo o habilitar una fuente <strong>no genera</strong> los eventos que no se capturaron en su momento. Si el incidente ya ocurrió y el logging estaba mal configurado, esa evidencia no existe. Cualquier opción que prometa recuperar eventos pasados es falsa.
+    </div>
+
+    <div class="callout exam">
+      <b>VPC Flow Logs no ven el contenido</b>
+      Registran <strong>metadatos</strong> de la conexión (IPs, puertos, protocolo, bytes, accept/reject), nunca el payload. Si la pregunta necesita saber <em>qué</em> se transfirió, Flow Logs no basta. Además hay tráfico que no capturan, como el dirigido al servidor DNS de Amazon o a <code>169.254.169.254</code>.
+    </div>
+
 
     <h2 id="quiz">Quiz de práctica — Detection</h2>
     <p class="lede">40 preguntas estilo examen. Elige una opción para ver si es correcta y por qué.</p>

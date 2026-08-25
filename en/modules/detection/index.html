@@ -41,6 +41,7 @@
     <a href="#network-logs">VPC Flow Logs &amp; Route 53 Resolver</a>
     <h4>1.3 Troubleshooting</h4>
     <a href="#troubleshoot">Diagnosing broken logging</a>
+    <a href="#trampas">Classic traps</a>
     <h4>Practice</h4>
     <a href="#quiz">Quiz (40 questions)</a>
   </aside>
@@ -183,6 +184,40 @@
       <tr><td>API Gateway missing request/response detail</td><td>Data trace logging isn't explicitly enabled at the stage level (default execution logging doesn't include the body).</td></tr>
       <tr><td>CloudFront missing recent logs</td><td>Confusing Standard logs (delayed, to S3) with Real-time logs (Kinesis, seconds) — check which one is actually configured.</td></tr>
     </table>
+
+    <h2 id="trampas">Classic exam traps</h2>
+    <p class="lede">The mistakes that repeat most in this domain. If you're short on time before the exam, review just this and the quiz.</p>
+
+    <div class="callout exam">
+      <b>Management events are not data events</b>
+      CloudTrail logs only <strong>management events</strong> by default (control plane: <code>CreateBucket</code>, <code>PutBucketPolicy</code>). Who downloaded a specific object is a <strong>data event</strong>, off by default and needing explicit enabling. If the stem says "we can't see who accessed the object", the answer is nearly always to enable data events.
+    </div>
+
+    <div class="callout exam">
+      <b>GuardDuty doesn't need you to enable its sources</b>
+      GuardDuty reads CloudTrail, VPC Flow Logs and DNS logs <strong>independently</strong>, through a service-linked role. You don't need to enable or pay for those logs for GuardDuty to work. Any option saying "first enable VPC Flow Logs so GuardDuty can analyze them" is a distractor.
+    </div>
+
+    <div class="callout exam">
+      <b>The four services that always get confused</b>
+      <strong>GuardDuty</strong> detects threats and malicious behavior. <strong>Inspector</strong> assesses vulnerabilities (CVEs) in instances, containers and Lambda. <strong>Macie</strong> discovers sensitive data in S3. <strong>Config</strong> evaluates resource configuration state. None does another's job, and the exam swaps them constantly.
+    </div>
+
+    <div class="callout exam">
+      <b>Multi-account and multi-Region are separate axes</b>
+      In Security Hub, GuardDuty or Config, the <strong>delegated administrator</strong> solves the multi-account view and <strong>Region aggregation</strong> solves the multi-Region one. They are two separate settings: if the question asks for both, both answers are needed.
+    </div>
+
+    <div class="callout exam">
+      <b>Logs never appear retroactively</b>
+      Extending retention, creating a new trail or enabling a source <strong>does not generate</strong> events that weren't captured at the time. If the incident already happened and logging was misconfigured, that evidence doesn't exist. Any option promising to recover past events is false.
+    </div>
+
+    <div class="callout exam">
+      <b>VPC Flow Logs don't see content</b>
+      They record connection <strong>metadata</strong> (IPs, ports, protocol, bytes, accept/reject), never the payload. If the question needs to know <em>what</em> was transferred, Flow Logs aren't enough. They also skip some traffic, such as that to the Amazon DNS server or <code>169.254.169.254</code>.
+    </div>
+
 
     <h2 id="quiz">Practice quiz — Detection</h2>
     <p class="lede">40 exam-style questions. Choose an option to see if it's correct and why.</p>

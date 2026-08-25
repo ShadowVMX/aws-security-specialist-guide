@@ -44,6 +44,7 @@
     <a href="#sg-nacl">Security Groups vs NACLs</a>
     <a href="#hybrid-connectivity">Hybrid connectivity</a>
     <a href="#segmentation">Segmentation &amp; Network Firewall</a>
+    <a href="#trampas">Classic traps</a>
     <h4>Practice</h4>
     <a href="#quiz">Quiz (42 questions)</a>
   </aside>
@@ -278,6 +279,40 @@
       <b>Coming from Azure</b>
       <strong>AWS Network Firewall</strong> ↔ <strong>Azure Firewall</strong>: both are managed layer 3-7 firewalls with domain rules, designed for centralized transit traffic (often sitting behind a Transit Gateway / Virtual WAN respectively).
     </div>
+
+    <h2 id="trampas">Classic exam traps</h2>
+    <p class="lede">The mistakes that repeat most in this domain. If you're short on time before the exam, review just this and the quiz.</p>
+
+    <div class="callout exam">
+      <b>Stateful vs stateless, and ephemeral ports</b>
+      <strong>Security groups are stateful</strong>: allow inbound and the reply leaves on its own. <strong>NACLs are stateless</strong>: return traffic must be allowed explicitly, and that is where the <strong>ephemeral port</strong> range (1024-65535) comes in. A "connection establishes but gets no response" scenario with a NACL involved is almost always this.
+    </div>
+
+    <div class="callout exam">
+      <b>Security groups cannot deny</b>
+      A security group has only <em>allow</em> rules: anything not allowed is implicitly denied, but you <strong>cannot block a specific IP</strong> with it. That's the NACL's job — it supports Deny and is evaluated by rule number, lowest first, stopping at the first match.
+    </div>
+
+    <div class="callout exam">
+      <b>WAF is layer 7, Shield is layer 3/4</b>
+      SQL injection, XSS or bots → <strong>AWS WAF</strong>. Volumetric floods (SYN flood, UDP amplification) → <strong>Shield</strong>. If the question mixes both attacks, the right answer usually needs both services, not one.
+    </div>
+
+    <div class="callout exam">
+      <b>CloudFront's WAF lives in us-east-1</b>
+      A web ACL attached to <strong>CloudFront</strong> is global scope and is created in <code>us-east-1</code>. Those attached to ALB, API Gateway or AppSync are regional and live in the resource's Region. The exam uses this detail to rule options out.
+    </div>
+
+    <div class="callout exam">
+      <b>Inspector assesses, it doesn't block</b>
+      Amazon Inspector finds and prioritizes vulnerabilities, but it is <strong>not in the traffic path</strong> and prevents nothing. If the question asks to stop malicious requests, Inspector is never the answer.
+    </div>
+
+    <div class="callout exam">
+      <b>Session Manager needs no inbound ports</b>
+      The session is established by an <strong>outbound</strong> connection from the agent to the service. No port 22, no public IP and no bastion are needed — but the <strong>SSM Agent</strong> and an <strong>instance profile</strong> with permissions are. If the instance has no internet egress, the fix is VPC endpoints, not opening inbound.
+    </div>
+
 
     <h2 id="quiz">Practice quiz — Infrastructure Security</h2>
     <p class="lede">42 exam-style questions. Choose an option to see if it's correct and why.</p>

@@ -49,6 +49,7 @@
     <a href="#access-analyzer">Access Analyzer &amp; Policy Simulator</a>
     <a href="#root">Root user &amp; MFA</a>
     <a href="#perimeter">Data perimeter</a>
+    <a href="#trampas">Classic traps</a>
     <h4>Practice</h4>
     <a href="#quiz">Quiz (53 questions)</a>
   </aside>
@@ -489,6 +490,45 @@
       <tr><td>Resource</td><td>Which resources are trusted?</td><td>RCP/SCP with <code>aws:ResourceOrgID</code>, restrictive resource policies</td></tr>
       <tr><td>Network</td><td>What network is the access coming from?</td><td>VPC endpoint policies + <code>aws:SourceVpce</code> / <code>aws:SourceIp</code></td></tr>
     </table>
+
+    <h2 id="trampas">Classic exam traps</h2>
+    <p class="lede">The mistakes that repeat most in this domain. If you're short on time before the exam, review just this and the quiz.</p>
+
+    <div class="callout exam">
+      <b>An explicit Deny always wins, wherever it comes from</b>
+      The order is: <strong>explicit Deny &gt; explicit Allow &gt; implicit Deny</strong>. That Deny can live in the identity policy, the resource policy, an SCP, an RCP, a permission boundary or a session policy. Faced with an unexplained AccessDenied, check all six, not just the user's policy.
+    </div>
+
+    <div class="callout exam">
+      <b>SCPs grant nothing</b>
+      An SCP is a <strong>ceiling</strong>, not a grant: even if it allows an action, the user still needs an Allow in their identity policy. They also <strong>don't apply to the management account</strong> — which is why AWS advises against running workloads there.
+    </div>
+
+    <div class="callout exam">
+      <b>Permission boundaries don't grant either</b>
+      Effective permission is the <strong>intersection</strong> of the identity policy and the boundary. A boundary with <code>AdministratorAccess</code> makes nobody an admin, and a broad identity policy gets trimmed by a narrow boundary.
+    </div>
+
+    <div class="callout exam">
+      <b>Cross-account requires both ends</b>
+      Assuming a role in another account needs <strong>two</strong> things: the target role's trust policy must authorize the principal, and that principal must hold <code>sts:AssumeRole</code>. Same with another account's KMS key: key policy on the owner and identity policy on the consumer. An Allow on one side alone is never enough.
+    </div>
+
+    <div class="callout exam">
+      <b>Access Analyzer and Policy Simulator answer different questions</b>
+      <strong>Policy Simulator</strong> answers "would this policy allow this action?" on a hypothetical. <strong>Access Analyzer</strong> audits access that <em>already exists</em> in the account (external, unused, internal). They are complementary, and the exam offers them as mutually exclusive.
+    </div>
+
+    <div class="callout exam">
+      <b>SCPs protect identities, RCPs protect resources</b>
+      SCPs cap what <em>your organization's</em> identities can do: they don't reach an external or anonymous principal accessing your resources. <strong>RCPs</strong> close that gap. If the scenario involves access from outside the organization, the SCP is not the answer.
+    </div>
+
+    <div class="callout exam">
+      <b>Role chaining caps the session at one hour</b>
+      When a role assumes another role, the maximum session duration drops to <strong>1 hour</strong>, regardless of the configured <code>MaxSessionDuration</code>. It's a classic cause of "credentials expire sooner than expected".
+    </div>
+
 
     <h2 id="quiz">Practice quiz — IAM</h2>
     <p class="lede">53 exam-style questions. Pick an option to see if it's correct and why.</p>
