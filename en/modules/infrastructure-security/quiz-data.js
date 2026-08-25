@@ -455,4 +455,52 @@ const QUIZ_DATA = [
     correct: 1,
     explain: "An interface endpoint's Security Group only controls network-level access (what can connect to the endpoint's ENI, by IP/port) — it has no concept of S3 buckets. The Endpoint Policy is an IAM-format resource policy attached to the endpoint that explicitly limits which principals can perform which actions on which resources using THAT specific endpoint, acting as an additional layer of control alongside (not instead of) IAM identity policies and the resource's bucket policy.",
   },
+  {
+    tag: "Security Groups vs NACLs",
+    q: "You are designing a VPC's network controls. Which TWO statements about security groups and network ACLs are correct?",
+    options: [
+      "Security groups are stateful: return traffic is automatically allowed even with no outbound rule",
+      "Network ACLs are stateless and support explicit Deny rules, evaluated by rule number",
+      "Security groups support explicit Deny rules to block specific IPs",
+      "Network ACLs apply to the instance's network interface, not to the subnet",
+    ],
+    correct: [0, 1],
+    explain: "This is the domain's most-asked comparison. <b>SGs are stateful</b> (allow-only, return traffic automatic) and attach to the ENI; <b>NACLs are stateless</b> (allow and deny, evaluated in rule-number order, and return traffic must be opened explicitly, typically the ephemeral ports) and attach to the subnet. That's why blocking a specific IP is a NACL job, not a security group one.",
+  },
+  {
+    tag: "Protecting a public web app",
+    q: "A web application behind CloudFront is hit by SQL injection and a volumetric layer 3/4 attack. Which TWO services directly address these threats?",
+    options: [
+      "AWS WAF with the appropriate managed rule groups, for the SQL injection",
+      "AWS Shield, for mitigating the volumetric layer 3/4 attack",
+      "Amazon Inspector, which blocks malicious requests in real time",
+      "AWS Config, which prevents requests with suspicious payloads from arriving",
+    ],
+    correct: [0, 1],
+    explain: "<b>WAF</b> inspects at layer 7 and stops SQLi/XSS with managed rules; <b>Shield</b> mitigates volumetric DDoS at layers 3/4 (Standard is included, Advanced adds protection and managed response). Inspector assesses <i>vulnerabilities</i> in instances, containers and Lambda: it doesn't filter traffic. Config evaluates resource <i>configuration</i>: also not in the request path. Telling apart what sits inline with traffic and what doesn't is key.",
+  },
+  {
+    tag: "Admin access without exposed SSH",
+    q: "Security forbids opening port 22 to the internet and wants to eliminate bastion hosts, but operators need shell access to EC2 instances in private subnets. Which TWO enable this?",
+    options: [
+      "AWS Systems Manager Session Manager, which opens the session with no inbound ports",
+      "The SSM Agent installed on the instance and an instance profile with Systems Manager permissions",
+      "A security group rule allowing port 22 from the corporate IP range",
+      "An Elastic IP on each instance so Systems Manager can reach it",
+    ],
+    correct: [0, 1],
+    explain: "<b>Session Manager</b> works over an <i>outbound</i> connection from the agent to the service, so it needs no inbound ports, no public IP and no bastion — and it logs the session to CloudTrail/S3/CloudWatch. It needs both pieces: the <b>agent</b> and <b>permissions via an instance profile</b>. Opening port 22, even to a corporate range, is exactly what's being eliminated, and an Elastic IP would expose the instance rather than protect it.",
+  },
+  {
+    tag: "Hardened base images",
+    q: "The company wants every EC2 instance to boot from hardened, patched images. Which TWO services fit that chain?",
+    options: [
+      "EC2 Image Builder, to build and version hardened AMIs repeatably",
+      "Amazon Inspector, to detect known vulnerabilities in the images and instances",
+      "AWS Shield Advanced, to validate that the AMI contains no malware",
+      "Amazon Macie, to scan the AMI's operating system for CVEs",
+    ],
+    correct: [0, 1],
+    explain: "<b>Image Builder</b> automates building, hardening and versioning AMIs, and <b>Inspector</b> continuously assesses them against known CVEs. Shield is purely anti-DDoS. Macie discovers and classifies <b>sensitive data in S3</b> — it doesn't analyze operating systems: mistaking Macie for a vulnerability scanner is a recurring distractor.",
+  },
 ];

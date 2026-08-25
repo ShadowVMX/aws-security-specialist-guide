@@ -420,6 +420,53 @@ td strong, td code { color: var(--text); }
 .quiz-opt.correct { border-color: var(--green); background: var(--green-soft); }
 .quiz-opt.incorrect { border-color: var(--red); background: var(--red-soft); }
 .quiz-opt:disabled { cursor: default; }
+/* multiple response: toggled on but not submitted yet */
+.quiz-opt.selected { border-color: var(--accent); background: var(--accent-soft); }
+.quiz-opt.selected::before { content: "✓ "; font-weight: 700; color: var(--accent); }
+/* required but not picked — without this a wrong multi answer looks right */
+.quiz-opt.missed {
+  border-color: var(--green);
+  border-style: dashed;
+  background: transparent;
+}
+.quiz-opt.missed::after {
+  content: " — " attr(data-note);
+  font-size: 12px;
+  color: var(--green);
+  font-weight: 700;
+}
+
+.quiz-multi {
+  display: inline-block;
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--accent);
+  background: var(--accent-soft);
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin: 0 0 10px 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.quiz-check {
+  margin-top: 12px;
+  padding: 9px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 13.5px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+.quiz-check:disabled {
+  border-color: var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-faint);
+  cursor: default;
+  font-weight: 400;
+}
 .quiz-explain {
   display: none;
   margin-top: 12px;

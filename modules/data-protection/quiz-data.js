@@ -503,4 +503,52 @@ const QUIZ_DATA = [
     correct: 1,
     explain: "Todas las operaciones de la API de KMS quedan registradas como eventos de CloudTrail (activado por defecto como 'management events'), incluyendo el principal (usuario/rol) que hizo la llamada, la hora, el Key ID afectado, la IP de origen y si la llamada tuvo éxito o fue denegada — la fuente de verdad para auditar el uso de una KMS key.",
   },
+  {
+    tag: "Uso cross-account de una KMS key",
+    q: "Un rol de la cuenta B debe descifrar objetos cifrados con una KMS key gestionada por el cliente que vive en la cuenta A. ¿Qué DOS condiciones deben cumplirse?",
+    options: [
+      "La key policy de la clave en la cuenta A debe permitir el acceso al principal de la cuenta B",
+      "La política de identidad del rol en la cuenta B debe permitir kms:Decrypt sobre esa clave",
+      "La clave debe ser una AWS managed key en lugar de una customer managed key",
+      "Ambas cuentas deben estar en la misma Región y en la misma Organization",
+    ],
+    correct: [0, 1],
+    explain: "Igual que en el acceso cross-account a roles, KMS exige <b>las dos puntas</b>: key policy en el propietario e identity policy en el consumidor. Precisamente las <b>AWS managed keys no se pueden compartir</b> entre cuentas — por eso el caso de uso cross-account obliga a una customer managed key, justo lo contrario de la opción C. Y no hace falta Organizations; la Región sí importa porque las claves son regionales, pero eso no es lo que falta aquí.",
+  },
+  {
+    tag: "Envelope encryption",
+    q: "¿Qué DOS afirmaciones describen correctamente el envelope encryption tal y como lo implementa AWS KMS?",
+    options: [
+      "Los datos se cifran con una data key, y esa data key se cifra a su vez con la KMS key",
+      "La data key en claro se usa en memoria y se descarta; solo se almacena su versión cifrada junto al dato",
+      "Los datos viajan a KMS para ser cifrados allí, sin importar su tamaño",
+      "La KMS key sale del servicio para cifrar los datos en el cliente",
+    ],
+    correct: [0, 1],
+    explain: "El envelope encryption existe justamente para <b>no</b> mandar los datos a KMS: KMS cifra la data key (operación pequeña y rápida) y el cifrado masivo ocurre localmente. La operación directa <code>Encrypt</code> de KMS está limitada a 4 KB, lo que descarta la opción C para datos reales. Y el material criptográfico de una KMS key <b>nunca sale sin cifrar</b> del servicio: es su garantía fundamental.",
+  },
+  {
+    tag: "Retención inmutable en S3",
+    q: "Un requisito regulatorio exige que ciertos objetos de S3 no puedan borrarse durante 7 años. ¿Qué DOS afirmaciones sobre S3 Object Lock son correctas?",
+    options: [
+      "En modo compliance, ningún usuario — incluido el root de la cuenta — puede borrar el objeto antes de que expire la retención",
+      "Object Lock requiere que el versionado esté habilitado en el bucket",
+      "En modo governance nadie puede sobrescribir la retención bajo ninguna circunstancia",
+      "Object Lock puede activarse sobre objetos ya existentes sin ninguna configuración previa del bucket",
+    ],
+    correct: [0, 1],
+    explain: "<b>Compliance</b> es el modo verdaderamente inmutable (ni root puede saltárselo) y Object Lock <b>depende del versionado</b>, porque protege versiones concretas. El modo <b>governance</b> sí admite excepción para quien tenga el permiso <code>s3:BypassGovernanceRetention</code> — esa es justo la diferencia entre los dos modos y lo que suele preguntarse. Y Object Lock se habilita a nivel de bucket, no se improvisa sobre objetos existentes en un bucket que no lo tiene.",
+  },
+  {
+    tag: "Rotación en Secrets Manager",
+    q: "Quieres rotar automáticamente la contraseña de una base de datos RDS almacenada en Secrets Manager. ¿Qué DOS elementos intervienen?",
+    options: [
+      "Una función Lambda de rotación con permiso para cambiar la credencial en la base de datos",
+      "Una programación de rotación que define cada cuánto se ejecuta el proceso",
+      "Un bucket S3 donde Secrets Manager deposita la contraseña anterior en texto plano",
+      "Una regla de AWS Config que cambie la contraseña cuando detecte que ha caducado",
+    ],
+    correct: [0, 1],
+    explain: "La rotación se apoya en una <b>Lambda</b> (AWS provee plantillas para las bases de datos soportadas) y una <b>programación</b>. Secrets Manager mantiene las versiones del secreto con etiquetas como AWSCURRENT y AWSPREVIOUS dentro del propio servicio y cifradas con KMS: jamás escribe credenciales en claro en un bucket. Y Config <b>evalúa</b> configuración, no rota credenciales.",
+  },
 ];

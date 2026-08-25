@@ -443,4 +443,52 @@ const QUIZ_DATA = [
     correct: 1,
     explain: "S3 Object Lock's compliance mode prevents anyone (including root) from modifying or deleting the object for as long as the configured retention period lasts. Legal Hold is an independent mechanism with no expiration date: it keeps protecting the object even after the retention period has already expired, until someone with permission explicitly removes it — exactly what's needed when litigation drags on longer than originally expected.",
   },
+  {
+    tag: "Containing a compromised EC2",
+    q: "GuardDuty reports that a production EC2 instance is talking to a command-and-control IP. You must contain it while preserving evidence for later forensics. Which TWO actions are appropriate?",
+    options: [
+      "Replace its security group with one that has no outbound rules, isolating it without powering it off",
+      "Take EBS volume snapshots and capture memory before anything else",
+      "Terminate the instance immediately to cut off the communication",
+      "Reboot the instance to clear the malicious processes from memory",
+    ],
+    correct: [0, 1],
+    explain: "Network isolation cuts the channel without destroying state, and the <b>EBS snapshot plus memory capture</b> preserve the evidence. Terminating destroys ephemeral disk and memory at once: the case is gone. Rebooting is just as damaging, because memory is exactly where fileless malware lives. Exam rule: contain is not destroy.",
+  },
+  {
+    tag: "Exposed IAM credentials",
+    q: "An IAM user's access key is found to have been public in a repository for days. Which TWO actions come first?",
+    options: [
+      "Disable or delete the compromised access key immediately",
+      "Review CloudTrail to determine what was done with the key and from where",
+      "Change the user's console password and consider the incident closed",
+      "Wait for the key to expire on its own, since access keys rotate automatically",
+    ],
+    correct: [0, 1],
+    explain: "First cut off access (<b>disable the key</b>), then establish scope (<b>CloudTrail</b>): without knowing what the attacker did you cannot know whether they left backdoors such as new roles or users. Changing the console password does nothing to an access key, which is a separate credential. And IAM access keys <b>never expire on their own</b>: they live until someone disables them.",
+  },
+  {
+    tag: "Preparing the response plan",
+    q: "The security team wants to respond to incidents without depending on an administrator being available to grant permissions mid-crisis. Which TWO measures prepare for this?",
+    options: [
+      "Pre-create an incident response role with the needed permissions and a scoped trust policy",
+      "Document and automate the procedures as runbooks executable in Systems Manager",
+      "Distribute the accounts' root credentials among team members just in case",
+      "Grant permanent AdministratorAccess to the whole security team",
+    ],
+    correct: [0, 1],
+    explain: "A <b>pre-provisioned role</b> and <b>automated runbooks</b> allow fast action without improvising permissions or steps. Sharing root credentials destroys traceability and is the opposite of AWS guidance: root is protected with MFA and used only for tasks that require it. Permanent AdministratorAccess turns the response team into the account's biggest risk.",
+  },
+  {
+    tag: "Chain of custody",
+    q: "Evidence collected from an incident may end up in legal proceedings. Which TWO practices protect its validity?",
+    options: [
+      "Store the evidence in a separate forensics account with restricted, logged access",
+      "Compute and retain integrity hashes of the collected artifacts",
+      "Analyze the affected instance's original volumes directly",
+      "Compress the evidence and email it to the legal team",
+    ],
+    correct: [0, 1],
+    explain: "<b>Isolation in a forensics account</b> with audited access and <b>integrity hashes</b> are what let you prove the evidence wasn't altered. Working on the original volumes modifies them and ruins the chain of custody: always analyze copies. Email provides neither access control nor proof of integrity.",
+  },
 ];

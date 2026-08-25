@@ -443,4 +443,52 @@ const QUIZ_DATA = [
     correct: 1,
     explain: "El modo compliance de S3 Object Lock impide que cualquiera (incluido el root) modifique o borre el objeto mientras dure el periodo de retención configurado. El Legal Hold es un mecanismo independiente y sin fecha de caducidad: sigue protegiendo el objeto aunque el periodo de retención ya haya expirado, hasta que alguien con permiso lo retire explícitamente — justo lo que se necesita cuando un litigio se alarga más de lo previsto originalmente.",
   },
+  {
+    tag: "Contención de una EC2 comprometida",
+    q: "GuardDuty reporta que una instancia EC2 de producción está comunicándose con una IP de command-and-control. Debes contenerla preservando la evidencia para el análisis forense posterior. ¿Qué DOS acciones son las adecuadas?",
+    options: [
+      "Sustituir su security group por uno sin reglas de salida, aislándola sin apagarla",
+      "Tomar un snapshot de los volúmenes EBS y capturar la memoria antes de cualquier otra cosa",
+      "Terminar la instancia de inmediato para cortar la comunicación",
+      "Reiniciar la instancia para limpiar los procesos maliciosos en memoria",
+    ],
+    correct: [0, 1],
+    explain: "Aislar por red corta el canal sin destruir estado, y el <b>snapshot de EBS más la captura de memoria</b> preservan la evidencia. Terminar la instancia destruye a la vez el disco efímero y la memoria: se pierde el caso. Reiniciar es igual de dañino, porque la memoria es justo donde vive el malware sin fichero en disco. Regla del examen: contener no es destruir.",
+  },
+  {
+    tag: "Credenciales de IAM expuestas",
+    q: "Se descubre que una access key de un usuario IAM lleva días publicada en un repositorio público. ¿Qué DOS acciones deben tomarse primero?",
+    options: [
+      "Desactivar o eliminar la access key comprometida inmediatamente",
+      "Revisar CloudTrail para determinar qué se hizo con esa clave y desde dónde",
+      "Cambiar la contraseña de consola del usuario y dar por cerrado el incidente",
+      "Esperar a que la clave expire por sí sola, ya que las access keys caducan automáticamente",
+    ],
+    correct: [0, 1],
+    explain: "Primero se corta el acceso (<b>desactivar la clave</b>) y después se determina el alcance (<b>CloudTrail</b>): sin saber qué hizo el atacante no se puede saber si dejó puertas traseras, como roles o usuarios nuevos. Cambiar la contraseña de consola no afecta a una access key, que es un credencial distinto. Y las access keys de IAM <b>no caducan solas</b>: viven hasta que alguien las desactiva.",
+  },
+  {
+    tag: "Preparación del plan de respuesta",
+    q: "El equipo de seguridad quiere poder responder a incidentes sin depender de que un administrador esté disponible para conceder permisos en mitad de la crisis. ¿Qué DOS medidas preparan ese escenario?",
+    options: [
+      "Crear de antemano un rol de respuesta a incidentes con los permisos necesarios y un trust policy acotado",
+      "Documentar y automatizar los procedimientos como runbooks ejecutables en Systems Manager",
+      "Repartir las credenciales root de las cuentas entre los miembros del equipo por si acaso",
+      "Conceder AdministratorAccess permanente a todo el equipo de seguridad",
+    ],
+    correct: [0, 1],
+    explain: "Un <b>rol preaprovisionado</b> y unos <b>runbooks automatizados</b> permiten actuar rápido sin improvisar permisos ni pasos. Repartir credenciales root destruye la trazabilidad y es lo contrario de lo que recomienda AWS: el root se protege con MFA y se usa solo para tareas que lo exigen. Y AdministratorAccess permanente convierte el equipo de respuesta en el mayor riesgo de la cuenta.",
+  },
+  {
+    tag: "Cadena de custodia",
+    q: "La evidencia recogida de un incidente podría acabar en un procedimiento legal. ¿Qué DOS prácticas protegen su validez?",
+    options: [
+      "Guardar la evidencia en una cuenta forense separada, con acceso restringido y registrado",
+      "Calcular y conservar hashes de integridad de los artefactos recogidos",
+      "Analizar directamente los volúmenes originales de la instancia afectada",
+      "Comprimir la evidencia y enviarla por correo al equipo legal",
+    ],
+    correct: [0, 1],
+    explain: "El <b>aislamiento en una cuenta forense</b> con acceso auditado y los <b>hashes de integridad</b> son lo que permite demostrar que la evidencia no se alteró. Trabajar sobre los volúmenes originales los modifica y arruina la cadena de custodia: se analiza siempre sobre copias. Y el correo no ofrece ni control de acceso ni prueba de integridad.",
+  },
 ];

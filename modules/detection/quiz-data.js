@@ -431,4 +431,52 @@ const QUIZ_DATA = [
     correct: 1,
     explain: "Aunque ambas resuelven 'quiero ver datos de varias regiones en un solo sitio', operan sobre capas distintas: Security Hub cross-region aggregation trabaja con FINDINGS (el resultado de la detección/evaluación) y los replica hacia una región agregadora designada para el panel de Security Hub; Security Lake rollup regions trabaja con LOGS crudos normalizados a OCSF y replica copias de esos logs hacia una región de destino para análisis. No son intercambiables ni dependen técnicamente la una de la otra.",
   },
+  {
+    tag: "GuardDuty a escala de organización",
+    q: "Una empresa con 180 cuentas en AWS Organizations quiere que GuardDuty esté activo en todas, y que cualquier cuenta nueva quede protegida sin intervención manual. ¿Qué DOS pasos son necesarios?",
+    options: [
+      "Designar una cuenta como delegated administrator de GuardDuty desde la management account",
+      "Activar la opción de auto-enable para que las cuentas nuevas de la organización se incorporen solas",
+      "Crear un rol de IAM en cada cuenta miembro que permita a GuardDuty leer CloudTrail",
+      "Habilitar GuardDuty manualmente en cada cuenta e invitarlas una a una desde la cuenta central",
+    ],
+    correct: [0, 1],
+    explain: "GuardDuty se gobierna en Organizations con un <b>delegated administrator</b> y la opción de <b>auto-enable</b>, que incorpora las cuentas nuevas sin tocar nada. GuardDuty consume CloudTrail, VPC Flow Logs y DNS logs por su cuenta mediante un service-linked role: no hay que crear roles ni habilitar esos logs. El flujo de invitaciones manuales existe, pero es justo lo que se quiere evitar y no cubre las cuentas futuras.",
+  },
+  {
+    tag: "CloudTrail: eventos de datos",
+    q: "Tras un incidente, el equipo descubre que CloudTrail no registró QUIÉN descargó objetos concretos de un bucket S3, aunque sí registró la creación del bucket. ¿Qué DOS afirmaciones explican y resuelven la situación?",
+    options: [
+      "Los management events registran operaciones sobre el bucket, pero no las operaciones sobre objetos individuales",
+      "Hay que habilitar data events de S3 para el bucket y registrar operaciones de lectura como GetObject",
+      "CloudTrail nunca puede registrar accesos a objetos: hay que usar exclusivamente S3 server access logging",
+      "Basta con aumentar la retención del trail existente para que aparezcan los eventos retroactivamente",
+    ],
+    correct: [0, 1],
+    explain: "CloudTrail separa <b>management events</b> (plano de control: CreateBucket, PutBucketPolicy) de <b>data events</b> (plano de datos: GetObject, PutObject), y los data events están desactivados por defecto porque tienen coste y volumen altos. S3 server access logging es una alternativa, no la única vía. Y la retención nunca genera eventos que no se capturaron: lo que no se registró no existe.",
+  },
+  {
+    tag: "Cuenta de logging inmutable",
+    q: "Auditoría exige que los logs de CloudTrail no puedan ser borrados ni alterados por un administrador de la cuenta que los genera, ni siquiera con credenciales root. ¿Qué DOS medidas lo consiguen?",
+    options: [
+      "Entregar los logs a un bucket S3 en una cuenta de logging dedicada y separada, con su propia bucket policy",
+      "Aplicar S3 Object Lock en modo compliance sobre el bucket de destino",
+      "Cifrar el bucket con SSE-S3 en lugar de SSE-KMS",
+      "Activar el versionado del bucket y confiar en que los administradores no borren versiones",
+    ],
+    correct: [0, 1],
+    explain: "La separación de cuentas quita el poder al administrador de la cuenta origen, y <b>Object Lock en modo compliance</b> impide el borrado incluso a root durante el periodo de retención (el modo governance sí admite excepción con un permiso especial, por eso no vale aquí). El tipo de cifrado no cambia quién puede borrar. El versionado ayuda a recuperar, pero un administrador con permisos puede borrar versiones: confiar no es un control.",
+  },
+  {
+    tag: "Security Hub multi-Región",
+    q: "Una organización opera en 5 Regiones y quiere revisar todos los findings de Security Hub desde un único panel, en una sola cuenta y Región. ¿Qué DOS elementos hacen falta?",
+    options: [
+      "Designar un delegated administrator de Security Hub en la organización",
+      "Configurar una Región de agregación que consolide los findings de las demás Regiones",
+      "Replicar manualmente los findings con una función Lambda por Región",
+      "Desactivar Security Hub en las Regiones secundarias para evitar duplicados",
+    ],
+    correct: [0, 1],
+    explain: "Security Hub necesita <b>delegated administrator</b> para la vista multi-cuenta y <b>cross-Region aggregation</b> para la vista multi-Región; son dos ejes distintos y hacen falta los dos. La replicación con Lambda es reinventar una función nativa. Y desactivar Security Hub en las otras Regiones eliminaría precisamente los findings que se quieren ver: los controles se evalúan donde están los recursos.",
+  },
 ];

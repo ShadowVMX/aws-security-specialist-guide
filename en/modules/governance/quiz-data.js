@@ -431,4 +431,52 @@ const QUIZ_DATA = [
     correct: 0,
     explain: "AWS has been incrementally expanding the regional availability of both Config conformance packs and their organization-level management, adding regions such as Asia Pacific (Malaysia), Asia Pacific (New Zealand), Asia Pacific (Thailand), Asia Pacific (Taipei), and Mexico (Central) in 2025 — a realistic exam scenario is verifying a governance feature's regional availability before assuming uniform global coverage.",
   },
+  {
+    tag: "SCP scope",
+    q: "You are rolling out Service Control Policies across an organization. Which TWO statements are correct?",
+    options: [
+      "An SCP grants nothing: it only caps the maximum permissions the account's identities can have",
+      "SCPs do not apply to the organization's management account",
+      "An SCP can grant permissions to a user who lacks them in their identity policy",
+      "SCPs also apply to external principals accessing your resources",
+    ],
+    correct: [0, 1],
+    explain: "Two exam classics. An SCP is a <b>guardrail</b>, never a grant: effective permission is the intersection of the SCP and the identity policies. And the <b>management account is not subject to SCPs</b>, which is why AWS advises against running workloads in it. Option D describes what <b>RCPs</b> do, since they do reach external identities: that is precisely the gap SCPs leave open.",
+  },
+  {
+    tag: "Control Tower controls",
+    q: "Control Tower offers different control types across the landing zone. Which TWO descriptions are correct?",
+    options: [
+      "Preventive controls are implemented with SCPs and stop the action from executing",
+      "Detective controls are implemented with AWS Config rules and flag drift after the fact",
+      "Detective controls block the action before it happens, just like preventive ones",
+      "Preventive controls can only be applied to the audit account",
+    ],
+    correct: [0, 1],
+    explain: "The <b>preventive vs detective</b> distinction is the most-tested one: preventive controls (SCP) <b>stop</b> the action, detective controls (Config) <b>find</b> what already happened. That is why option C contradicts itself. Preventive controls apply to OUs and accounts, not only the audit account. Control Tower also adds <i>proactive</i> controls, which validate CloudFormation templates before deployment.",
+  },
+  {
+    tag: "Multi-account compliance with Config",
+    q: "You need a single view of AWS Config rule compliance across 90 accounts and 4 Regions. Which TWO enable this?",
+    options: [
+      "An AWS Config aggregator collecting data from all accounts and Regions",
+      "Conformance packs deployed across the organization to apply the same rule set everywhere",
+      "An S3 bucket in each account from which to download reports manually every week",
+      "Enabling Config only in the management account, which automatically inherits the others' state",
+    ],
+    correct: [0, 1],
+    explain: "The <b>aggregator</b> delivers the consolidated view and organization-level <b>conformance packs</b> ensure everyone evaluates the same rules. Manual downloads don't scale to 90 accounts and are always stale. And Config is a <b>regional, per-account</b> service: the management account inherits nothing, it must be enabled where the resources are.",
+  },
+  {
+    tag: "Protecting the root user",
+    q: "You are hardening the root user across every account in the organization. Which TWO does AWS recommend?",
+    options: [
+      "Enable MFA on root and delete its access keys if any exist",
+      "Use centralized root access management to remove root credentials from member accounts",
+      "Create a root access key in each account and store it in Secrets Manager to automate tasks",
+      "Use root for daily administrative work, since it is never blocked by an SCP",
+    ],
+    correct: [0, 1],
+    explain: "The basics are <b>MFA and no access keys</b> on root, and <b>centralized root access management</b> lets you remove those credentials from member accounts entirely, leaving root-only tasks to scoped sessions via <code>sts:AssumeRoot</code>. Creating root access keys is the exact opposite of the guidance. And while it is true SCPs don't restrict the management account's root, that is a reason <b>not</b> to use it daily, not a reason to use it.",
+  },
 ];
