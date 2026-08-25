@@ -98,6 +98,7 @@ assets/
 tools/
   audit-questions.js          → auditoría de calidad del banco de preguntas
   check-links.sh              → comprobador de enlaces externos
+  check-internal-links.sh      → enlaces internos que no rompan al renombrar
 modules/<dominio>/
   index.html                → contenido del módulo (español)
   quiz-data.js               → preguntas del quiz (español)
