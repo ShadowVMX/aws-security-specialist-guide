@@ -109,6 +109,60 @@
     onScrollTop();
   }
 
+
+  /* ---- theme switch --------------------------------------------------- */
+
+  // The page already follows the system theme. This adds an explicit override
+  // for the common case of a phone locked to one theme and a reader who wants
+  // the other — and for browsers whose forced dark mode fights the page.
+  (function () {
+    const KEY = "scs-c03:theme";
+    const nav = document.querySelector(".topnav");
+    if (!nav) return;
+
+    const LABEL = LANG === "en"
+      ? { system: "Theme: system", light: "Theme: light", dark: "Theme: dark" }
+      : { system: "Tema: sistema", light: "Tema: claro", dark: "Tema: oscuro" };
+    const ICON = { system: "◐", light: "☀", dark: "☾" };
+    const ORDER = ["system", "light", "dark"];
+
+    function read() {
+      try {
+        const v = localStorage.getItem(KEY);
+        return ORDER.indexOf(v) >= 0 ? v : "system";
+      } catch (e) {
+        return "system";
+      }
+    }
+
+    function apply(mode) {
+      if (mode === "system") document.documentElement.removeAttribute("data-theme");
+      else document.documentElement.setAttribute("data-theme", mode);
+      btn.textContent = ICON[mode];
+      btn.title = LABEL[mode];
+      btn.setAttribute("aria-label", LABEL[mode]);
+    }
+
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "theme-switch";
+    nav.appendChild(btn);
+
+    let mode = read();
+    apply(mode);
+
+    btn.addEventListener("click", () => {
+      mode = ORDER[(ORDER.indexOf(mode) + 1) % ORDER.length];
+      try {
+        if (mode === "system") localStorage.removeItem(KEY);
+        else localStorage.setItem(KEY, mode);
+      } catch (e) {
+        /* storage unavailable — the choice just won't outlive the page */
+      }
+      apply(mode);
+    });
+  })();
+
   /* ---- sidebar scrollspy ---------------------------------------------- */
 
   const links = document.querySelectorAll(".sidebar a[href^='#']");
