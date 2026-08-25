@@ -9,8 +9,9 @@
  *                        a check button submits them; scored all-or-nothing,
  *                        the way the real exam scores them.
  *
- * Progress is saved to localStorage so closing the tab doesn't lose it, and
- * the reset button clears the saved copy as well as the on-screen state.
+ * Answers and study preferences are saved to localStorage. Answers are always
+ * stored as ORIGINAL option indices, so turning shuffle on or off never
+ * invalidates saved progress.
  */
 (function () {
   const root = document.getElementById("quiz-root");
@@ -30,6 +31,17 @@
       check: "Comprobar respuesta",
       pick: (n) => `Selecciona ${n} opciones`,
       missed: "Faltaba esta",
+      allTopics: "Todos los temas",
+      viewAll: "Todas",
+      viewUnanswered: "Sin responder",
+      viewWrong: "Solo falladas",
+      viewFlagged: "Marcadas",
+      shuffle: "Barajar",
+      reshuffle: "Volver a barajar",
+      showing: (n, t) => `Mostrando ${n} de ${t}`,
+      empty: "No hay preguntas que cumplan este filtro.",
+      flag: "Marcar para repasar",
+      unflag: "Quitar marca",
     },
     en: {
       answered: (a, t) => `${a} / ${t} answered`,
@@ -43,6 +55,17 @@
       check: "Check answer",
       pick: (n) => `Select ${n} options`,
       missed: "This one was required",
+      allTopics: "All topics",
+      viewAll: "All",
+      viewUnanswered: "Unanswered",
+      viewWrong: "Wrong only",
+      viewFlagged: "Flagged",
+      shuffle: "Shuffle",
+      reshuffle: "Shuffle again",
+      showing: (n, t) => `Showing ${n} of ${t}`,
+      empty: "No questions match this filter.",
+      flag: "Flag for review",
+      unflag: "Remove flag",
     },
   };
 
@@ -70,7 +93,7 @@
     return sameAnswer(state[qi], isMulti(item) ? correctSet(item) : item.correct);
   }
 
-  /* ---- persistence ---------------------------------------------------- */
+  /* ---- storage -------------------------------------------------------- */
 
   // Module id from the URL: /modules/iam/index.html -> "iam". Falls back to
   // the whole path so two quizzes can never share a key by accident.
@@ -80,7 +103,9 @@
     return parts.pop() || location.pathname;
   }
 
-  const STORE_KEY = `scs-c03:quiz:${LANG}:${moduleId()}`;
+  const MOD = moduleId();
+  const ANSWER_KEY = `scs-c03:quiz:${LANG}:${MOD}`;
+  const PREFS_KEY = `scs-c03:quizprefs:${LANG}:${MOD}`;
 
   // Answers are stored against a hash of the question text rather than its
   // index, so adding or reordering questions later doesn't silently shift
@@ -95,32 +120,28 @@
 
   // Any storage access can throw (private mode, site data blocked), and a
   // quiz that works is worth more than one that saves, so failures are silent.
-  function load() {
+  function readJSON(key, fallback) {
     try {
-      const raw = localStorage.getItem(STORE_KEY);
-      if (!raw) return {};
+      const raw = localStorage.getItem(key);
+      if (!raw) return fallback;
       const parsed = JSON.parse(raw);
-      return parsed && typeof parsed === "object" ? parsed : {};
+      return parsed && typeof parsed === "object" ? parsed : fallback;
     } catch (e) {
-      return {};
+      return fallback;
     }
   }
 
-  function save() {
+  function writeJSON(key, value) {
     try {
-      const out = {};
-      state.forEach((v, i) => {
-        if (v !== null) out[keys[i]] = v;
-      });
-      localStorage.setItem(STORE_KEY, JSON.stringify(out));
+      localStorage.setItem(key, JSON.stringify(value));
     } catch (e) {
       /* storage unavailable — keep going in memory only */
     }
   }
 
-  function clearSaved() {
+  function removeKey(key) {
     try {
-      localStorage.removeItem(STORE_KEY);
+      localStorage.removeItem(key);
     } catch (e) {
       /* nothing to do */
     }
@@ -140,11 +161,92 @@
     return inRange(v) ? v : null;
   }
 
-  const saved = load();
-  const state = QUIZ_DATA.map((item, i) => sanitise(saved[keys[i]], item));
+  const savedAnswers = readJSON(ANSWER_KEY, {});
+  const state = QUIZ_DATA.map((item, i) => sanitise(savedAnswers[keys[i]], item));
 
   // options toggled on a multiple-response question but not submitted yet
   const pending = QUIZ_DATA.map(() => []);
+
+  const storedPrefs = readJSON(PREFS_KEY, {});
+  const prefs = {
+    shuffle: storedPrefs.shuffle === true,
+    // a stored seed keeps the shuffled order stable across reloads: a study
+    // list that reorders itself every refresh is disorienting
+    seed: Number.isFinite(storedPrefs.seed) ? storedPrefs.seed : Date.now() % 2147483647,
+    flags: Array.isArray(storedPrefs.flags) ? storedPrefs.flags.filter((k) => keys.includes(k)) : [],
+  };
+
+  function savePrefs() {
+    writeJSON(PREFS_KEY, prefs);
+  }
+
+  function saveAnswers() {
+    const out = {};
+    state.forEach((v, i) => {
+      if (v !== null) out[keys[i]] = v;
+    });
+    writeJSON(ANSWER_KEY, out);
+  }
+
+  /* ---- shuffling ------------------------------------------------------ */
+
+  // Deterministic PRNG so the same seed always rebuilds the same order.
+  function rng(seed) {
+    let a = seed >>> 0;
+    return function () {
+      a |= 0;
+      a = (a + 0x6d2b79f5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function shuffled(arr, seed) {
+    const rand = rng(seed);
+    const out = arr.slice();
+    for (let i = out.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1));
+      [out[i], out[j]] = [out[j], out[i]];
+    }
+    return out;
+  }
+
+  // Option order for a question. Answers are stored as original indices, so
+  // this only ever affects what is drawn, never what is saved.
+  function optionOrder(qi) {
+    const n = QUIZ_DATA[qi].options.length;
+    const identity = Array.from({ length: n }, (_, i) => i);
+    if (!prefs.shuffle) return identity;
+    // mix the seed with the question's own hash so questions don't all get
+    // permuted the same way
+    return shuffled(identity, (prefs.seed ^ parseInt(keys[qi], 36)) >>> 0);
+  }
+
+  function questionOrder() {
+    const identity = QUIZ_DATA.map((_, i) => i);
+    return prefs.shuffle ? shuffled(identity, prefs.seed) : identity;
+  }
+
+  /* ---- filtering ------------------------------------------------------ */
+
+  const view = { mode: "all", tag: "all" };
+
+  const TAGS = Array.from(new Set(QUIZ_DATA.map((q) => q.tag).filter(Boolean))).sort(
+    (a, b) => a.localeCompare(b, LANG)
+  );
+
+  function passes(qi) {
+    if (view.tag !== "all" && QUIZ_DATA[qi].tag !== view.tag) return false;
+    if (view.mode === "unanswered") return state[qi] === null;
+    if (view.mode === "wrong") return state[qi] !== null && !isRight(qi);
+    if (view.mode === "flagged") return prefs.flags.includes(keys[qi]);
+    return true;
+  }
+
+  function visible() {
+    return questionOrder().filter(passes);
+  }
 
   /* ---- rendering ------------------------------------------------------ */
 
@@ -156,6 +258,80 @@
     return state.filter((v) => v !== null).length;
   }
 
+  function select(labelled, value, onChange) {
+    const sel = document.createElement("select");
+    sel.className = "quiz-select";
+    labelled.forEach(([v, label]) => {
+      const opt = document.createElement("option");
+      opt.value = v;
+      opt.textContent = label;
+      if (v === value) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    sel.addEventListener("change", () => onChange(sel.value));
+    return sel;
+  }
+
+  function renderToolbar() {
+    const bar = document.createElement("div");
+    bar.className = "quiz-toolbar";
+
+    bar.appendChild(
+      select(
+        [
+          ["all", T.viewAll],
+          ["unanswered", T.viewUnanswered],
+          ["wrong", T.viewWrong],
+          ["flagged", T.viewFlagged],
+        ],
+        view.mode,
+        (v) => {
+          view.mode = v;
+          render();
+        }
+      )
+    );
+
+    bar.appendChild(
+      select(
+        [["all", T.allTopics]].concat(TAGS.map((t) => [t, t])),
+        view.tag,
+        (v) => {
+          view.tag = v;
+          render();
+        }
+      )
+    );
+
+    const shuffleBtn = document.createElement("button");
+    shuffleBtn.type = "button";
+    shuffleBtn.className = "quiz-toggle" + (prefs.shuffle ? " on" : "");
+    shuffleBtn.setAttribute("aria-pressed", prefs.shuffle ? "true" : "false");
+    shuffleBtn.textContent = T.shuffle;
+    shuffleBtn.addEventListener("click", () => {
+      prefs.shuffle = !prefs.shuffle;
+      if (prefs.shuffle) prefs.seed = (Date.now() % 2147483647) >>> 0;
+      savePrefs();
+      render();
+    });
+    bar.appendChild(shuffleBtn);
+
+    if (prefs.shuffle) {
+      const again = document.createElement("button");
+      again.type = "button";
+      again.className = "quiz-toggle";
+      again.textContent = T.reshuffle;
+      again.addEventListener("click", () => {
+        prefs.seed = (Date.now() % 2147483647) >>> 0;
+        savePrefs();
+        render();
+      });
+      bar.appendChild(again);
+    }
+
+    return bar;
+  }
+
   function renderOption(item, qi, oi, optText) {
     const chosen = state[qi];
     const btn = document.createElement("button");
@@ -164,9 +340,8 @@
     btn.textContent = optText;
 
     const multi = isMulti(item);
-    const answeredNow = chosen !== null;
 
-    if (answeredNow) {
+    if (chosen !== null) {
       const wanted = correctSet(item);
       const picked = multi ? chosen : [chosen];
       btn.disabled = true;
@@ -190,15 +365,95 @@
         else pending[qi].push(oi);
       } else {
         state[qi] = oi;
-        save();
+        saveAnswers();
       }
       render();
     });
     return btn;
   }
 
+  function renderCard(qi, position) {
+    const item = QUIZ_DATA[qi];
+    const chosen = state[qi];
+    const multi = isMulti(item);
+    const card = document.createElement("div");
+    card.className = "quiz-item";
+
+    const head = document.createElement("div");
+    head.className = "quiz-head";
+
+    const tag = document.createElement("span");
+    tag.className = "quiz-tag";
+    tag.textContent = item.tag || "IAM";
+    head.appendChild(tag);
+
+    if (multi) {
+      const badge = document.createElement("span");
+      badge.className = "quiz-multi";
+      badge.textContent = T.choose(item.correct.length);
+      head.appendChild(badge);
+    }
+
+    const flagged = prefs.flags.includes(keys[qi]);
+    const flag = document.createElement("button");
+    flag.type = "button";
+    flag.className = "quiz-flag" + (flagged ? " on" : "");
+    flag.textContent = flagged ? "★" : "☆";
+    flag.title = flagged ? T.unflag : T.flag;
+    flag.setAttribute("aria-label", flagged ? T.unflag : T.flag);
+    flag.setAttribute("aria-pressed", flagged ? "true" : "false");
+    flag.addEventListener("click", () => {
+      const at = prefs.flags.indexOf(keys[qi]);
+      if (at >= 0) prefs.flags.splice(at, 1);
+      else prefs.flags.push(keys[qi]);
+      savePrefs();
+      render();
+    });
+    head.appendChild(flag);
+
+    card.appendChild(head);
+
+    const qEl = document.createElement("div");
+    qEl.className = "quiz-q";
+    qEl.textContent = `${position}. ${item.q}`;
+    card.appendChild(qEl);
+
+    const opts = document.createElement("div");
+    opts.className = "quiz-opts";
+    optionOrder(qi).forEach((oi) =>
+      opts.appendChild(renderOption(item, qi, oi, item.options[oi]))
+    );
+    card.appendChild(opts);
+
+    if (multi && chosen === null) {
+      const need = item.correct.length;
+      const ready = pending[qi].length === need;
+      const check = document.createElement("button");
+      check.className = "quiz-check";
+      check.type = "button";
+      check.disabled = !ready;
+      check.textContent = ready ? T.check : T.pick(need);
+      check.addEventListener("click", () => {
+        if (pending[qi].length !== need) return;
+        state[qi] = pending[qi].slice();
+        saveAnswers();
+        render();
+      });
+      card.appendChild(check);
+    }
+
+    const explain = document.createElement("div");
+    explain.className = "quiz-explain" + (chosen !== null ? " show" : "");
+    explain.innerHTML = `<b>${isRight(qi) ? T.correct : T.explanation}</b> ${item.explain}`;
+    card.appendChild(explain);
+
+    return card;
+  }
+
   function render() {
     const total = QUIZ_DATA.length;
+    const list = visible();
+
     root.innerHTML = `
       <div class="quiz-progress">
         <span>${T.answered(answered(), total)}</span>
@@ -207,60 +462,23 @@
       <div class="quiz-bar"><div class="quiz-bar-fill" style="width:${(answered() / total) * 100}%"></div></div>
     `;
 
-    QUIZ_DATA.forEach((item, qi) => {
-      const chosen = state[qi];
-      const multi = isMulti(item);
-      const card = document.createElement("div");
-      card.className = "quiz-item";
+    root.appendChild(renderToolbar());
 
-      const tag = document.createElement("div");
-      tag.className = "quiz-tag";
-      tag.textContent = item.tag || "IAM";
-      card.appendChild(tag);
+    if (list.length !== total) {
+      const showing = document.createElement("p");
+      showing.className = "quiz-showing";
+      showing.textContent = T.showing(list.length, total);
+      root.appendChild(showing);
+    }
 
-      if (multi) {
-        const badge = document.createElement("span");
-        badge.className = "quiz-multi";
-        badge.textContent = T.choose(item.correct.length);
-        card.appendChild(badge);
-      }
+    if (!list.length) {
+      const empty = document.createElement("p");
+      empty.className = "quiz-empty";
+      empty.textContent = T.empty;
+      root.appendChild(empty);
+    }
 
-      const qEl = document.createElement("div");
-      qEl.className = "quiz-q";
-      qEl.textContent = `${qi + 1}. ${item.q}`;
-      card.appendChild(qEl);
-
-      const opts = document.createElement("div");
-      opts.className = "quiz-opts";
-      item.options.forEach((optText, oi) =>
-        opts.appendChild(renderOption(item, qi, oi, optText))
-      );
-      card.appendChild(opts);
-
-      if (multi && chosen === null) {
-        const need = item.correct.length;
-        const ready = pending[qi].length === need;
-        const check = document.createElement("button");
-        check.className = "quiz-check";
-        check.type = "button";
-        check.disabled = !ready;
-        check.textContent = ready ? T.check : T.pick(need);
-        check.addEventListener("click", () => {
-          if (pending[qi].length !== need) return;
-          state[qi] = pending[qi].slice();
-          save();
-          render();
-        });
-        card.appendChild(check);
-      }
-
-      const explain = document.createElement("div");
-      explain.className = "quiz-explain" + (chosen !== null ? " show" : "");
-      explain.innerHTML = `<b>${isRight(qi) ? T.correct : T.explanation}</b> ${item.explain}`;
-      card.appendChild(explain);
-
-      root.appendChild(card);
-    });
+    list.forEach((qi, n) => root.appendChild(renderCard(qi, n + 1)));
 
     const footer = document.createElement("div");
     footer.className = "quiz-footer";
@@ -274,7 +492,11 @@
       if (answered() > 0 && !window.confirm(T.resetConfirm)) return;
       state.fill(null);
       pending.forEach((p) => (p.length = 0));
-      clearSaved();
+      prefs.flags.length = 0;
+      savePrefs();
+      removeKey(ANSWER_KEY);
+      view.mode = "all";
+      view.tag = "all";
       render();
     });
     footer.appendChild(resetBtn);

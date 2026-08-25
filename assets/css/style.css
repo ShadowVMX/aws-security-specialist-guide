@@ -400,7 +400,7 @@ td strong, td code { color: var(--text); }
   background: var(--purple-soft);
   padding: 2px 8px;
   border-radius: 999px;
-  margin-bottom: 10px;
+  margin-bottom: 0;
   text-transform: uppercase;
   letter-spacing: 0.4px;
 }
@@ -436,6 +436,71 @@ td strong, td code { color: var(--text); }
   font-weight: 700;
 }
 
+/* ---- quiz toolbar ---- */
+.quiz-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.quiz-select {
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text);
+  font-size: 13px;
+  font-family: inherit;
+  max-width: 100%;
+}
+.quiz-toggle {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-dim);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+}
+.quiz-toggle:hover { border-color: var(--accent); color: var(--accent); }
+.quiz-toggle.on {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+}
+.quiz-showing { font-size: 13px; color: var(--text-faint); margin: 0 0 12px; }
+.quiz-empty {
+  font-size: 14px;
+  color: var(--text-dim);
+  padding: 20px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  text-align: center;
+}
+
+.quiz-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+/* pushes the flag to the right edge whatever else is in the header */
+.quiz-flag {
+  margin-left: auto;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 17px;
+  line-height: 1;
+  padding: 2px 4px;
+  color: var(--text-faint);
+}
+.quiz-flag:hover { color: var(--accent); }
+.quiz-flag.on { color: var(--accent); }
+
 .quiz-multi {
   display: inline-block;
   font-size: 10.5px;
@@ -444,7 +509,7 @@ td strong, td code { color: var(--text); }
   background: var(--accent-soft);
   padding: 2px 8px;
   border-radius: 999px;
-  margin: 0 0 10px 6px;
+  margin: 0;
   text-transform: uppercase;
   letter-spacing: 0.4px;
 }
