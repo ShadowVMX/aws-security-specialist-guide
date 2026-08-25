@@ -1,4 +1,4 @@
-const QUIZ_DATA = [
+var QUIZ_DATA = [
   {
     tag: "Security Groups vs NACLs",
     q: "What is the MOST important behavioral difference between a Security Group and a Network ACL?",
@@ -504,3 +504,6 @@ const QUIZ_DATA = [
     explain: "<b>Image Builder</b> automates building, hardening and versioning AMIs, and <b>Inspector</b> continuously assesses them against known CVEs. Shield is purely anti-DDoS. Macie discovers and classifies <b>sensitive data in S3</b> — it doesn't analyze operating systems: mistaking Macie for a vulnerability scanner is a recurring distractor.",
   },
 ];
+
+// Registrado para el simulacro de examen, que carga los seis bancos a la vez.
+(window.QUIZ_BANK = window.QUIZ_BANK || {})["infrastructure-security"] = QUIZ_DATA;

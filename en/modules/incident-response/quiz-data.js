@@ -1,4 +1,4 @@
-const QUIZ_DATA = [
+var QUIZ_DATA = [
   {
     tag: "Runbooks & OpsCenter",
     q: "What role does AWS Systems Manager OpsCenter play in an incident response plan?",
@@ -492,3 +492,6 @@ const QUIZ_DATA = [
     explain: "<b>Isolation in a forensics account</b> with audited access and <b>integrity hashes</b> are what let you prove the evidence wasn't altered. Working on the original volumes modifies them and ruins the chain of custody: always analyze copies. Email provides neither access control nor proof of integrity.",
   },
 ];
+
+// Registrado para el simulacro de examen, que carga los seis bancos a la vez.
+(window.QUIZ_BANK = window.QUIZ_BANK || {})["incident-response"] = QUIZ_DATA;

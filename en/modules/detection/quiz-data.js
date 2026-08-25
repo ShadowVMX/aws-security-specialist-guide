@@ -1,4 +1,4 @@
-const QUIZ_DATA = [
+var QUIZ_DATA = [
   {
     tag: "GuardDuty",
     q: "What data sources does Amazon GuardDuty analyze for behavior to detect threats, without you having to manually enable logging in each account?",
@@ -480,3 +480,6 @@ const QUIZ_DATA = [
     explain: "Security Hub needs a <b>delegated administrator</b> for the multi-account view and <b>cross-Region aggregation</b> for the multi-Region view; they are two separate axes and both are required. Replicating with Lambda reinvents a native feature. Disabling Security Hub in the other Regions would remove the very findings you want to see: controls are evaluated where the resources live.",
   },
 ];
+
+// Registrado para el simulacro de examen, que carga los seis bancos a la vez.
+(window.QUIZ_BANK = window.QUIZ_BANK || {})["detection"] = QUIZ_DATA;
