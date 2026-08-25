@@ -70,3 +70,15 @@ jobs:
             grep -q 'name="color-scheme"' "$f" || { echo "::error file=$f::no color-scheme"; fail=1; }
           done
           exit $fail
+
+  links:
+    name: External links
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Every claim in an explanation is backed by an AWS documentation page.
+      # A source link that 404s is worse than no source at all, and AWS moves
+      # pages. The runner has open internet, so this is the place to check.
+      - name: AWS documentation links still resolve
+        run: bash tools/check-links.sh

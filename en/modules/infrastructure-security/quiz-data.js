@@ -133,15 +133,15 @@ var QUIZ_DATA = [
   },
   {
     tag: "Pipeline security",
-    q: "Which AWS tool is designed to analyze source code and detect security vulnerabilities (e.g. injection, hardcoded secrets) WITHIN the CI/CD pipeline, before deployment?",
+    q: "A team wants to stop credentials hardcoded in source and dependencies with known CVEs from ever reaching production. They require the failure to surface as early in the cycle as possible, not as a finding on an already-deployed instance. Which control fits that requirement?",
     options: [
-      "Amazon GuardDuty, which analyzes the repository's code on every commit in the pipeline",
-      "Amazon Detective, which reconstructs the code flow to pinpoint the vulnerability",
-      "AWS Config, with managed rules that evaluate the code before each deployment",
-      "CodeGuru Security, static analysis (SAST) that plugs into the CI/CD pipeline",
+      "GuardDuty Runtime Monitoring on the instance, alerting when the credential is used",
+      "Code and dependency scanning in the pipeline, failing the build before publishing",
+      "Amazon Inspector over the image already pushed to ECR, reporting after each push",
+      "An AWS Config rule that flags the resource as non-compliant once it is deployed",
     ],
-    correct: 3,
-    explain: "The control that belongs here is <strong>static code analysis</strong> (SAST) plus secret detection, running in the pipeline before deployment. That was CodeGuru Security's role; AWS retired it in November 2025 and its capabilities now live in <strong>Amazon Inspector Code Security</strong> and Amazon Q Developer. GuardDuty and Detective observe the running account, not the code. <a href=\"https://docs.aws.amazon.com/inspector/latest/user/scanning-cicd.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+    correct: 1,
+    explain: "The stem turns on <strong>when</strong> the problem is caught, not on which service catches it. The other three are real, useful controls, but all of them act <em>after</em> the fact: GuardDuty observes the running instance, Inspector scans the image once it is already in ECR, and Config evaluates the resource after deployment. Only analysis inside the pipeline stops the artifact from being published at all. Amazon Inspector covers that stage today through Code Security, which plugs into CI/CD and pull requests. <a href=\"https://docs.aws.amazon.com/inspector/latest/user/what-is-inspector.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
   {
     tag: "GenAI guardrails",
