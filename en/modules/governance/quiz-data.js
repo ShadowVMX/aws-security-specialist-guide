@@ -237,7 +237,7 @@ var QUIZ_DATA = [
       "A Declarative Policy enabling VPC Block Public Access at the OU or org level",
     ],
     correct: 3,
-    explain: "Declarative Policies cover EC2/VPC/EBS at scale by enforcing a configuration <strong>state</strong>, not just blocking API calls the way an SCP does. VPC Block Public Access blocks public ingress via internet gateway centrally, non-destructively, and reversibly, and applies to future VPCs too. An SCP on ec2:CreateInternetGateway does nothing about the internet gateways that <em>already exist</em>. <a href=\"https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_declarative.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+    explain: "Declarative Policies cover EC2/VPC/EBS at scale by enforcing a configuration <strong>state</strong>, not just blocking API calls the way an SCP does. VPC Block Public Access blocks public ingress via internet gateway centrally, non-destructively, and reversibly, and applies to future VPCs too. An SCP on ec2:CreateInternetGateway does nothing about the internet gateways that <em>already exist</em>. <a href=\"https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_declarative_policies.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
   {
     tag: "Declarative Policies: allowed AMI providers",
@@ -249,7 +249,7 @@ var QUIZ_DATA = [
       "An IAM permission boundary on every role able to launch EC2 instances",
     ],
     correct: 0,
-    explain: "'Allowed AMIs' is one of the EC2 configurations supported by Declarative Policies: it defines which AMI providers are valid for the whole organization, blocking launches and <strong>hiding from console and CLI</strong> any AMI from a non-approved provider. It is preventive and inherited; the Config Rule arrives too late and permission boundaries must be maintained role by role. <a href=\"https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_declarative.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+    explain: "'Allowed AMIs' is one of the EC2 configurations supported by Declarative Policies: it defines which AMI providers are valid for the whole organization, blocking launches and <strong>hiding from console and CLI</strong> any AMI from a non-approved provider. It is preventive and inherited; the Config Rule arrives too late and permission boundaries must be maintained role by role. <a href=\"https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_declarative_policies.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
   {
     tag: "Tag Policies: IaC enforcement",
@@ -417,7 +417,7 @@ var QUIZ_DATA = [
       "There is no practical difference: both of them deny exactly the same EC2 API calls",
     ],
     correct: 2,
-    explain: "Declarative Policies are designed for durable, 'set and forget' service configuration: once the desired state is defined (e.g. mandatory IMDSv2), it is automatically maintained even as the service adds new APIs or related features. An SCP operates on <strong>specific API permissions</strong>: if a new path to the undesired outcome appears, the SCP must be updated by hand. <a href=\"https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_declarative.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+    explain: "Declarative Policies are designed for durable, 'set and forget' service configuration: once the desired state is defined (e.g. mandatory IMDSv2), it is automatically maintained even as the service adds new APIs or related features. An SCP operates on <strong>specific API permissions</strong>: if a new path to the undesired outcome appears, the SCP must be updated by hand. <a href=\"https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_declarative_policies.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
   {
     tag: "AWS Config conformance packs: regional expansion",

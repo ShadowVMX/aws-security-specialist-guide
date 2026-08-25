@@ -165,7 +165,7 @@ var QUIZ_DATA = [
       "El Credential Report necesita GuardDuty habilitado para poder generarse",
     ],
     correct: 1,
-    explain: "El Credential Report es un CSV a nivel de cuenta que audita el ESTADO de las credenciales de todos los usuarios IAM (antigüedad de contraseña, access keys, MFA). Access Advisor muestra el HISTÓRICO de servicios accedidos por un usuario o rol, y es la herramienta para recortar permisos no usados. No dependen de GuardDuty ni se limitan al root. <a href=\"https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_access-advisor.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+    explain: "El Credential Report es un CSV a nivel de cuenta que audita el ESTADO de las credenciales de todos los usuarios IAM (antigüedad de contraseña, access keys, MFA). Access Advisor muestra el HISTÓRICO de servicios accedidos por un usuario o rol, y es la herramienta para recortar permisos no usados. No dependen de GuardDuty ni se limitan al root. <a href=\"https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_last-accessed.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
   {
     tag: "Cross-account trust policy",
@@ -465,7 +465,7 @@ var QUIZ_DATA = [
       "Depende de si el usuario original se autenticó con MFA al inicio",
     ],
     correct: 2,
-    explain: "AWS STS limita explícitamente el role chaining: si usas las credenciales temporales de un AssumeRole para llamar de nuevo a AssumeRole, la sesión resultante dura como máximo 1 hora, sin importar el MaxSessionDuration configurado en el rol de destino. Pedir más provoca un error. Es un detalle muy preguntado porque contradice la expectativa de que manda la configuración del rol. <a href=\"https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_terms-and-concepts.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+    explain: "AWS STS limita explícitamente el role chaining: si usas las credenciales temporales de un AssumeRole para llamar de nuevo a AssumeRole, la sesión resultante dura como máximo 1 hora, sin importar el MaxSessionDuration configurado en el rol de destino. Pedir más provoca un error. Es un detalle muy preguntado porque contradice la expectativa de que manda la configuración del rol. <a href=\"https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
   {
     tag: "RCP – aws:PrincipalOrgID vs aws:ResourceOrgID",

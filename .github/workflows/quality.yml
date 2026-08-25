@@ -82,3 +82,9 @@ jobs:
       # pages. The runner has open internet, so this is the place to check.
       - name: AWS documentation links still resolve
         run: bash tools/check-links.sh
+
+      # A 200 only proves a page exists. This reads each page's title and
+      # checks it has something to do with the question that links to it,
+      # so a KMS question can't quietly cite a VPC page.
+      - name: Sources match the question that cites them
+        run: node tools/check-sources.js --titles
