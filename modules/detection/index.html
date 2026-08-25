@@ -130,6 +130,16 @@
       <li><strong>Systems Manager State Manager</strong>: aplica y mantiene un estado de configuración deseado en instancias (ej. "el agente de CloudWatch debe estar siempre corriendo"), corrigiendo desviaciones automáticamente.</li>
     </ul>
 
+    <p class="code-label">Delegar GuardDuty y auto-incorporar las cuentas nuevas</p>
+    <pre><code># Desde la management account: delegar en la cuenta de seguridad.
+aws guardduty enable-organization-admin-account \
+  --admin-account-id 444455556666
+
+# Desde la cuenta delegada: que toda cuenta nueva entre sola.
+aws guardduty update-organization-configuration \
+  --detector-id 12abc34d567e8fa901bc2d34e56789f0 \
+  --auto-enable-organization-members ALL</code></pre>
+
     <h2 id="log-sources">Fuentes de log &amp; arquitectura de logging (1.2.1 / 1.2.2)</h2>
     <p class="lede">Identificar QUÉ registrar es tan importante como CÓMO centralizarlo.</p>
     <table role="table">
@@ -153,6 +163,56 @@
       Imagina que tu cuenta de producción se ve comprometida y el atacante obtiene credenciales de administrador. Si el CloudTrail de esa cuenta escribe a un bucket S3 DE LA MISMA CUENTA, el atacante puede borrar el rastro de sus propias acciones (<code>s3:DeleteObject</code> sobre los logs). Si en cambio los logs viajan a una cuenta de logging separada donde ni siquiera el rol comprometido tiene <code>s3:DeleteObject</code>, la evidencia sobrevive intacta — la separación de cuentas no es burocracia, es una defensa activa.
     </div>
 
+    <p class="code-label">Bucket policy que impide borrar o alterar los logs entregados</p>
+    <pre><code>{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [
+    {
+      &quot;Sid&quot;: &quot;PermitirEntregaDeCloudTrail&quot;,
+      &quot;Effect&quot;: &quot;Allow&quot;,
+      &quot;Principal&quot;: { &quot;Service&quot;: &quot;cloudtrail.amazonaws.com&quot; },
+      &quot;Action&quot;: &quot;s3:PutObject&quot;,
+      &quot;Resource&quot;: &quot;arn:aws:s3:::central-security-logs-111122223333/AWSLogs/o-abc123/*&quot;,
+      &quot;Condition&quot;: {
+        &quot;StringEquals&quot;: { &quot;s3:x-amz-acl&quot;: &quot;bucket-owner-full-control&quot; }
+      }
+    },
+    {
+      &quot;Sid&quot;: &quot;NadieBorraLosLogs&quot;,
+      &quot;Effect&quot;: &quot;Deny&quot;,
+      &quot;Principal&quot;: &quot;*&quot;,
+      &quot;Action&quot;: [&quot;s3:DeleteObject&quot;, &quot;s3:DeleteObjectVersion&quot;, &quot;s3:PutBucketPolicy&quot;],
+      &quot;Resource&quot;: [
+        &quot;arn:aws:s3:::central-security-logs-111122223333&quot;,
+        &quot;arn:aws:s3:::central-security-logs-111122223333/*&quot;
+      ]
+    }
+  ]
+}</code></pre>
+
+    <p class="code-label">Crear un organization trail que capture también data events de S3</p>
+    <pre><code>aws cloudtrail create-trail \
+  --name org-security-trail \
+  --s3-bucket-name central-security-logs-111122223333 \
+  --is-organization-trail \
+  --is-multi-region-trail \
+  --kms-key-id alias/cloudtrail-cmk
+
+# Los data events NO se capturan por defecto: hay que pedirlos.
+aws cloudtrail put-event-selectors \
+  --trail-name org-security-trail \
+  --advanced-event-selectors &#x27;[
+    {
+      &quot;Name&quot;: &quot;Lecturas y escrituras de objetos S3&quot;,
+      &quot;FieldSelectors&quot;: [
+        { &quot;Field&quot;: &quot;eventCategory&quot;, &quot;Equals&quot;: [&quot;Data&quot;] },
+        { &quot;Field&quot;: &quot;resources.type&quot;, &quot;Equals&quot;: [&quot;AWS::S3::Object&quot;] }
+      ]
+    }
+  ]&#x27;
+
+aws cloudtrail start-logging --name org-security-trail</code></pre>
+
     <h2 id="security-lake">Amazon Security Lake &amp; OCSF (1.2.3)</h2>
     <ul>
       <li>Ingesta, normaliza (a OCSF) y particiona logs de múltiples cuentas/fuentes AWS y de terceros compatibles en un data lake gestionado (sobre S3, en tu propia cuenta).</li>
@@ -169,6 +229,19 @@
       <tr><td><strong>Amazon Managed Grafana</strong></td><td>Visualización/correlación de métricas y logs de múltiples fuentes de datos en un solo dashboard.</td></tr>
     </table>
 
+    <p class="code-label">Consulta Athena: buscar llamadas denegadas en CloudTrail</p>
+    <pre><code>SELECT eventtime,
+       useridentity.arn      AS principal,
+       eventsource,
+       eventname,
+       errorcode,
+       sourceipaddress
+FROM   cloudtrail_logs
+WHERE  errorcode IN (&#x27;AccessDenied&#x27;, &#x27;UnauthorizedOperation&#x27;)
+  AND  eventtime &gt; &#x27;2026-08-01T00:00:00Z&#x27;
+ORDER  BY eventtime DESC
+LIMIT  100;</code></pre>
+
     <h2 id="network-logs">VPC Flow Logs &amp; Route 53 Resolver logs (1.2.6)</h2>
     <div class="callout warn">
       <b>Distinción clave</b>
@@ -184,6 +257,18 @@
       <tr><td>API Gateway sin detalle de request/response</td><td>Falta activar explícitamente "data trace logging" a nivel de stage (el execution logging por defecto no incluye el body).</td></tr>
       <tr><td>CloudFront sin logs recientes</td><td>Confundir Standard logs (diferidos, a S3) con Real-time logs (Kinesis, segundos) — revisar cuál está realmente configurado.</td></tr>
     </table>
+
+    <p class="code-label">Comprobar por qué un trail dejó de entregar</p>
+    <pre><code># ¿Sigue registrando, y falló la última entrega?
+aws cloudtrail get-trail-status --name org-security-trail
+
+# Salida relevante:
+# &quot;IsLogging&quot;: false                      -&gt; el logging está parado
+# &quot;LatestDeliveryError&quot;: &quot;AccessDenied&quot;   -&gt; la bucket policy o la KMS key bloquean
+# &quot;LatestDeliveryAttemptTime&quot;: &quot;...&quot;      -&gt; cuándo lo intentó por última vez
+
+# Si el error es AccessDenied sobre KMS, revisar que la key policy
+# permita a cloudtrail.amazonaws.com la acción kms:GenerateDataKey*</code></pre>
 
     <h2 id="trampas">Trampas típicas del examen</h2>
     <p class="lede">Los errores que más se repiten en este dominio. Si vas justo de tiempo antes del examen, repasa solo esto y el quiz.</p>

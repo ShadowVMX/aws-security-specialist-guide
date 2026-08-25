@@ -70,6 +70,22 @@
       Es la diferencia entre tener las llaves de repuesto de casa en un cajón conocido, y tener que llamar a un cerrajero a las 3 AM porque te quedaste fuera. Un rol IAM "IR-Responder" con permisos de solo lectura amplios + un puñado de acciones de contención específicas (modificar SG, crear snapshot), ya creado y probado, es la llave de repuesto. Crear ese rol EN MEDIO del incidente es llamar al cerrajero — más lento y con más margen de error.
     </div>
 
+    <p class="code-label">Rol de respuesta a incidentes, preaprovisionado y acotado</p>
+    <pre><code>{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [
+    {
+      &quot;Effect&quot;: &quot;Allow&quot;,
+      &quot;Principal&quot;: { &quot;AWS&quot;: &quot;arn:aws:iam::444455556666:role/SecurityResponders&quot; },
+      &quot;Action&quot;: &quot;sts:AssumeRole&quot;,
+      &quot;Condition&quot;: {
+        &quot;Bool&quot;: { &quot;aws:MultiFactorAuthPresent&quot;: &quot;true&quot; },
+        &quot;StringEquals&quot;: { &quot;aws:PrincipalOrgID&quot;: &quot;o-abc123&quot; }
+      }
+    }
+  ]
+}</code></pre>
+
     <h2 id="testing">Probar el plan: Fault Injection Service &amp; Resilience Hub (2.1.3)</h2>
     <table role="table">
       <tr><th>Herramienta</th><th>Qué valida</th></tr>
@@ -94,6 +110,19 @@
     "detail": {"severity": [{"numeric": [">=", 7]}]}
   }' \
   --targets "Id"="1","Arn"="arn:aws:lambda:eu-west-1:111122223333:function:IsolateCompromisedInstance"</code></pre>
+
+    <p class="code-label">Disparar una remediación automática con EventBridge</p>
+    <pre><code>{
+  &quot;source&quot;: [&quot;aws.guardduty&quot;],
+  &quot;detail-type&quot;: [&quot;GuardDuty Finding&quot;],
+  &quot;detail&quot;: {
+    &quot;severity&quot;: [{ &quot;numeric&quot;: [&quot;&gt;=&quot;, 7] }],
+    &quot;type&quot;: [&quot;UnauthorizedAccess:EC2/MaliciousIPCaller.Custom&quot;]
+  }
+}
+
+# La regla invoca un documento de SSM Automation que aisla la instancia.
+# Config DETECTA la desviacion; quien ACTUA es la automatizacion.</code></pre>
 
     <h2 id="forensics-flow">Flujo forense automatizado en EC2 (2.1.4 / 2.2.1 / 2.2.4)</h2>
     <p class="lede">Este flujo combina varios skills a la vez — es el escenario "de manual" del examen. Haz clic en cada paso.</p>
@@ -147,6 +176,42 @@
       La primera reacción intuitiva ante una instancia comprometida es "apágala ya". Es la respuesta INCORRECTA si hay valor forense en juego: apagar destruye la memoria RAM (procesos, conexiones activas, claves en memoria) antes de poder capturarla. La secuencia correcta es aislar por RED primero, capturar evidencia, y solo DESPUÉS terminar la instancia.
     </div>
 
+    <p class="code-label">Capturar la evidencia antes de tocar el ciclo de vida</p>
+    <pre><code># Snapshot de cada volumen, etiquetado para la cadena de custodia.
+aws ec2 create-snapshot \
+  --volume-id vol-0123456789abcdef0 \
+  --description &quot;Evidencia INC-2026-014 - i-0abcd1234efgh5678&quot; \
+  --tag-specifications &#x27;ResourceType=snapshot,Tags=[
+      {Key=Incidente,Value=INC-2026-014},
+      {Key=Origen,Value=i-0abcd1234efgh5678},
+      {Key=Recogido,Value=2026-08-25T10:14:00Z}
+    ]&#x27;
+
+# Compartir el snapshot solo con la cuenta forense.
+aws ec2 modify-snapshot-attribute \
+  --snapshot-id snap-0fedcba9876543210 \
+  --attribute createVolumePermission \
+  --operation-type add --user-ids 999988887777</code></pre>
+
+    <p class="code-label">Aislar una instancia comprometida sin apagarla</p>
+    <pre><code># 1. Un security group de cuarentena: sin reglas de entrada ni de salida.
+QUARANTINE=$(aws ec2 create-security-group \
+  --group-name forensics-quarantine \
+  --description &quot;Sin trafico: aislamiento forense&quot; \
+  --vpc-id vpc-0a1b2c3d4e5f67890 \
+  --query GroupId --output text)
+
+# create-security-group crea una regla de salida abierta por defecto: quitarla.
+aws ec2 revoke-security-group-egress \
+  --group-id &quot;$QUARANTINE&quot; \
+  --protocol -1 --port -1 --cidr 0.0.0.0/0
+
+# 2. Sustituir los security groups de la instancia por el de cuarentena.
+#    La instancia sigue encendida: no se pierde la memoria.
+aws ec2 modify-instance-attribute \
+  --instance-id i-0abcd1234efgh5678 \
+  --groups &quot;$QUARANTINE&quot;</code></pre>
+
     <h2 id="validar-findings">Validar findings antes de actuar (2.2.3 — nuevo en SCS-C03)</h2>
     <p class="lede">Skill añadido en esta versión del examen: no toda alerta merece la respuesta de máximo impacto inmediatamente.</p>
     <ul>
@@ -167,6 +232,19 @@
       <b>Si vienes de Azure</b>
       Lo más parecido a Amazon Detective es el <strong>Investigation Graph de Microsoft Sentinel</strong>: ambos visualizan relaciones entre entidades (usuarios, IPs, recursos) a lo largo del tiempo para facilitar el root cause analysis, en vez de obligarte a correlacionar eventos aislados manualmente.
     </div>
+
+    <p class="code-label">Reconstruir qué hizo una credencial comprometida</p>
+    <pre><code>aws cloudtrail lookup-events \
+  --lookup-attributes AttributeKey=AccessKeyId,AttributeValue=AKIAIOSFODNN7EXAMPLE \
+  --start-time 2026-08-18T00:00:00Z \
+  --end-time 2026-08-25T00:00:00Z \
+  --query &#x27;Events[].{Hora:EventTime,Accion:EventName,Origen:Username}&#x27; \
+  --output table
+
+# Buscar persistencia: usuarios, roles o claves creados por el atacante.
+aws cloudtrail lookup-events \
+  --lookup-attributes AttributeKey=EventName,AttributeValue=CreateAccessKey \
+  --start-time 2026-08-18T00:00:00Z</code></pre>
 
     <h2 id="recovery">Contención, erradicación &amp; recuperación (2.2.4)</h2>
     <table role="table">
