@@ -14,7 +14,7 @@
 <p align="center">
   <b>🇪🇸 Español</b> &nbsp;·&nbsp; <a href="README.en.md">🇬🇧 English</a>
   &nbsp;&nbsp;|&nbsp;&nbsp;
-  <a href="index.html">🌐 Abrir guía (ES)</a> &nbsp;·&nbsp; <a href="en/index.html">🌐 Open guide (EN)</a>
+  <a href="https://shadowvmx.github.io/aws-security-specialist-guide/"><b>🌐 Abrir la guía</b></a> &nbsp;·&nbsp; <a href="https://shadowvmx.github.io/aws-security-specialist-guide/en/">🌐 In English</a> &nbsp;·&nbsp; <a href="https://shadowvmx.github.io/aws-security-specialist-guide/examen/">⏱️ Simulacro de examen</a>
 </p>
 
 <p align="center">
@@ -28,17 +28,25 @@
 
 ## 🚀 Cómo usarla
 
+**No hace falta instalar nada.** La guía está publicada y funciona en el móvil igual que en el escritorio:
+
+### 👉 [shadowvmx.github.io/aws-security-specialist-guide](https://shadowvmx.github.io/aws-security-specialist-guide/)
+
+El progreso del quiz se guarda en tu propio navegador: no hay cuentas, ni registro, ni servidor que recoja nada.
+
+<details>
+<summary>¿Prefieres tenerla en local?</summary>
+
 ```bash
 git clone https://github.com/ShadowVMX/aws-security-specialist-guide.git
 cd aws-security-specialist-guide
-```
-
-Abre `index.html` (español) o `en/index.html` (inglés) haciendo doble clic, o sirve la carpeta con cualquier servidor estático simple:
-
-```bash
 python3 -m http.server 8000
 # → http://localhost:8000
 ```
+
+También puedes abrir `index.html` con doble clic: no hay build step ni dependencias, así que funciona igual desde el disco.
+
+</details>
 
 ## 📚 Dominios (SCS-C03)
 
@@ -66,6 +74,8 @@ Cada módulo incluye: teoría organizada por los *task statements* oficiales del
 
 **Panel de progreso** — el hub muestra cuánto llevas respondido, tu porcentaje de acierto y el resultado del último simulacro.
 
+**En el móvil** — pensada para estudiar en ratos muertos: índice desplegable en cada módulo, diagramas que se desplazan sin perder legibilidad, y tema claro/oscuro que sigue al del sistema. Los diagramas también se recorren con teclado, para quien no use ratón.
+
 ## 🔍 Calidad del banco de preguntas
 
 Un banco de preguntas puede ser correcto y aun así enseñar el hábito equivocado. `tools/audit-questions.js` lo comprueba en cada cambio:
@@ -90,10 +100,13 @@ en/exam/index.html          → simulacro de examen completo (EN)
 assets/
   css/style.css              → estilos compartidos (tema claro/oscuro automático)
   img/banner.svg              → banner de este README
+  img/favicon.svg             → icono de pestaña
   js/app.js                   → interacción de diagramas + sidebar activa
   js/quiz.js                  → motor de quiz + progreso guardado (ES/EN según el lang de la página)
   js/exam.js                  → simulacro cronometrado de 65 preguntas
   js/progress.js              → panel de progreso del hub
+.github/workflows/
+  quality.yml                 → CI: audita el banco y valida las páginas en cada PR
 tools/
   audit-questions.js          → auditoría de calidad del banco de preguntas
   check-links.sh              → comprobador de enlaces externos
@@ -133,5 +146,5 @@ Antes de abrir una PR que toque preguntas, ejecuta `node tools/audit-questions.j
 <br>
 
 <p align="center">
-<sub>Guía de estudio personal — no es material oficial de AWS. Contenido revisado a fecha de 2026.</sub>
+<sub>Guía de estudio independiente, sin relación con Amazon Web Services. Contenido revisado en agosto de 2026.</sub>
 </p>

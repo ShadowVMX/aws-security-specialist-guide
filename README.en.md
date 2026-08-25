@@ -14,7 +14,7 @@
 <p align="center">
   <a href="README.md">🇪🇸 Español</a> &nbsp;·&nbsp; <b>🇬🇧 English</b>
   &nbsp;&nbsp;|&nbsp;&nbsp;
-  <a href="index.html">🌐 Open guide (ES)</a> &nbsp;·&nbsp; <a href="en/index.html">🌐 Open guide (EN)</a>
+  <a href="https://shadowvmx.github.io/aws-security-specialist-guide/en/"><b>🌐 Open the guide</b></a> &nbsp;·&nbsp; <a href="https://shadowvmx.github.io/aws-security-specialist-guide/">🌐 En español</a> &nbsp;·&nbsp; <a href="https://shadowvmx.github.io/aws-security-specialist-guide/en/exam/">⏱️ Exam simulation</a>
 </p>
 
 <p align="center">
@@ -28,17 +28,25 @@
 
 ## 🚀 How to use it
 
+**Nothing to install.** The guide is published and works on a phone just as well as on a desktop:
+
+### 👉 [shadowvmx.github.io/aws-security-specialist-guide/en](https://shadowvmx.github.io/aws-security-specialist-guide/en/)
+
+Quiz progress is saved in your own browser: no accounts, no sign-up, no server collecting anything.
+
+<details>
+<summary>Prefer to run it locally?</summary>
+
 ```bash
 git clone https://github.com/ShadowVMX/aws-security-specialist-guide.git
 cd aws-security-specialist-guide
-```
-
-Open `index.html` (Spanish) or `en/index.html` (English) by double-clicking it, or serve the folder with any simple static server:
-
-```bash
 python3 -m http.server 8000
 # → http://localhost:8000
 ```
+
+You can also just double-click `index.html`: there is no build step and no dependencies, so it works straight from disk.
+
+</details>
 
 ## 📚 Domains (SCS-C03)
 
@@ -66,6 +74,8 @@ Every module includes: theory organized around the exam guide's official task st
 
 **Progress panel** — the hub shows how much you've answered, your accuracy and your last simulation result.
 
+**On a phone** — built for studying in spare moments: a collapsible index in every module, diagrams that pan without losing legibility, and a light/dark theme that follows the system. The diagrams are keyboard-navigable too, for anyone not using a mouse.
+
 ## 🔍 Question bank quality
 
 A question bank can be factually correct and still train the wrong habit. `tools/audit-questions.js` checks it on every change:
@@ -90,10 +100,13 @@ en/exam/index.html          → full exam simulation (EN)
 assets/
   css/style.css              → shared styles (automatic light/dark theme)
   img/banner.svg              → this README's banner
+  img/favicon.svg             → browser tab icon
   js/app.js                   → diagram interaction + active sidebar
   js/quiz.js                  → quiz engine + saved progress (ES/EN based on the page lang)
   js/exam.js                  → timed 65-question exam simulation
   js/progress.js              → hub progress panel
+.github/workflows/
+  quality.yml                 → CI: audits the bank and validates the pages on every PR
 tools/
   audit-questions.js          → question bank quality audit
   check-links.sh              → external link checker
@@ -133,5 +146,5 @@ Before opening a PR that touches questions, run `node tools/audit-questions.js`:
 <br>
 
 <p align="center">
-<sub>Personal study guide — not official AWS material. Content reviewed as of 2026.</sub>
+<sub>Independent study guide, not affiliated with Amazon Web Services. Content reviewed in August 2026.</sub>
 </p>
