@@ -167,6 +167,12 @@
     return (h >>> 0).toString(36);
   }
 
+  // Identity of a question for storage purposes includes its options: a saved
+  // answer is an option index, so reordering the options must invalidate it.
+  function questionKey(item) {
+    return hash(item.q + "\u0000" + item.options.join("\u0000"));
+  }
+
   function readJSON(key, fallback) {
     try {
       const raw = localStorage.getItem(key);
@@ -225,7 +231,7 @@
     BLUEPRINT.forEach((d) => {
       const bank = window.QUIZ_BANK[d.id] || [];
       sample(bank, d.count).forEach((item) => {
-        picked.push({ domain: d.id, key: hash(item.q) });
+        picked.push({ domain: d.id, key: questionKey(item) });
       });
     });
     return {
@@ -246,7 +252,7 @@
     const out = [];
     sess.picked.forEach((ref) => {
       const bank = window.QUIZ_BANK[ref.domain] || [];
-      const item = bank.find((q) => hash(q.q) === ref.key);
+      const item = bank.find((q) => questionKey(q) === ref.key);
       if (item) out.push({ domain: ref.domain, key: ref.key, item });
     });
     return out;
