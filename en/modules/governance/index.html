@@ -119,6 +119,50 @@
       <tr><td><strong>AI services opt-out policy</strong></td><td>Controls whether AWS AI services can use content from your accounts to train/improve their models.</td></tr>
     </table>
 
+    <p class="code-label">RCP that closes resource access from outside the organization</p>
+    <pre><code>{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [
+    {
+      &quot;Sid&quot;: &quot;SoloIdentidadesDeLaOrganizacion&quot;,
+      &quot;Effect&quot;: &quot;Deny&quot;,
+      &quot;Principal&quot;: &quot;*&quot;,
+      &quot;Action&quot;: [&quot;s3:*&quot;, &quot;sts:AssumeRole&quot;],
+      &quot;Resource&quot;: &quot;*&quot;,
+      &quot;Condition&quot;: {
+        &quot;StringNotEqualsIfExists&quot;: { &quot;aws:PrincipalOrgID&quot;: &quot;o-abc123&quot; },
+        &quot;BoolIfExists&quot;: { &quot;aws:PrincipalIsAWSService&quot;: &quot;false&quot; }
+      }
+    }
+  ]
+}</code></pre>
+
+    <p class="code-label">SCP that prevents disabling security controls</p>
+    <pre><code>{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [
+    {
+      &quot;Sid&quot;: &quot;NoApagarLaSeguridad&quot;,
+      &quot;Effect&quot;: &quot;Deny&quot;,
+      &quot;Action&quot;: [
+        &quot;cloudtrail:StopLogging&quot;,
+        &quot;cloudtrail:DeleteTrail&quot;,
+        &quot;guardduty:DeleteDetector&quot;,
+        &quot;guardduty:DisassociateFromMasterAccount&quot;,
+        &quot;config:DeleteConfigurationRecorder&quot;,
+        &quot;config:StopConfigurationRecorder&quot;,
+        &quot;securityhub:DisableSecurityHub&quot;
+      ],
+      &quot;Resource&quot;: &quot;*&quot;,
+      &quot;Condition&quot;: {
+        &quot;ArnNotLike&quot;: {
+          &quot;aws:PrincipalARN&quot;: &quot;arn:aws:iam::*:role/OrgSecurityBreakGlass&quot;
+        }
+      }
+    }
+  ]
+}</code></pre>
+
     <h2 id="delegated-admin">Delegated administrator (6.1.4)</h2>
     <div class="callout plain">
       <b>Plain-language example</b>
@@ -137,6 +181,19 @@
       "Break-glass" is practically the same term and concept as Microsoft Entra ID's <strong>emergency access accounts</strong>: accounts excluded from Conditional Access, with physically stored credentials, monitored with alerts if they're ever used. One of the most direct mappings (even in the colloquial name) in the whole exam.
     </div>
 
+    <p class="code-label">Remove root credentials and act only when needed</p>
+    <pre><code># Habilitar la gestión centralizada del acceso root en la organización.
+aws organizations enable-aws-service-access \
+  --service-principal iam.amazonaws.com
+
+aws iam enable-organizations-root-credentials-management
+
+# A partir de aquí, una tarea que exige root se hace con una sesión acotada
+# por una TaskPolicy administrada por AWS — no con credenciales permanentes.
+aws sts assume-root \
+  --target-principal 111122223333 \
+  --task-policy-arn arn:aws:iam::aws:policy/root-task/S3UnlockBucketPolicy</code></pre>
+
     <h2 id="iac">Infrastructure as Code at scale (6.2.1)</h2>
     <table role="table">
       <tr><th>Tool</th><th>What it's for</th></tr>
@@ -154,6 +211,22 @@
 
     <h2 id="tagging">Tagging strategy (6.2.2)</h2>
     <p class="lede">It's not just FinOps: it's the foundation for ABAC, conditional conformance packs, and fast incident response ("what is production?", "who is the owner?").</p>
+
+    <p class="code-label">Actually requiring tags: the SCP that backs the tag policy</p>
+    <pre><code>{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [
+    {
+      &quot;Sid&quot;: &quot;SinClasificacionNoSeCrea&quot;,
+      &quot;Effect&quot;: &quot;Deny&quot;,
+      &quot;Action&quot;: [&quot;ec2:RunInstances&quot;, &quot;rds:CreateDBInstance&quot;],
+      &quot;Resource&quot;: &quot;*&quot;,
+      &quot;Condition&quot;: {
+        &quot;Null&quot;: { &quot;aws:RequestTag/DataClassification&quot;: &quot;true&quot; }
+      }
+    }
+  ]
+}</code></pre>
 
     <h2 id="firewall-manager">AWS Firewall Manager (6.2.3)</h2>
     <p>Applies and MAINTAINS WAF, Shield Advanced, Security Groups, and Network Firewall policies centrally across the entire organization — even for accounts and resources created in the future, without repeated manual intervention.</p>
@@ -184,6 +257,22 @@
     "Automatic": true,
     "MaximumAutomaticAttempts": 3
   }]'</code></pre>
+
+    <p class="code-label">Config aggregator across the whole organization</p>
+    <pre><code>aws configservice put-configuration-aggregator \
+  --configuration-aggregator-name org-wide \
+  --organization-aggregation-source &#x27;{
+    &quot;RoleArn&quot;: &quot;arn:aws:iam::444455556666:role/AWSConfigRoleForOrganizations&quot;,
+    &quot;AllAwsRegions&quot;: true
+  }&#x27;
+
+# Preguntar por lo que NO cumple, en todas las cuentas y Regiones a la vez.
+aws configservice get-aggregate-compliance-details-by-config-rule \
+  --configuration-aggregator-name org-wide \
+  --config-rule-name s3-bucket-server-side-encryption-enabled \
+  --account-id 111122223333 \
+  --aws-region eu-west-1 \
+  --compliance-type NON_COMPLIANT</code></pre>
 
     <h2 id="audit">AWS Audit Manager vs AWS Artifact (6.3.2)</h2>
     <table role="table">

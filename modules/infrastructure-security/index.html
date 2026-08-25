@@ -140,6 +140,47 @@
       </table>
     </div>
 
+    <p class="code-label">Web ACL con reglas gestionadas y límite de tasa</p>
+    <pre><code># Para CloudFront, el scope es CLOUDFRONT y la Region us-east-1.
+aws wafv2 create-web-acl \
+  --name edge-protection \
+  --scope CLOUDFRONT \
+  --region us-east-1 \
+  --default-action Allow={} \
+  --visibility-config \
+      SampledRequestsEnabled=true,CloudWatchMetricsEnabled=true,MetricName=edge \
+  --rules &#x27;[
+    {
+      &quot;Name&quot;: &quot;AWSManagedRulesCommonRuleSet&quot;,
+      &quot;Priority&quot;: 1,
+      &quot;Statement&quot;: {
+        &quot;ManagedRuleGroupStatement&quot;: {
+          &quot;VendorName&quot;: &quot;AWS&quot;,
+          &quot;Name&quot;: &quot;AWSManagedRulesCommonRuleSet&quot;
+        }
+      },
+      &quot;OverrideAction&quot;: { &quot;None&quot;: {} },
+      &quot;VisibilityConfig&quot;: {
+        &quot;SampledRequestsEnabled&quot;: true,
+        &quot;CloudWatchMetricsEnabled&quot;: true,
+        &quot;MetricName&quot;: &quot;common&quot;
+      }
+    },
+    {
+      &quot;Name&quot;: &quot;LimitePorIP&quot;,
+      &quot;Priority&quot;: 2,
+      &quot;Statement&quot;: {
+        &quot;RateBasedStatement&quot;: { &quot;Limit&quot;: 2000, &quot;AggregateKeyType&quot;: &quot;IP&quot; }
+      },
+      &quot;Action&quot;: { &quot;Block&quot;: {} },
+      &quot;VisibilityConfig&quot;: {
+        &quot;SampledRequestsEnabled&quot;: true,
+        &quot;CloudWatchMetricsEnabled&quot;: true,
+        &quot;MetricName&quot;: &quot;rate&quot;
+      }
+    }
+  ]&#x27;</code></pre>
+
     <h2 id="edge-controls">Reglas de edge avanzadas &amp; OCSF (3.1.3 / 3.1.4)</h2>
     <ul>
       <li><strong>Geolocation / rate limiting / client fingerprinting</strong>: WAF combina condiciones (país, volumen, huella del cliente vía JA3/JA4 fingerprinting) para bloquear patrones de bot sofisticados que rotan de IP.</li>
@@ -174,6 +215,21 @@
       <tr><td><strong>Systems Manager Patch Manager</strong></td><td>Aplica parches según baseline aprobado</td><td>Programado (Maintenance Windows)</td></tr>
     </table>
 
+    <p class="code-label">Consultar los hallazgos críticos de Inspector</p>
+    <pre><code>aws inspector2 list-findings \
+  --filter-criteria &#x27;{
+    &quot;severity&quot;: [{ &quot;comparison&quot;: &quot;EQUALS&quot;, &quot;value&quot;: &quot;CRITICAL&quot; }],
+    &quot;findingStatus&quot;: [{ &quot;comparison&quot;: &quot;EQUALS&quot;, &quot;value&quot;: &quot;ACTIVE&quot; }]
+  }&#x27; \
+  --query &#x27;findings[].{
+      Recurso:resources[0].id,
+      CVE:packageVulnerabilityDetails.vulnerabilityId,
+      Puntuacion:inspectorScore
+   }&#x27; \
+  --output table
+
+# Inspector EVALUA: encuentra y prioriza, pero no bloquea trafico.</code></pre>
+
     <h2 id="secure-admin">Acceso administrativo seguro (3.2.5)</h2>
     <div class="callout azure">
       <b>Si vienes de Azure</b>
@@ -181,6 +237,22 @@
     </div>
     <p class="code-label">Iniciar una sesión sin SSH ni puerto abierto</p>
     <pre><code>aws ssm start-session --target i-0123456789abcdef0</code></pre>
+
+    <p class="code-label">Acceso administrativo sin abrir un solo puerto</p>
+    <pre><code># La instancia necesita el SSM Agent y un instance profile con permisos.
+aws iam attach-role-policy \
+  --role-name EC2SessionManagerRole \
+  --policy-arn arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore
+
+# Abrir sesion: sin puerto 22, sin IP publica y sin bastion.
+aws ssm start-session --target i-0abcd1234efgh5678
+
+# Sin salida a internet, la solucion son VPC endpoints — no abrir entrada.
+aws ec2 create-vpc-endpoint \
+  --vpc-id vpc-0a1b2c3d4e5f67890 \
+  --vpc-endpoint-type Interface \
+  --service-name com.amazonaws.eu-west-1.ssmmessages \
+  --subnet-ids subnet-0123456789abcdef0</code></pre>
 
     <h2 id="pipeline-genai">Seguridad en el pipeline &amp; guardrails GenAI (3.2.6 / 3.2.7)</h2>
     <ul>
@@ -205,6 +277,26 @@
       <b>Cuidado si vienes de Azure — esto es distinto</b>
       Azure tiene UN solo constructo, el <strong>Network Security Group (NSG)</strong>, que puedes asociar a una subnet O a una NIC, y que SÍ soporta reglas explícitas de Deny con prioridad numérica — es decir, un NSG se parece un poco a la mezcla de Security Group + NACL de AWS. En AWS, en cambio, son DOS mecanismos separados con comportamientos distintos (stateful vs stateless) que se aplican SIEMPRE juntos (primero NACL de la subnet, luego SG de la instancia). No asumas que "ya tengo NACL configurada = no necesito Security Group" ni al revés: en AWS ambas capas actúan simultáneamente.
     </div>
+
+    <p class="code-label">El detalle que se olvida: los puertos efímeros en la NACL</p>
+    <pre><code># Entrada: permitir HTTPS desde internet.
+aws ec2 create-network-acl-entry \
+  --network-acl-id acl-0a1b2c3d4e5f67890 \
+  --rule-number 100 --protocol tcp --port-range From=443,To=443 \
+  --cidr-block 0.0.0.0/0 --rule-action allow --ingress
+
+# Salida: SIN esta regla, la respuesta no sale y la conexion parece colgarse.
+# Las NACL son stateless: el trafico de vuelta hay que permitirlo a mano.
+aws ec2 create-network-acl-entry \
+  --network-acl-id acl-0a1b2c3d4e5f67890 \
+  --rule-number 100 --protocol tcp --port-range From=1024,To=65535 \
+  --cidr-block 0.0.0.0/0 --rule-action allow --egress
+
+# Bloquear una IP concreta: esto un security group NO puede hacerlo.
+aws ec2 create-network-acl-entry \
+  --network-acl-id acl-0a1b2c3d4e5f67890 \
+  --rule-number 50 --protocol -1 \
+  --cidr-block 203.0.113.25/32 --rule-action deny --ingress</code></pre>
 
     <h2 id="hybrid-connectivity">Conectividad híbrida &amp; multi-cloud (3.3.2 / 3.3.3)</h2>
     <p class="lede">Skill 3.3.2/3.3.3 explícitamente. Sigue este árbol de decisión.</p>

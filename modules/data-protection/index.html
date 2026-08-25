@@ -116,6 +116,25 @@
       Azure Key Vault también soporta un patrón de envelope encryption (usando <code>WrapKey</code>/<code>UnwrapKey</code>), conceptualmente idéntico. La diferencia organizativa: <strong>Azure Key Vault es UN servicio</strong> que guarda claves, secretos Y certificados juntos. AWS reparte esa misma funcionalidad en <strong>tres servicios distintos</strong>: KMS (claves de cifrado), Secrets Manager (credenciales/secretos) y ACM (certificados) — cada uno con su propia consola, pricing y API. Mentalmente, "Key Vault" ≈ "KMS + Secrets Manager + ACM" combinados.
     </div>
 
+    <p class="code-label">Envelope encryption paso a paso con la CLI</p>
+    <pre><code># 1. Pedir a KMS una data key: devuelve la version en claro Y la cifrada.
+aws kms generate-data-key \
+  --key-id alias/datos-cliente \
+  --key-spec AES_256 \
+  --query &#x27;{EnClaro:Plaintext,Cifrada:CiphertextBlob}&#x27;
+
+# 2. Cifrar el fichero LOCALMENTE con la clave en claro.
+#    Los datos nunca viajan a KMS: Encrypt esta limitado a 4 KB.
+openssl enc -aes-256-cbc -in backup.tar -out backup.tar.enc -K &quot;$CLAVE_HEX&quot;
+
+# 3. Descartar la clave en claro y guardar solo la cifrada junto al dato.
+unset CLAVE_HEX
+
+# Para descifrar, KMS devuelve la clave en claro a partir de la cifrada.
+aws kms decrypt \
+  --ciphertext-blob fileb://data-key.enc \
+  --query Plaintext --output text</code></pre>
+
     <h2 id="transit-tls">TLS &amp; conectividad privada (5.1.1 / 5.1.2)</h2>
     <p class="lede">Dos preguntas distintas: ¿cifro el canal? y ¿evito que el tráfico salga a la red pública?</p>
 
@@ -231,6 +250,33 @@
       <b>Tip de examen</b>
       Si la pregunta menciona "exportar la clave" o "control exclusivo del hardware" → <strong>CloudHSM</strong>, casi siempre (KMS nunca exporta claves, ni con imported key material). Si menciona "el material nunca debe entrar en AWS" → <strong>XKS</strong>. El resto de casos, con integración nativa AWS de por medio, casi siempre es <strong>KMS customer managed key</strong>.
     </div>
+
+    <p class="code-label">Key policy que habilita el uso desde otra cuenta</p>
+    <pre><code>{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [
+    {
+      &quot;Sid&quot;: &quot;LaCuentaPropietariaAdministraLaClave&quot;,
+      &quot;Effect&quot;: &quot;Allow&quot;,
+      &quot;Principal&quot;: { &quot;AWS&quot;: &quot;arn:aws:iam::111122223333:root&quot; },
+      &quot;Action&quot;: &quot;kms:*&quot;,
+      &quot;Resource&quot;: &quot;*&quot;
+    },
+    {
+      &quot;Sid&quot;: &quot;LaCuentaConsumidoraSoloDescifra&quot;,
+      &quot;Effect&quot;: &quot;Allow&quot;,
+      &quot;Principal&quot;: { &quot;AWS&quot;: &quot;arn:aws:iam::444455556666:role/AppRole&quot; },
+      &quot;Action&quot;: [&quot;kms:Decrypt&quot;, &quot;kms:DescribeKey&quot;],
+      &quot;Resource&quot;: &quot;*&quot;,
+      &quot;Condition&quot;: {
+        &quot;StringEquals&quot;: { &quot;kms:ViaService&quot;: &quot;s3.eu-west-1.amazonaws.com&quot; }
+      }
+    }
+  ]
+}
+
+# Esto es solo UNA punta: el rol de la cuenta 4444... necesita ademas
+# kms:Decrypt sobre esta clave en su propia politica de identidad.</code></pre>
 
     <h2 id="integridad">Integridad de datos (5.2.2)</h2>
     <ul>
