@@ -51,7 +51,35 @@ python3 -m http.server 8000
 | 5 | Data Protection | 18% | ✅ |
 | 6 | Security Foundations & Governance | 14% | ✅ |
 
-Every module includes: theory organized around the exam guide's official task statements, 1-2 interactive SVG diagrams, real CLI/JSON examples, Azure comparisons (where the mapping is reliable) or plain-language examples (where forcing the comparison would mislead), and a practice quiz with an explanation on every answer.
+Every module includes: theory organized around the exam guide's official task statements, interactive SVG diagrams, real CLI/JSON examples, Azure comparisons (where the mapping is reliable) or plain-language examples (where forcing the comparison would mislead), a **classic exam traps** section, the **links to the official documentation** it rests on, and a quiz with an explanation on every answer.
+
+## 🎯 How to study with it
+
+**Per-module quiz** — 262 questions in total, 25 of them **multiple response** (`choose TWO`), scored all-or-nothing as in the real exam. Progress is saved in your browser, and you can:
+
+- filter by topic, or show **wrong answers only**, unanswered, or flagged
+- **shuffle** questions and options, so you don't learn answers by position
+- flag questions with ★ to review later
+- reset one module, or erase all progress from the hub
+
+**Full simulation** — 65 questions in 170 minutes with the official domain mix, no grading until you submit. It ends with your score, the per-domain breakdown and every explanation.
+
+**Progress panel** — the hub shows how much you've answered, your accuracy and your last simulation result.
+
+## 🔍 Question bank quality
+
+A question bank can be factually correct and still train the wrong habit. `tools/audit-questions.js` checks it on every change:
+
+```bash
+node tools/audit-questions.js
+```
+
+It verifies ES/EN parity, indices in range, duplicate options or stems and missing explanations — and it catches two biases that destroy practice value:
+
+- **Position bias**: if the correct answer nearly always lands on the same letter, you pass without reading. Found (195 of 237 sat on B) and **fixed**: the split is now A=61, B=60, C=58, D=58.
+- **Length tell**: if the longest option is nearly always correct, you pass by counting characters. Found in 98% of questions and **not yet fixed** — it requires rewriting the distractors. The auditor reports it as a standing warning.
+
+`tools/check-links.sh` checks that the links to AWS documentation are still alive.
 
 ## 🗂️ Structure
 
@@ -66,6 +94,10 @@ assets/
   js/app.js                   → diagram interaction + active sidebar
   js/quiz.js                  → quiz engine + saved progress (ES/EN based on the page lang)
   js/exam.js                  → timed 65-question exam simulation
+  js/progress.js              → hub progress panel
+tools/
+  audit-questions.js          → question bank quality audit
+  check-links.sh              → external link checker
 modules/<domain>/
   index.html                → module content (Spanish)
   quiz-data.js               → quiz questions (Spanish)
@@ -95,6 +127,8 @@ This repo accepts contributions — with a **strict** workflow designed so every
 📋 Templates available when opening an issue: **[🐛 Web bug](.github/ISSUE_TEMPLATE/bug.md)** · **[📝 Content error](.github/ISSUE_TEMPLATE/content-error.md)** · **[✨ New content](.github/ISSUE_TEMPLATE/new-content.md)**
 
 📖 Full workflow, validations to run before the PR, and checklist: **[CONTRIBUTING.md](CONTRIBUTING.md)**
+
+Before opening a PR that touches questions, run `node tools/audit-questions.js`: it fails if you break ES/EN parity or the bank's structure.
 
 <br>
 

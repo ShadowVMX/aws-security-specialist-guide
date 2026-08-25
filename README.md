@@ -51,7 +51,35 @@ python3 -m http.server 8000
 | 5 | Data Protection | 18% | ✅ |
 | 6 | Security Foundations & Governance | 14% | ✅ |
 
-Cada módulo incluye: teoría organizada por los *task statements* oficiales del exam guide, 1-2 diagramas SVG interactivos, ejemplos CLI/JSON reales, comparativas con Azure (donde el mapeo es fiable) o ejemplos en lenguaje llano (donde forzar la comparación induciría a error), y un quiz de práctica con explicación en cada respuesta.
+Cada módulo incluye: teoría organizada por los *task statements* oficiales del exam guide, diagramas SVG interactivos, ejemplos CLI/JSON reales, comparativas con Azure (donde el mapeo es fiable) o ejemplos en lenguaje llano (donde forzar la comparación induciría a error), una sección de **trampas típicas del examen**, los **enlaces a la documentación oficial** en la que se apoya, y un quiz con explicación en cada respuesta.
+
+## 🎯 Cómo se estudia
+
+**Quiz por módulo** — 262 preguntas en total, 25 de ellas de **respuesta múltiple** (`choose TWO`), puntuadas todo-o-nada como en el examen real. El progreso se guarda en tu navegador y puedes:
+
+- filtrar por tema o ver **solo las falladas**, las sin responder o las marcadas
+- **barajar** preguntas y opciones, para no aprenderte la respuesta por su posición
+- marcar preguntas con ★ para repasarlas luego
+- reiniciar un módulo, o borrar todo el progreso desde el hub
+
+**Simulacro completo** — 65 preguntas en 170 minutos con la mezcla oficial por dominio, sin corrección hasta entregar. Al terminar da la nota, el desglose por dominio y la explicación de cada pregunta.
+
+**Panel de progreso** — el hub muestra cuánto llevas respondido, tu porcentaje de acierto y el resultado del último simulacro.
+
+## 🔍 Calidad del banco de preguntas
+
+Un banco de preguntas puede ser correcto y aun así enseñar el hábito equivocado. `tools/audit-questions.js` lo comprueba en cada cambio:
+
+```bash
+node tools/audit-questions.js
+```
+
+Verifica paridad ES/EN, índices en rango, opciones o enunciados duplicados y explicaciones ausentes — y además detecta dos sesgos que arruinan el valor de práctica:
+
+- **Sesgo de posición**: si la respuesta correcta cae casi siempre en la misma letra, se aprueba sin leer. Se detectó (195 de 237 estaban en la B) y está **corregido**: el reparto es A=61, B=60, C=58, D=58.
+- **Señal de longitud**: si la opción más larga es casi siempre la correcta, se aprueba midiendo caracteres. Detectado en el 98% de las preguntas y **todavía sin corregir** — exige reescribir los distractores. El auditor lo reporta como aviso permanente.
+
+`tools/check-links.sh` comprueba que los enlaces a la documentación de AWS siguen vivos.
 
 ## 🗂️ Estructura
 
@@ -66,6 +94,10 @@ assets/
   js/app.js                   → interacción de diagramas + sidebar activa
   js/quiz.js                  → motor de quiz + progreso guardado (ES/EN según el lang de la página)
   js/exam.js                  → simulacro cronometrado de 65 preguntas
+  js/progress.js              → panel de progreso del hub
+tools/
+  audit-questions.js          → auditoría de calidad del banco de preguntas
+  check-links.sh              → comprobador de enlaces externos
 modules/<dominio>/
   index.html                → contenido del módulo (español)
   quiz-data.js               → preguntas del quiz (español)
@@ -95,6 +127,8 @@ Este repo acepta contribuciones — con un flujo **estricto** pensado para que c
 📋 Plantillas disponibles al abrir un issue: **[🐛 Bug de la web](.github/ISSUE_TEMPLATE/bug.md)** · **[📝 Error de contenido](.github/ISSUE_TEMPLATE/content-error.md)** · **[✨ Contenido nuevo](.github/ISSUE_TEMPLATE/new-content.md)**
 
 📖 Flujo completo, validaciones a correr antes de la PR, y checklist: **[CONTRIBUTING.md](CONTRIBUTING.md)**
+
+Antes de abrir una PR que toque preguntas, ejecuta `node tools/audit-questions.js`: falla si rompes la paridad ES/EN o la estructura del banco.
 
 <br>
 

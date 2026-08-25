@@ -60,7 +60,22 @@ This repo is a personal study guide, but it's open to contributions. To keep qua
 
 No build step, but do validate syntax before submitting:
 
+```
+
+Desde ahora hay dos herramientas que hacen esto por ti, y son las que debes
+ejecutar antes de abrir la PR / There are now two tools that do this for you,
+and they are what you should run before opening the PR:
+
 ```bash
+# Estructura del banco, paridad ES/EN y sesgos de las preguntas.
+# Bank structure, ES/EN parity and question biases.
+node tools/audit-questions.js
+
+# Enlaces externos vivos (necesita salida a internet sin proxy).
+# External links still alive (needs unproxied internet access).
+./tools/check-links.sh
+```
+bash
 # Syntax of any quiz-data.js you touched
 node -c modules/<module>/quiz-data.js
 
