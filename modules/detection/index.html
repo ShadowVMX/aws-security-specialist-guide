@@ -95,7 +95,7 @@
 
     <div class="callout azure">
       <b>Si vienes de Azure</b>
-      <table>
+      <table role="table">
         <tr><th>Azure</th><th>AWS</th><th>Diferencia clave</th></tr>
         <tr><td><strong>Microsoft Defender for Cloud</strong></td><td><strong>GuardDuty + Security Hub</strong> (juntos)</td><td>Azure combina detección de amenazas Y agregación de compliance en UN producto. AWS lo reparte en dos servicios: GuardDuty detecta, Security Hub agrega y evalúa compliance.</td></tr>
         <tr><td>Azure Activity Log + Diagnostic Settings</td><td><strong>CloudTrail (org trail)</strong></td><td>Concepto equivalente: registro inmutable de llamadas a la API de control plane.</td></tr>
@@ -108,7 +108,7 @@
     <h2 id="which-service">GuardDuty vs Macie vs Config vs Security Hub</h2>
     <p class="lede">Cuatro servicios que el examen confunde a propósito en las respuestas incorrectas. Cada uno responde una pregunta distinta.</p>
 
-    <table>
+    <table role="table">
       <tr><th>Servicio</th><th>Pregunta que responde</th><th>Cómo funciona</th></tr>
       <tr><td><strong>GuardDuty</strong></td><td>"¿Hay comportamiento anómalo o una amenaza activa?"</td><td>ML + threat intelligence sobre CloudTrail, VPC Flow Logs, DNS logs, runtime monitoring — sin activar nada manualmente.</td></tr>
       <tr><td><strong>Macie</strong></td><td>"¿Dónde tengo datos sensibles (PII) expuestos o mal ubicados?"</td><td>Descubrimiento y clasificación de contenido en S3 mediante ML y patrones gestionados/personalizados.</td></tr>
@@ -130,7 +130,7 @@
 
     <h2 id="log-sources">Fuentes de log &amp; arquitectura de logging (1.2.1 / 1.2.2)</h2>
     <p class="lede">Identificar QUÉ registrar es tan importante como CÓMO centralizarlo.</p>
-    <table>
+    <table role="table">
       <tr><th>Fuente</th><th>Qué captura</th></tr>
       <tr><td><strong>CloudTrail</strong></td><td>Llamadas a la API (management events: quién hizo qué; data events opcionales: operaciones sobre objetos S3/funciones Lambda individuales).</td></tr>
       <tr><td><strong>CloudWatch Logs</strong></td><td>Logs de aplicación/sistema enviados por el CloudWatch Agent, Lambda, contenedores, etc.</td></tr>
@@ -159,7 +159,7 @@
     </ul>
 
     <h2 id="analysis">Analizar, normalizar &amp; correlacionar (1.2.4 / 1.2.5)</h2>
-    <table>
+    <table role="table">
       <tr><th>Herramienta</th><th>Mejor para</th></tr>
       <tr><td><strong>CloudWatch Logs Insights</strong></td><td>Consultas rápidas sobre logs recientes ya en un log group — investigación inmediata.</td></tr>
       <tr><td><strong>Amazon Athena</strong></td><td>SQL estándar sobre grandes volúmenes históricos en S3 (ej. sobre el data lake de Security Lake).</td></tr>
@@ -175,7 +175,7 @@
 
     <h2 id="troubleshoot">Troubleshooting de logging roto (1.3.1 / 1.3.2)</h2>
     <p class="lede">Patrón de pregunta muy repetido: "el log group está vacío, ¿por qué?" — casi siempre son las mismas dos causas.</p>
-    <table>
+    <table role="table">
       <tr><th>Síntoma</th><th>Causas más comunes</th></tr>
       <tr><td>CloudWatch Agent corriendo pero sin logs</td><td>Configuración del agente mal apuntada (rutas/log group incorrectos) o permisos IAM insuficientes en el Instance Profile.</td></tr>
       <tr><td>Lambda se ejecuta pero sin logs</td><td>Execution role sin <code>logs:CreateLogStream</code>/<code>logs:PutLogEvents</code> (falta la managed policy AWSLambdaBasicExecutionRole).</td></tr>

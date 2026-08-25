@@ -54,7 +54,7 @@
     <h2 id="fundamentos">Modelos de cifrado</h2>
     <p class="lede">Antes de KMS, hay que tener claros tres ejes que el examen combina constantemente.</p>
 
-    <table>
+    <table role="table">
       <tr><th>Eje</th><th>Opciones</th><th>Idea clave</th></tr>
       <tr><td><strong>Dónde cifra</strong></td><td>Client-side vs Server-side</td><td>Client-side: el dato sale ya cifrado de tu app, AWS nunca ve el texto plano. Server-side: AWS recibe el dato (por TLS) y lo cifra él al guardarlo.</td></tr>
       <tr><td><strong>Quién gestiona la clave (server-side)</strong></td><td>SSE-S3 / SSE-KMS / SSE-C</td><td>SSE-S3: clave gestionada 100% por S3. SSE-KMS: clave en KMS, con auditoría y control de acceso granular. SSE-C: TÚ envías la clave en cada request; AWS no la almacena.</td></tr>
@@ -117,7 +117,7 @@
     <h2 id="transit-tls">TLS &amp; conectividad privada (5.1.1 / 5.1.2)</h2>
     <p class="lede">Dos preguntas distintas: ¿cifro el canal? y ¿evito que el tráfico salga a la red pública?</p>
 
-    <table>
+    <table role="table">
       <tr><th>Mecanismo</th><th>Resuelve</th></tr>
       <tr><td><strong>ELB Security Policies</strong></td><td>Fuerza versión mínima de TLS y cipher suites permitidos en el listener HTTPS/TLS de un ALB/NLB.</td></tr>
       <tr><td><strong>AWS PrivateLink / VPC endpoints</strong></td><td>Accede a servicios de AWS o SaaS de terceros sin salir a la red pública de Internet — el tráfico nunca cruza la Internet abierta.</td></tr>
@@ -132,7 +132,7 @@
 
     <div class="callout azure">
       <b>Si vienes de Azure</b>
-      <table>
+      <table role="table">
         <tr><th>Azure</th><th>AWS</th><th>Diferencia clave</th></tr>
         <tr><td><strong>Azure Private Link</strong></td><td><strong>AWS PrivateLink</strong></td><td>Prácticamente idéntico en concepto: exponer un servicio como endpoint privado dentro de una VNet/VPC sin pasar por Internet.</td></tr>
         <tr><td><strong>Point-to-Site (P2S) VPN</strong></td><td><strong>AWS Client VPN</strong></td><td>Mismo modelo: túnel VPN de cliente individual hacia la red virtual.</td></tr>
@@ -217,7 +217,7 @@
       <p class="diagram-note">Árbol de decisión: qué servicio de gestión de claves elegir (Skill 5.2.1)</p>
     </div>
 
-    <table>
+    <table role="table">
       <tr><th>Tipo de key</th><th>Rotación</th><th>Key policy propia</th><th>Multi-Region</th><th>Exportable</th></tr>
       <tr><td>AWS managed (<code>aws/s3</code>...)</td><td>Automática anual, sin control</td><td>No</td><td>No</td><td>No</td></tr>
       <tr><td>Customer managed</td><td>Opcional, automática (anual) o manual</td><td>Sí</td><td>Sí</td><td>No</td></tr>
@@ -258,7 +258,7 @@
     </ul>
 
     <h2 id="backup">Replicación &amp; backup (5.2.4)</h2>
-    <table>
+    <table role="table">
       <tr><th>Servicio</th><th>Para qué</th></tr>
       <tr><td><strong>AWS Backup</strong></td><td>Política centralizada de backup (retención, programación, copiado cross-Region/cross-account) para EBS, RDS, DynamoDB, EFS, FSx, etc. Soporta <strong>Vault Lock</strong> (inmutabilidad WORM) como defensa contra ransomware.</td></tr>
       <tr><td><strong>Amazon Data Lifecycle Manager (DLM)</strong></td><td>Automatiza específicamente snapshots de EBS y creación/retención de AMIs.</td></tr>
@@ -291,7 +291,7 @@
 
     <h2 id="imported-keys">Imported key material &amp; External Key Store (5.3.2 / 5.3.3)</h2>
     <p class="lede">Ver también el árbol de decisión de arriba. Aquí el matiz que más se pregunta: las diferencias prácticas frente a una key generada por AWS.</p>
-    <table>
+    <table role="table">
       <tr><th></th><th>Generada por AWS</th><th>Material importado (BYOK)</th></tr>
       <tr><td>Rotación automática</td><td>Sí (opcional, anual)</td><td>No — hay que re-importar manualmente</td></tr>
       <tr><td>Expiración configurable</td><td>No</td><td>Sí, opcional (o "no expirar nunca")</td></tr>
@@ -327,7 +327,7 @@
 }</code></pre>
 
     <h2 id="certs">Certificados &amp; claves multi-Region (5.3.5)</h2>
-    <table>
+    <table role="table">
       <tr><th>Servicio</th><th>Para qué</th></tr>
       <tr><td><strong>ACM (público)</strong></td><td>Certificados TLS gratuitos, de confianza pública, con renovación automática. Para dominios públicos verificables.</td></tr>
       <tr><td><strong>AWS Private CA</strong></td><td>Tu propia jerarquía de CA privada: certificados internos para mTLS entre microservicios, IoT, IAM Roles Anywhere. Solo de confianza donde distribuyas el certificado raíz. Coste por CA activa.</td></tr>

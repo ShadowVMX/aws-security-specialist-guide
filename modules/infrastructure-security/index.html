@@ -108,7 +108,7 @@
     </div>
 
     <h2 id="waf-shield">WAF, Shield &amp; CloudFront (3.1.1 / 3.1.2 / 3.1.3)</h2>
-    <table>
+    <table role="table">
       <tr><th>Servicio</th><th>Protege contra</th></tr>
       <tr><td><strong>AWS WAF</strong></td><td>OWASP Top 10 (SQLi, XSS...), rate-based rules (fuerza bruta/scraping), geo-match, reglas gestionadas por AWS o de terceros (AWS Marketplace).</td></tr>
       <tr><td><strong>Shield Standard / Advanced</strong></td><td>DDoS de capa 3/4 (siempre activo) y, con Advanced, mitigación ampliada de capa 7 combinada con WAF.</td></tr>
@@ -131,7 +131,7 @@
 
     <div class="callout azure">
       <b>Si vienes de Azure</b>
-      <table>
+      <table role="table">
         <tr><th>Azure</th><th>AWS</th><th>Diferencia clave</th></tr>
         <tr><td><strong>Azure Front Door / WAF</strong></td><td><strong>CloudFront + AWS WAF</strong></td><td>Mapeo casi directo: CDN + WAF integrado en el edge.</td></tr>
         <tr><td><strong>Azure DDoS Protection (Standard)</strong></td><td><strong>Shield Advanced</strong></td><td>Ambos son la capa de pago sobre la protección básica gratuita que ya viene incluida (Shield Standard / DDoS IP Protection básico).</td></tr>
@@ -153,7 +153,7 @@
     </div>
 
     <h2 id="instance-roles">Instance profiles, service roles &amp; execution roles (3.2.2)</h2>
-    <table>
+    <table role="table">
       <tr><th>Tipo</th><th>Se usa en</th></tr>
       <tr><td><strong>Instance Profile</strong></td><td>EC2 — contenedor que asocia un IAM Role a la instancia; el SDK obtiene credenciales automáticamente del Instance Metadata Service (IMDS).</td></tr>
       <tr><td><strong>Service Role</strong></td><td>Un servicio de AWS (ej. Config, CodePipeline) asume este rol para actuar en tu nombre sobre otros recursos.</td></tr>
@@ -165,7 +165,7 @@
     </div>
 
     <h2 id="vuln-scanning">Inspector, GuardDuty runtime &amp; patching (3.2.3 / 3.2.4)</h2>
-    <table>
+    <table role="table">
       <tr><th>Servicio</th><th>Qué detecta</th><th>Cuándo</th></tr>
       <tr><td><strong>Amazon Inspector</strong></td><td>CVEs conocidas en paquetes de SO (EC2), imágenes de contenedor (ECR) y dependencias de funciones Lambda</td><td>Escaneo continuo, estático</td></tr>
       <tr><td><strong>GuardDuty (Runtime Monitoring)</strong></td><td>Comportamiento anómalo en tiempo real (ej. proceso sospechoso, conexión a IP maliciosa)</td><td>Continuo, en ejecución</td></tr>
@@ -191,7 +191,7 @@
     </div>
 
     <h2 id="sg-nacl">Security Groups vs Network ACLs (3.3.1)</h2>
-    <table>
+    <table role="table">
       <tr><th></th><th>Security Group</th><th>Network ACL</th></tr>
       <tr><td><strong>Nivel</strong></td><td>ENI / instancia</td><td>Subnet</td></tr>
       <tr><td><strong>Estado</strong></td><td>Stateful (el retorno se permite solo)</td><td>Stateless (hay que permitir ida y vuelta)</td></tr>
