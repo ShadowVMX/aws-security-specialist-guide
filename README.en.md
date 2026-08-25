@@ -1,41 +1,51 @@
 <p align="center">
-  <img src="assets/img/banner.svg" width="100%" alt="AWS Certified Security - Specialty — Interactive Study Guide">
+  <img src="assets/img/banner.svg" width="100%" alt="AWS Certified Security - Specialty — Interactive study guide">
 </p>
 
 <p align="center">
   <img src="https://img.shields.io/badge/exam-SCS--C03-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white" alt="SCS-C03">
-  <img src="https://img.shields.io/badge/domains-6%2F6%20complete-3ECF8E?style=for-the-badge" alt="6/6 domains complete">
-  <img src="https://img.shields.io/badge/practice%20questions-262-B892FF?style=for-the-badge" alt="262 practice questions">
-  <img src="https://img.shields.io/badge/languages-ES%20%7C%20EN-4FA8FF?style=for-the-badge" alt="ES | EN">
-  <img src="https://img.shields.io/badge/contributions-issue%20required-FF6B6B?style=for-the-badge" alt="Contributions require an issue">
-  <img src="https://img.shields.io/badge/stack-HTML%2FCSS%2FJS-0b1220?style=for-the-badge" alt="Plain HTML/CSS/JS">
+  <img src="https://img.shields.io/badge/domains-6%2F6-3ECF8E?style=for-the-badge" alt="6 of 6 domains">
+  <img src="https://img.shields.io/badge/questions-262-B892FF?style=for-the-badge" alt="262 questions">
+  <img src="https://img.shields.io/badge/simulation-65%20questions%20%C2%B7%20170%20min-4FA8FF?style=for-the-badge" alt="65-question, 170-minute simulation">
+  <img src="https://img.shields.io/badge/languages-ES%20%7C%20EN-0b1220?style=for-the-badge" alt="Spanish and English">
 </p>
 
 <p align="center">
   <a href="README.md">🇪🇸 Español</a> &nbsp;·&nbsp; <b>🇬🇧 English</b>
-  &nbsp;&nbsp;|&nbsp;&nbsp;
-  <a href="https://shadowvmx.github.io/aws-security-specialist-guide/en/"><b>🌐 Open the guide</b></a> &nbsp;·&nbsp; <a href="https://shadowvmx.github.io/aws-security-specialist-guide/">🌐 En español</a> &nbsp;·&nbsp; <a href="https://shadowvmx.github.io/aws-security-specialist-guide/en/exam/">⏱️ Exam simulation</a>
 </p>
+
+<h3 align="center">
+  <a href="https://shadowvmx.github.io/aws-security-specialist-guide/en/">Open the guide →</a>
+</h3>
 
 <p align="center">
-  An <b>interactive</b> study guide for the <b>AWS Certified Security — Specialty (SCS-C03)</b> exam.<br>
-  Structured theory, clickable diagrams, real CLI/JSON commands, Azure comparisons, 262 practice questions and a timed exam simulation. No build step: plain HTML/CSS/JS.
+  <a href="https://shadowvmx.github.io/aws-security-specialist-guide/en/exam/">Exam simulation</a>
+  &nbsp;·&nbsp;
+  <a href="https://shadowvmx.github.io/aws-security-specialist-guide/">Versión en español</a>
 </p>
 
-<br>
+---
 
-> **📌 Version note:** the SCS-C02 exam retired on Dec. 1, 2025. Since Dec. 2, 2025, the only active exam is **SCS-C03** ([official exam guide](https://docs.aws.amazon.com/aws-certification/latest/security-specialty-03/security-specialty-03.html)), with restructured domains compared to SCS-C02. This guide follows SCS-C03's official domain numbering and weights.
+## Overview
 
-## 🚀 How to use it
+An interactive study guide for the **AWS Certified Security — Specialty (SCS-C03)** exam, organized around the six official domains and their task statements.
 
-**Nothing to install.** The guide is published and works on a phone just as well as on a desktop:
+Every module combines structured theory, interactive diagrams, real AWS CLI and JSON policy examples, Azure comparisons where the mapping is reliable, the exam's most frequent traps, and a quiz with a reasoned explanation on every answer.
 
-### 👉 [shadowvmx.github.io/aws-security-specialist-guide/en](https://shadowvmx.github.io/aws-security-specialist-guide/en/)
+It runs in the browser, with no installation and no accounts: **your progress is saved on your own device**.
 
-Quiz progress is saved in your own browser: no accounts, no sign-up, no server collecting anything.
+> **Note on the exam version**
+>
+> The SCS-C02 exam retired on December 1, 2025. Since December 2, 2025 the only active version is **SCS-C03**, with restructured domains. This guide follows the numbering and weights of the [official exam guide](https://docs.aws.amazon.com/aws-certification/latest/security-specialty-03/security-specialty-03.html).
+
+## Getting started
+
+No installation required:
+
+### [shadowvmx.github.io/aws-security-specialist-guide/en](https://shadowvmx.github.io/aws-security-specialist-guide/en/)
 
 <details>
-<summary>Prefer to run it locally?</summary>
+<summary>Run it locally</summary>
 
 ```bash
 git clone https://github.com/ShadowVMX/aws-security-specialist-guide.git
@@ -44,107 +54,73 @@ python3 -m http.server 8000
 # → http://localhost:8000
 ```
 
-You can also just double-click `index.html`: there is no build step and no dependencies, so it works straight from disk.
+You can also open `index.html` straight from disk: there is no build step and no dependencies.
 
 </details>
 
-## 📚 Domains (SCS-C03)
+## Exam domains
 
-| # | Domain | Weight | Status |
+| # | Domain | Weight | Questions |
 |---|---|---|---|
-| 1 | Detection | 16% | ✅ |
-| 2 | Incident Response | 14% | ✅ |
-| 3 | Infrastructure Security | 18% | ✅ |
-| 4 | Identity and Access Management | 20% | ✅ |
-| 5 | Data Protection | 18% | ✅ |
-| 6 | Security Foundations & Governance | 14% | ✅ |
+| 1 | Detection | 16% | 40 |
+| 2 | Incident Response | 14% | 41 |
+| 3 | Infrastructure Security | 18% | 42 |
+| 4 | Identity and Access Management | 20% | 53 |
+| 5 | Data Protection | 18% | 46 |
+| 6 | Security Foundations & Governance | 14% | 40 |
 
-Every module includes: theory organized around the exam guide's official task statements, interactive SVG diagrams, real CLI/JSON examples, Azure comparisons (where the mapping is reliable) or plain-language examples (where forcing the comparison would mislead), a **classic exam traps** section, the **links to the official documentation** it rests on, and a quiz with an explanation on every answer.
+Every module includes:
 
-## 🎯 How to study with it
+- Theory organized around the exam guide's official task statements
+- Interactive SVG diagrams, navigable by keyboard as well
+- AWS CLI and JSON policy examples ready to read and adapt
+- Azure comparisons where the mapping is reliable, or plain-language examples where forcing it would mislead
+- A section on the exam's most frequent traps
+- Links to the official AWS documentation it rests on
+- A quiz with a reasoned explanation on every answer
 
-**Per-module quiz** — 262 questions in total, 25 of them **multiple response** (`choose TWO`), scored all-or-nothing as in the real exam. Progress is saved in your browser, and you can:
+## How to study
 
-- filter by topic, or show **wrong answers only**, unanswered, or flagged
-- **shuffle** questions and options, so you don't learn answers by position
-- flag questions with ★ to review later
-- reset one module, or erase all progress from the hub
+### Per-domain quiz
 
-**Full simulation** — 65 questions in 170 minutes with the official domain mix, no grading until you submit. It ends with your score, the per-domain breakdown and every explanation.
+262 questions, 25 of them **multiple response** (`choose TWO`), scored all-or-nothing exactly as in the real exam.
 
-**Progress panel** — the hub shows how much you've answered, your accuracy and your last simulation result.
+| Feature | What it's for |
+|---|---|
+| Wrong answers only | Review just what you haven't mastered |
+| Topic filter | Focus on one service or concept |
+| Shuffle | Avoid memorizing an answer by its position |
+| Flag with ★ | Set questions aside to come back to |
+| Reset | Start over, per module or across the guide |
 
-**On a phone** — built for studying in spare moments: a collapsible index in every module, diagrams that pan without losing legibility, and a light/dark theme that follows the system. The diagrams are keyboard-navigable too, for anyone not using a mouse.
+### Exam simulation
 
-## 🔍 Question bank quality
+65 questions in 170 minutes, with the official domain mix and no grading until you submit. It ends with your score, the per-domain breakdown and every explanation.
 
-A question bank can be factually correct and still train the wrong habit. `tools/audit-questions.js` checks it on every change:
+It trains what a topic quiz cannot: **pacing yourself and deciding without knowing how you're doing**.
 
-```bash
-node tools/audit-questions.js
-```
+### Tracking
 
-It verifies ES/EN parity, answer indices in range, no duplicate options or stems, no question left without an explanation, and that correct answers are spread evenly across the four letters — so the quiz can't be passed by pattern instead of knowledge.
+The home page shows how much you've answered, your accuracy and your last simulation result.
 
-It runs automatically on every Pull Request: if something breaks, the change doesn't land.
+### On a phone
 
-`tools/check-links.sh` checks that the links to AWS documentation are still alive.
+Built for studying in spare moments: a collapsible index in every module, diagrams that pan without losing legibility, and a light or dark theme that follows the system.
 
-## 🗂️ Structure
+## Contributing
 
-```
-index.html                 → ES hub with cards for all domains
-en/index.html               → EN hub (same content, in English)
-examen/index.html           → full exam simulation (ES)
-en/exam/index.html          → full exam simulation (EN)
-assets/
-  css/style.css              → shared styles (automatic light/dark theme)
-  img/banner.svg              → this README's banner
-  img/favicon.svg             → browser tab icon
-  js/app.js                   → diagram interaction + active sidebar
-  js/quiz.js                  → quiz engine + saved progress (ES/EN based on the page lang)
-  js/exam.js                  → timed 65-question exam simulation
-  js/progress.js              → hub progress panel
-.github/workflows/
-  quality.yml                 → CI: audits the bank and validates the pages on every PR
-tools/
-  audit-questions.js          → question bank quality audit
-  check-links.sh              → external link checker
-  check-internal-links.sh      → internal links that survive a rename
-modules/<domain>/
-  index.html                → module content (Spanish)
-  quiz-data.js               → quiz questions (Spanish)
-en/modules/<domain>/
-  index.html                → same module, translated to English
-  quiz-data.js               → same questions, translated
-```
+Corrections and contributions are welcome. See **[CONTRIBUTING.md](CONTRIBUTING.md)** for the process and the writing criteria.
 
-Every Spanish page links to its English twin under `en/` (and vice versa) via the ES/EN switch in the top bar.
-
-## 🤝 How to contribute
-
-This repo accepts contributions — with a **strict** workflow designed so every change is documented and verified before it touches `main`:
-
-```
- 1. Open an Issue           → template: bug / content error / new content
-                                (github.com/ShadowVMX/aws-security-specialist-guide/issues/new/choose)
- 2. Brief discussion        → especially for large new content (a whole module, etc.)
- 3. Fork + branch           → fix/something-specific, content/something-new...
- 4. Changes + official source → if you touch technical content, link the AWS/Azure doc backing it
- 5. Open the PR             → mandatory template, with "Closes #123"
- 6. Review + merge          → main is protected: PR + 1 approved review, no exceptions
-```
-
-**`main` has branch protection enabled**: no direct pushes, no force-push, no branch deletion. Every PR needs at least 1 approved review before it can be merged.
-
-📋 Templates available when opening an issue: **[🐛 Web bug](.github/ISSUE_TEMPLATE/bug.md)** · **[📝 Content error](.github/ISSUE_TEMPLATE/content-error.md)** · **[✨ New content](.github/ISSUE_TEMPLATE/new-content.md)**
-
-📖 Full workflow, validations to run before the PR, and checklist: **[CONTRIBUTING.md](CONTRIBUTING.md)**
-
-Before opening a PR that touches questions, run `node tools/audit-questions.js`: it fails if you break ES/EN parity or the bank's structure.
+If you spot a content error, [open an issue](https://github.com/ShadowVMX/aws-security-specialist-guide/issues/new/choose) naming the module and, where possible, the AWS documentation page that backs it.
 
 <br>
 
+---
+
 <p align="center">
-<sub>Independent study guide, not affiliated with Amazon Web Services. Content reviewed in August 2026.</sub>
+<sub>
+Independent study guide. Not affiliated with, sponsored by, or endorsed by Amazon Web Services.<br>
+AWS and AWS Certified Security — Specialty are trademarks of Amazon.com, Inc. or its affiliates.<br>
+Content reviewed in August 2026.
+</sub>
 </p>

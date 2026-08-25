@@ -1,41 +1,51 @@
 <p align="center">
-  <img src="assets/img/banner.svg" width="100%" alt="AWS Certified Security - Specialty — Interactive Study Guide">
+  <img src="assets/img/banner.svg" width="100%" alt="AWS Certified Security - Specialty — Guía de estudio interactiva">
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/exam-SCS--C03-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white" alt="SCS-C03">
-  <img src="https://img.shields.io/badge/domains-6%2F6%20complete-3ECF8E?style=for-the-badge" alt="6/6 domains complete">
-  <img src="https://img.shields.io/badge/practice%20questions-262-B892FF?style=for-the-badge" alt="262 practice questions">
-  <img src="https://img.shields.io/badge/languages-ES%20%7C%20EN-4FA8FF?style=for-the-badge" alt="ES | EN">
-  <img src="https://img.shields.io/badge/contributions-issue%20required-FF6B6B?style=for-the-badge" alt="Contributions require an issue">
-  <img src="https://img.shields.io/badge/stack-HTML%2FCSS%2FJS-0b1220?style=for-the-badge" alt="Plain HTML/CSS/JS">
+  <img src="https://img.shields.io/badge/examen-SCS--C03-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white" alt="SCS-C03">
+  <img src="https://img.shields.io/badge/dominios-6%2F6-3ECF8E?style=for-the-badge" alt="6 de 6 dominios">
+  <img src="https://img.shields.io/badge/preguntas-262-B892FF?style=for-the-badge" alt="262 preguntas">
+  <img src="https://img.shields.io/badge/simulacro-65%20preguntas%20%C2%B7%20170%20min-4FA8FF?style=for-the-badge" alt="Simulacro de 65 preguntas en 170 minutos">
+  <img src="https://img.shields.io/badge/idiomas-ES%20%7C%20EN-0b1220?style=for-the-badge" alt="Español e inglés">
 </p>
 
 <p align="center">
   <b>🇪🇸 Español</b> &nbsp;·&nbsp; <a href="README.en.md">🇬🇧 English</a>
-  &nbsp;&nbsp;|&nbsp;&nbsp;
-  <a href="https://shadowvmx.github.io/aws-security-specialist-guide/"><b>🌐 Abrir la guía</b></a> &nbsp;·&nbsp; <a href="https://shadowvmx.github.io/aws-security-specialist-guide/en/">🌐 In English</a> &nbsp;·&nbsp; <a href="https://shadowvmx.github.io/aws-security-specialist-guide/examen/">⏱️ Simulacro de examen</a>
 </p>
+
+<h3 align="center">
+  <a href="https://shadowvmx.github.io/aws-security-specialist-guide/">Abrir la guía →</a>
+</h3>
 
 <p align="center">
-  Guía de estudio <b>interactiva</b> para el examen <b>AWS Certified Security — Specialty (SCS-C03)</b>.<br>
-  Teoría estructurada, diagramas clicables, comandos CLI/JSON reales, comparativas con Azure, 262 preguntas de práctica y un simulacro de examen cronometrado. Sin build step: HTML/CSS/JS plano.
+  <a href="https://shadowvmx.github.io/aws-security-specialist-guide/examen/">Simulacro de examen</a>
+  &nbsp;·&nbsp;
+  <a href="https://shadowvmx.github.io/aws-security-specialist-guide/en/">English version</a>
 </p>
 
-<br>
+---
 
-> **📌 Nota de versión:** el examen SCS-C02 se retiró el 1 dic. 2025. Desde el 2 dic. 2025 el único examen vigente es **SCS-C03** ([exam guide oficial](https://docs.aws.amazon.com/aws-certification/latest/security-specialty-03/security-specialty-03.html)), con dominios reestructurados respecto a SCS-C02. Esta guía sigue la numeración y pesos oficiales de SCS-C03.
+## Descripción general
 
-## 🚀 Cómo usarla
+Guía de estudio interactiva para el examen **AWS Certified Security — Specialty (SCS-C03)**, organizada por los seis dominios oficiales y sus *task statements*.
 
-**No hace falta instalar nada.** La guía está publicada y funciona en el móvil igual que en el escritorio:
+Cada módulo combina teoría estructurada, diagramas interactivos, ejemplos reales de AWS CLI y de políticas JSON, comparativas con Azure donde el mapeo es fiable, las trampas más frecuentes del examen y un quiz con explicación razonada en cada respuesta.
 
-### 👉 [shadowvmx.github.io/aws-security-specialist-guide](https://shadowvmx.github.io/aws-security-specialist-guide/)
+Funciona en el navegador, sin instalación y sin cuentas: **el progreso se guarda en tu propio dispositivo**.
 
-El progreso del quiz se guarda en tu propio navegador: no hay cuentas, ni registro, ni servidor que recoja nada.
+> **Nota sobre la versión del examen**
+>
+> El examen SCS-C02 se retiró el 1 de diciembre de 2025. Desde el 2 de diciembre de 2025 la única versión vigente es **SCS-C03**, con los dominios reestructurados. Esta guía sigue la numeración y los pesos del [exam guide oficial](https://docs.aws.amazon.com/aws-certification/latest/security-specialty-03/security-specialty-03.html).
+
+## Empezar
+
+No requiere instalación:
+
+### [shadowvmx.github.io/aws-security-specialist-guide](https://shadowvmx.github.io/aws-security-specialist-guide/)
 
 <details>
-<summary>¿Prefieres tenerla en local?</summary>
+<summary>Ejecutarla en local</summary>
 
 ```bash
 git clone https://github.com/ShadowVMX/aws-security-specialist-guide.git
@@ -44,107 +54,73 @@ python3 -m http.server 8000
 # → http://localhost:8000
 ```
 
-También puedes abrir `index.html` con doble clic: no hay build step ni dependencias, así que funciona igual desde el disco.
+También puede abrirse `index.html` directamente desde el disco: no hay build step ni dependencias.
 
 </details>
 
-## 📚 Dominios (SCS-C03)
+## Dominios del examen
 
-| # | Dominio | Peso | Estado |
+| # | Dominio | Peso | Preguntas |
 |---|---|---|---|
-| 1 | Detection | 16% | ✅ |
-| 2 | Incident Response | 14% | ✅ |
-| 3 | Infrastructure Security | 18% | ✅ |
-| 4 | Identity and Access Management | 20% | ✅ |
-| 5 | Data Protection | 18% | ✅ |
-| 6 | Security Foundations & Governance | 14% | ✅ |
+| 1 | Detection | 16 % | 40 |
+| 2 | Incident Response | 14 % | 41 |
+| 3 | Infrastructure Security | 18 % | 42 |
+| 4 | Identity and Access Management | 20 % | 53 |
+| 5 | Data Protection | 18 % | 46 |
+| 6 | Security Foundations & Governance | 14 % | 40 |
 
-Cada módulo incluye: teoría organizada por los *task statements* oficiales del exam guide, diagramas SVG interactivos, ejemplos CLI/JSON reales, comparativas con Azure (donde el mapeo es fiable) o ejemplos en lenguaje llano (donde forzar la comparación induciría a error), una sección de **trampas típicas del examen**, los **enlaces a la documentación oficial** en la que se apoya, y un quiz con explicación en cada respuesta.
+Cada módulo incluye:
 
-## 🎯 Cómo se estudia
+- Teoría organizada por los *task statements* oficiales del exam guide
+- Diagramas SVG interactivos, navegables también con teclado
+- Ejemplos de AWS CLI y de políticas JSON listos para leer y adaptar
+- Comparativas con Azure donde el mapeo es fiable, o ejemplos en lenguaje llano donde forzarlo induciría a error
+- Una sección con las trampas más frecuentes del examen
+- Enlaces a la documentación oficial de AWS en la que se apoya
+- Un quiz con explicación razonada en cada respuesta
 
-**Quiz por módulo** — 262 preguntas en total, 25 de ellas de **respuesta múltiple** (`choose TWO`), puntuadas todo-o-nada como en el examen real. El progreso se guarda en tu navegador y puedes:
+## Cómo estudiar
 
-- filtrar por tema o ver **solo las falladas**, las sin responder o las marcadas
-- **barajar** preguntas y opciones, para no aprenderte la respuesta por su posición
-- marcar preguntas con ★ para repasarlas luego
-- reiniciar un módulo, o borrar todo el progreso desde el hub
+### Quiz por dominio
 
-**Simulacro completo** — 65 preguntas en 170 minutos con la mezcla oficial por dominio, sin corrección hasta entregar. Al terminar da la nota, el desglose por dominio y la explicación de cada pregunta.
+262 preguntas, 25 de ellas de **respuesta múltiple** (`choose TWO`), puntuadas todo-o-nada igual que en el examen real.
 
-**Panel de progreso** — el hub muestra cuánto llevas respondido, tu porcentaje de acierto y el resultado del último simulacro.
+| Función | Para qué sirve |
+|---|---|
+| Solo falladas | Repasar únicamente lo que aún no dominas |
+| Filtro por tema | Centrarte en un servicio o concepto concreto |
+| Barajar | Evitar memorizar la respuesta por su posición |
+| Marcar con ★ | Apartar preguntas para volver a ellas |
+| Reiniciar | Empezar de cero, por módulo o en toda la guía |
 
-**En el móvil** — pensada para estudiar en ratos muertos: índice desplegable en cada módulo, diagramas que se desplazan sin perder legibilidad, y tema claro/oscuro que sigue al del sistema. Los diagramas también se recorren con teclado, para quien no use ratón.
+### Simulacro de examen
 
-## 🔍 Calidad del banco de preguntas
+65 preguntas en 170 minutos, con la mezcla oficial por dominio y sin corrección hasta entregar. Al terminar muestra la nota, el desglose por dominio y la explicación de cada pregunta.
 
-Un banco de preguntas puede ser correcto y aun así enseñar el hábito equivocado. `tools/audit-questions.js` lo comprueba en cada cambio:
+Entrena lo que un quiz por temas no entrena: **repartir el tiempo y decidir sin saber si vas acertando**.
 
-```bash
-node tools/audit-questions.js
-```
+### Seguimiento
 
-Verifica la paridad ES/EN, que los índices de respuesta estén en rango, que no haya opciones ni enunciados duplicados, que ninguna pregunta se quede sin explicación, y que las respuestas correctas estén bien repartidas entre las cuatro letras — para que no se pueda acertar por patrón en lugar de por conocimiento.
+La página principal muestra cuánto llevas respondido, tu porcentaje de acierto y el resultado del último simulacro.
 
-Se ejecuta automáticamente en cada Pull Request: si algo se rompe, el cambio no entra.
+### En el móvil
 
-`tools/check-links.sh` comprueba que los enlaces a la documentación de AWS siguen vivos.
+Pensada para estudiar en ratos muertos: índice desplegable en cada módulo, diagramas que se desplazan sin perder legibilidad y tema claro u oscuro según el del sistema.
 
-## 🗂️ Estructura
+## Contribuir
 
-```
-index.html                 → hub ES con las tarjetas de todos los dominios
-en/index.html               → hub EN (mismo contenido, en inglés)
-examen/index.html           → simulacro de examen completo (ES)
-en/exam/index.html          → simulacro de examen completo (EN)
-assets/
-  css/style.css              → estilos compartidos (tema claro/oscuro automático)
-  img/banner.svg              → banner de este README
-  img/favicon.svg             → icono de pestaña
-  js/app.js                   → interacción de diagramas + sidebar activa
-  js/quiz.js                  → motor de quiz + progreso guardado (ES/EN según el lang de la página)
-  js/exam.js                  → simulacro cronometrado de 65 preguntas
-  js/progress.js              → panel de progreso del hub
-.github/workflows/
-  quality.yml                 → CI: audita el banco y valida las páginas en cada PR
-tools/
-  audit-questions.js          → auditoría de calidad del banco de preguntas
-  check-links.sh              → comprobador de enlaces externos
-  check-internal-links.sh      → enlaces internos que no rompan al renombrar
-modules/<dominio>/
-  index.html                → contenido del módulo (español)
-  quiz-data.js               → preguntas del quiz (español)
-en/modules/<dominio>/
-  index.html                → mismo módulo, traducido al inglés
-  quiz-data.js               → mismas preguntas, traducidas
-```
+Las correcciones y aportaciones son bienvenidas. Consulta **[CONTRIBUTING.md](CONTRIBUTING.md)** para el proceso y los criterios de redacción.
 
-Cada página en español enlaza a su gemela en `en/` (y viceversa) vía el selector ES/EN de la barra superior.
-
-## 🤝 Cómo contribuir
-
-Este repo acepta contribuciones — con un flujo **estricto** pensado para que cada cambio quede documentado y verificado antes de tocar `main`:
-
-```
- 1. Abres un Issue          → plantilla: bug / error de contenido / contenido nuevo
-                                (github.com/ShadowVMX/aws-security-specialist-guide/issues/new/choose)
- 2. Se discute brevemente   → sobre todo si es contenido nuevo grande (un módulo entero, etc.)
- 3. Haces fork + rama       → fix/algo-concreto, content/algo-nuevo...
- 4. Cambios + fuente oficial → si tocas contenido técnico, enlaza la doc de AWS/Azure que lo respalda
- 5. Abres la PR             → plantilla obligatoria, con "Closes #123"
- 6. Review + merge          → main está protegida: PR + 1 review aprobado, sin excepciones
-```
-
-**`main` tiene branch protection activada**: no se admite push directo, ni force-push, ni borrar la rama. Toda PR necesita al menos 1 review aprobado antes de poder mergearse.
-
-📋 Plantillas disponibles al abrir un issue: **[🐛 Bug de la web](.github/ISSUE_TEMPLATE/bug.md)** · **[📝 Error de contenido](.github/ISSUE_TEMPLATE/content-error.md)** · **[✨ Contenido nuevo](.github/ISSUE_TEMPLATE/new-content.md)**
-
-📖 Flujo completo, validaciones a correr antes de la PR, y checklist: **[CONTRIBUTING.md](CONTRIBUTING.md)**
-
-Antes de abrir una PR que toque preguntas, ejecuta `node tools/audit-questions.js`: falla si rompes la paridad ES/EN o la estructura del banco.
+Si detectas un error de contenido, [abre un issue](https://github.com/ShadowVMX/aws-security-specialist-guide/issues/new/choose) indicando el módulo y, a ser posible, la página de la documentación de AWS que lo respalda.
 
 <br>
 
+---
+
 <p align="center">
-<sub>Guía de estudio independiente, sin relación con Amazon Web Services. Contenido revisado en agosto de 2026.</sub>
+<sub>
+Guía de estudio independiente. No está afiliada, patrocinada ni respaldada por Amazon Web Services.<br>
+AWS y AWS Certified Security — Specialty son marcas de Amazon.com, Inc. o de sus filiales.<br>
+Contenido revisado en agosto de 2026.
+</sub>
 </p>
