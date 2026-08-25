@@ -722,6 +722,19 @@ footer {
   white-space: nowrap;
 }
 
+/* ---- official sources list ---- */
+.content ul.sources { padding-left: 0; list-style: none; }
+.content ul.sources li {
+  margin: 0;
+  border-bottom: 1px solid var(--border);
+}
+.content ul.sources li:last-child { border-bottom: none; }
+.content ul.sources a {
+  display: block;
+  padding: 9px 2px;
+  font-size: 14.5px;
+}
+
 @media (max-width: 780px) {
   .module-layout { grid-template-columns: 1fr; gap: 0; }
   .sidebar { position: static; display: none; }

@@ -46,6 +46,7 @@
     <a href="#imported-keys">Imported key material &amp; XKS</a>
     <a href="#masking">Masking de datos sensibles</a>
     <a href="#certs">Certificados multi-Region</a>
+    <a href="#fuentes">Fuentes oficiales</a>
     <a href="#trampas">Trampas típicas</a>
     <h4>Práctica</h4>
     <a href="#quiz">Quiz (46 preguntas)</a>
@@ -386,6 +387,21 @@ aws kms decrypt \
       <b>Cuidado si vienes de Azure</b>
       Azure Key Vault es un recurso <em>regional</em>: para tener alta disponibilidad multi-región de tus claves, replicas manualmente el Key Vault completo (o usas Managed HSM con su propio mecanismo). AWS KMS Multi-Region keys son conceptualmente distintas: no son "el mismo servicio replicado", son <strong>réplicas de UNA clave con material compartido</strong> gestionadas de forma nativa por KMS (<code>ReplicateKey</code>), con Key IDs distintos por región pero criptográficamente intercambiables. No asumas que es "lo mismo con otro nombre".
     </div>
+
+    <h2 id="fuentes">Fuentes oficiales</h2>
+    <p class="lede">Documentación de AWS en la que se apoya este módulo. Si algo no te cuadra o quieres profundizar, empieza por aquí: es la única fuente que manda.</p>
+    <ul class="sources">
+      <li><a href="https://docs.aws.amazon.com/kms/latest/developerguide/overview.html" target="_blank" rel="noopener">AWS KMS ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/kms/latest/developerguide/key-policies.html" target="_blank" rel="noopener">KMS — key policies ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html" target="_blank" rel="noopener">KMS — conceptos y envelope encryption ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/kms/latest/developerguide/multi-region-keys-overview.html" target="_blank" rel="noopener">KMS — multi-Region keys ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingEncryption.html" target="_blank" rel="noopener">Cifrado en Amazon S3 ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html" target="_blank" rel="noopener">S3 Object Lock ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html" target="_blank" rel="noopener">AWS Secrets Manager ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html" target="_blank" rel="noopener">AWS Certificate Manager ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/introduction.html" target="_blank" rel="noopener">AWS CloudHSM ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/aws-certification/latest/security-specialty-03/security-specialty-03.html" target="_blank" rel="noopener">Exam guide oficial SCS-C03 ↗</a></li>
+    </ul>
 
     <h2 id="trampas">Trampas típicas del examen</h2>
     <p class="lede">Los errores que más se repiten en este dominio. Si vas justo de tiempo antes del examen, repasa solo esto y el quiz.</p>

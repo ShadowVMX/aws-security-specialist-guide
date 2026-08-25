@@ -49,6 +49,7 @@
     <a href="#access-analyzer">Access Analyzer &amp; Policy Simulator</a>
     <a href="#root">Root user &amp; MFA</a>
     <a href="#perimeter">Data perimeter</a>
+    <a href="#fuentes">Official sources</a>
     <a href="#trampas">Classic traps</a>
     <h4>Practice</h4>
     <a href="#quiz">Quiz (53 questions)</a>
@@ -490,6 +491,21 @@
       <tr><td>Resource</td><td>Which resources are trusted?</td><td>RCP/SCP with <code>aws:ResourceOrgID</code>, restrictive resource policies</td></tr>
       <tr><td>Network</td><td>What network is the access coming from?</td><td>VPC endpoint policies + <code>aws:SourceVpce</code> / <code>aws:SourceIp</code></td></tr>
     </table>
+
+    <h2 id="fuentes">Official sources</h2>
+    <p class="lede">The AWS documentation this module rests on. If something doesn't add up or you want more depth, start here: it is the only source that counts.</p>
+    <ul class="sources">
+      <li><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html" target="_blank" rel="noopener">Policy evaluation logic ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html" target="_blank" rel="noopener">IAM best practices ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_boundaries.html" target="_blank" rel="noopener">Permission boundaries ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html" target="_blank" rel="noopener">Service Control Policies ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_rcps.html" target="_blank" rel="noopener">Resource Control Policies ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_condition-keys.html" target="_blank" rel="noopener">Global condition keys ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/singlesignon/latest/userguide/what-is.html" target="_blank" rel="noopener">IAM Identity Center ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html" target="_blank" rel="noopener">IAM Access Analyzer ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/rolesanywhere/latest/userguide/introduction.html" target="_blank" rel="noopener">IAM Roles Anywhere ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/aws-certification/latest/security-specialty-03/security-specialty-03.html" target="_blank" rel="noopener">Official SCS-C03 exam guide ↗</a></li>
+    </ul>
 
     <h2 id="trampas">Classic exam traps</h2>
     <p class="lede">The mistakes that repeat most in this domain. If you're short on time before the exam, review just this and the quiz.</p>
