@@ -108,16 +108,19 @@
   const PREFS_KEY = `scs-c03:quizprefs:${LANG}:${MOD}`;
   const SUMMARY_KEY = `scs-c03:summary:${LANG}:${MOD}`;
 
-  // Answers are stored against a hash of the question text rather than its
-  // index, so adding or reordering questions later doesn't silently shift
-  // every saved answer onto the wrong question.
+  // Answers are stored against a hash of the question rather than its index,
+  // so adding or reordering questions later doesn't silently shift every saved
+  // answer onto the wrong question. The options are part of the hash too: a
+  // saved answer is an option INDEX, so if the options are reordered or
+  // reworded that index now points somewhere else, and the honest thing is to
+  // drop it rather than resurrect it against the wrong option.
   function hash(str) {
     let h = 5381;
     for (let i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0;
     return (h >>> 0).toString(36);
   }
 
-  const keys = QUIZ_DATA.map((item) => hash(item.q));
+  const keys = QUIZ_DATA.map((item) => hash(item.q + "\u0000" + item.options.join("\u0000")));
 
   // Any storage access can throw (private mode, site data blocked), and a
   // quiz that works is worth more than one that saves, so failures are silent.
