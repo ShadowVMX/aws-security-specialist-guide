@@ -13,11 +13,16 @@ set -uo pipefail
 
 cd "$(dirname "$0")/.." || exit 1
 
+# Both the pages and the quiz explanations carry links; a dead source link in
+# an explanation is exactly the one a student would click to check a claim.
+# In the .js banks the HTML lives inside a JS string, so the quotes arrive
+# backslash-escaped — match either form.
 mapfile -t urls < <(
-  grep -rho 'href="https://[^"]*"' \
+  grep -rhoE 'href=\\?"https://[^"\\]+' \
     index.html en/index.html examen/index.html en/exam/index.html \
-    modules/*/index.html en/modules/*/index.html 2>/dev/null |
-  sed 's/href="//; s/"$//' |
+    modules/*/index.html en/modules/*/index.html \
+    modules/*/quiz-data.js en/modules/*/quiz-data.js 2>/dev/null |
+  sed -E 's/^href=\\?"//' |
   sort -u
 )
 
