@@ -503,4 +503,52 @@ const QUIZ_DATA = [
     correct: 1,
     explain: "Every KMS API operation is logged as a CloudTrail event (enabled by default as a 'management event'), including the principal (user/role) that made the call, the timestamp, the affected Key ID, the source IP, and whether the call succeeded or was denied — the source of truth for auditing use of a KMS key.",
   },
+  {
+    tag: "Cross-account KMS key use",
+    q: "A role in account B must decrypt objects encrypted with a customer managed KMS key living in account A. Which TWO conditions must hold?",
+    options: [
+      "The key policy in account A must allow access to the account B principal",
+      "The identity policy of the role in account B must allow kms:Decrypt on that key",
+      "The key must be an AWS managed key rather than a customer managed key",
+      "Both accounts must be in the same Region and the same Organization",
+    ],
+    correct: [0, 1],
+    explain: "As with cross-account role access, KMS requires <b>both ends</b>: key policy on the owner and identity policy on the consumer. Notably <b>AWS managed keys cannot be shared</b> across accounts — which is why the cross-account use case requires a customer managed key, the opposite of option C. Organizations isn't needed; Region does matter since keys are regional, but that is not what's missing here.",
+  },
+  {
+    tag: "Envelope encryption",
+    q: "Which TWO statements correctly describe envelope encryption as AWS KMS implements it?",
+    options: [
+      "Data is encrypted with a data key, and that data key is itself encrypted with the KMS key",
+      "The plaintext data key is used in memory and then discarded; only its encrypted version is stored beside the data",
+      "Data travels to KMS to be encrypted there, regardless of size",
+      "The KMS key leaves the service to encrypt data on the client",
+    ],
+    correct: [0, 1],
+    explain: "Envelope encryption exists precisely so data does <b>not</b> travel to KMS: KMS encrypts the data key (a small, fast operation) and bulk encryption happens locally. KMS's direct <code>Encrypt</code> operation is capped at 4 KB, which rules out option C for real data. And a KMS key's cryptographic material <b>never leaves the service in plaintext</b>: that is its fundamental guarantee.",
+  },
+  {
+    tag: "Immutable retention in S3",
+    q: "A regulatory requirement demands certain S3 objects cannot be deleted for 7 years. Which TWO statements about S3 Object Lock are correct?",
+    options: [
+      "In compliance mode no user — including the account root — can delete the object before retention expires",
+      "Object Lock requires versioning to be enabled on the bucket",
+      "In governance mode nobody can override retention under any circumstances",
+      "Object Lock can be turned on for existing objects with no prior bucket configuration",
+    ],
+    correct: [0, 1],
+    explain: "<b>Compliance</b> is the truly immutable mode (not even root can bypass it) and Object Lock <b>depends on versioning</b>, since it protects specific versions. <b>Governance</b> mode does allow an override for anyone holding <code>s3:BypassGovernanceRetention</code> — that is exactly the difference between the modes and what tends to be tested. And Object Lock is enabled at the bucket level, not improvised onto existing objects in a bucket without it.",
+  },
+  {
+    tag: "Secrets Manager rotation",
+    q: "You want to automatically rotate an RDS database password stored in Secrets Manager. Which TWO elements are involved?",
+    options: [
+      "A rotation Lambda function with permission to change the credential in the database",
+      "A rotation schedule defining how often the process runs",
+      "An S3 bucket where Secrets Manager drops the previous password in plaintext",
+      "An AWS Config rule that changes the password when it detects expiry",
+    ],
+    correct: [0, 1],
+    explain: "Rotation relies on a <b>Lambda</b> (AWS ships templates for supported databases) and a <b>schedule</b>. Secrets Manager keeps secret versions with staging labels such as AWSCURRENT and AWSPREVIOUS inside the service itself, encrypted with KMS: it never writes plaintext credentials to a bucket. And Config <b>evaluates</b> configuration, it does not rotate credentials.",
+  },
 ];

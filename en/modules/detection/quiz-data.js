@@ -431,4 +431,52 @@ const QUIZ_DATA = [
     correct: 1,
     explain: "Although both address 'I want to see data from multiple regions in one place', they operate on different layers: Security Hub cross-region aggregation works with FINDINGS (the output of detection/evaluation) and replicates them to a designated aggregation region for the Security Hub dashboard; Security Lake rollup regions work with raw OCSF-normalized LOGS and replicate copies of those logs to a destination region for analysis. They are not interchangeable and neither technically depends on the other.",
   },
+  {
+    tag: "GuardDuty at organization scale",
+    q: "A company with 180 accounts in AWS Organizations wants GuardDuty enabled everywhere, and any new account protected with no manual step. Which TWO are required?",
+    options: [
+      "Designate an account as the GuardDuty delegated administrator from the management account",
+      "Turn on auto-enable so new organization accounts are onboarded automatically",
+      "Create an IAM role in every member account allowing GuardDuty to read CloudTrail",
+      "Enable GuardDuty manually in each account and invite them one by one from the central account",
+    ],
+    correct: [0, 1],
+    explain: "GuardDuty is governed in Organizations through a <b>delegated administrator</b> plus <b>auto-enable</b>, which onboards new accounts with no action. GuardDuty ingests CloudTrail, VPC Flow Logs and DNS logs on its own via a service-linked role, so no roles or log setup are needed. The manual invitation flow exists but is exactly what this requirement rules out, and it misses future accounts.",
+  },
+  {
+    tag: "CloudTrail: data events",
+    q: "After an incident the team finds CloudTrail did not record WHO downloaded specific objects from an S3 bucket, though it did record the bucket's creation. Which TWO statements explain and fix this?",
+    options: [
+      "Management events log bucket-level operations but not operations on individual objects",
+      "S3 data events must be enabled for the bucket, logging read operations such as GetObject",
+      "CloudTrail can never log object access: only S3 server access logging can do it",
+      "Simply increasing the existing trail's retention will surface the events retroactively",
+    ],
+    correct: [0, 1],
+    explain: "CloudTrail separates <b>management events</b> (control plane: CreateBucket, PutBucketPolicy) from <b>data events</b> (data plane: GetObject, PutObject), and data events are off by default because of their cost and volume. S3 server access logging is an alternative, not the only route. Retention never manufactures events that were never captured: what wasn't logged doesn't exist.",
+  },
+  {
+    tag: "Immutable logging account",
+    q: "Audit requires that CloudTrail logs cannot be deleted or altered by an administrator of the account that produces them, not even with root credentials. Which TWO achieve this?",
+    options: [
+      "Deliver the logs to an S3 bucket in a separate, dedicated logging account with its own bucket policy",
+      "Apply S3 Object Lock in compliance mode on the destination bucket",
+      "Encrypt the bucket with SSE-S3 instead of SSE-KMS",
+      "Enable bucket versioning and trust that administrators won't delete versions",
+    ],
+    correct: [0, 1],
+    explain: "Account separation removes the source-account admin's power, and <b>Object Lock in compliance mode</b> blocks deletion even for root during the retention period (governance mode allows an exception with a special permission, which is why it wouldn't do here). The encryption type doesn't change who can delete. Versioning helps recovery, but an admin with permissions can delete versions: trust is not a control.",
+  },
+  {
+    tag: "Security Hub multi-Region",
+    q: "An organization operates in 5 Regions and wants to review all Security Hub findings from a single pane, in one account and Region. Which TWO are needed?",
+    options: [
+      "Designate a Security Hub delegated administrator for the organization",
+      "Configure an aggregation Region that consolidates findings from the other Regions",
+      "Manually replicate findings with a per-Region Lambda function",
+      "Disable Security Hub in the secondary Regions to avoid duplicates",
+    ],
+    correct: [0, 1],
+    explain: "Security Hub needs a <b>delegated administrator</b> for the multi-account view and <b>cross-Region aggregation</b> for the multi-Region view; they are two separate axes and both are required. Replicating with Lambda reinvents a native feature. Disabling Security Hub in the other Regions would remove the very findings you want to see: controls are evaluated where the resources live.",
+  },
 ];

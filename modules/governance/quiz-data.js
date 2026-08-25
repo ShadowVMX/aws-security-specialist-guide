@@ -431,4 +431,52 @@ const QUIZ_DATA = [
     correct: 0,
     explain: "AWS ha ido ampliando de forma incremental la disponibilidad regional tanto de los conformance packs de Config como de su gestión a nivel de organización, incorporando en 2025 regiones como Asia Pacífico (Malasia), Asia Pacífico (Nueva Zelanda), Asia Pacífico (Tailandia), Asia Pacífico (Taipéi) y México (Centro) — un supuesto de examen realista es verificar la disponibilidad regional de una funcionalidad de gobierno antes de asumir cobertura global uniforme.",
   },
+  {
+    tag: "Alcance de las SCP",
+    q: "Estás desplegando Service Control Policies en una organización. ¿Qué DOS afirmaciones son correctas?",
+    options: [
+      "Una SCP no concede permisos: solo acota el máximo que las identidades de la cuenta pueden llegar a tener",
+      "Las SCP no se aplican a la management account de la organización",
+      "Una SCP puede conceder permisos a un usuario que no los tiene en su identity policy",
+      "Las SCP se aplican también a los principals externos que acceden a tus recursos",
+    ],
+    correct: [0, 1],
+    explain: "Dos clásicos del examen. Una SCP es un <b>guardrail</b>, nunca una concesión: el permiso efectivo es la intersección entre la SCP y las políticas de identidad. Y la <b>management account no queda sujeta a las SCP</b>, motivo por el que AWS recomienda no alojar cargas de trabajo en ella. La opción D describe lo que hacen las <b>RCP</b>, que sí alcanzan a identidades externas: es justo el hueco que las SCP no cubren.",
+  },
+  {
+    tag: "Controles de Control Tower",
+    q: "Control Tower ofrece distintos tipos de control sobre la landing zone. ¿Qué DOS descripciones son correctas?",
+    options: [
+      "Los controles preventivos se implementan con SCPs e impiden que la acción llegue a ejecutarse",
+      "Los controles detectivos se implementan con reglas de AWS Config y avisan cuando algo ya se ha desviado",
+      "Los controles detectivos bloquean la acción antes de que ocurra, igual que los preventivos",
+      "Los controles preventivos solo pueden aplicarse a la cuenta de auditoría",
+    ],
+    correct: [0, 1],
+    explain: "La distinción <b>preventivo vs detectivo</b> es la que más se pregunta: los preventivos (SCP) <b>impiden</b>, los detectivos (Config) <b>detectan</b> lo que ya pasó. Por eso la opción C se contradice a sí misma. Los preventivos se aplican a OUs y cuentas, no solo a la de auditoría. Control Tower añade además controles <i>proactivos</i>, que validan plantillas de CloudFormation antes del despliegue.",
+  },
+  {
+    tag: "Compliance multi-cuenta con Config",
+    q: "Necesitas una visión única del cumplimiento de reglas de AWS Config en 90 cuentas y 4 Regiones. ¿Qué DOS elementos lo permiten?",
+    options: [
+      "Un aggregator de AWS Config que reúna los datos de todas las cuentas y Regiones",
+      "Conformance packs desplegados en la organización para aplicar el mismo conjunto de reglas en todas partes",
+      "Un bucket S3 en cada cuenta desde el que descargar informes manualmente cada semana",
+      "Activar Config solo en la cuenta de gestión, que hereda automáticamente el estado de las demás",
+    ],
+    correct: [0, 1],
+    explain: "El <b>aggregator</b> resuelve la vista consolidada y los <b>conformance packs</b> a nivel de organización garantizan que todas evalúan lo mismo. La descarga manual no escala a 90 cuentas y siempre llega tarde. Y Config es un servicio <b>regional y por cuenta</b>: la cuenta de gestión no hereda nada, hay que habilitarlo donde estén los recursos.",
+  },
+  {
+    tag: "Protección del usuario root",
+    q: "Estás endureciendo el usuario root de todas las cuentas de la organización. ¿Qué DOS medidas recomienda AWS?",
+    options: [
+      "Habilitar MFA en el root y eliminar sus access keys si existen",
+      "Usar la gestión centralizada de acceso root para retirar las credenciales root de las cuentas miembro",
+      "Crear una access key de root en cada cuenta y guardarla en Secrets Manager para automatizar tareas",
+      "Usar el root para las tareas administrativas diarias, ya que nunca queda bloqueado por una SCP",
+    ],
+    correct: [0, 1],
+    explain: "Lo básico es <b>MFA y cero access keys</b> en el root, y la <b>gestión centralizada de acceso root</b> permite retirar por completo esas credenciales de las cuentas miembro, dejando las tareas que exigen root para sesiones acotadas vía <code>sts:AssumeRoot</code>. Crear access keys de root es exactamente lo contrario de la recomendación. Y aunque es cierto que las SCP no limitan al root de la management account, eso es un motivo para <b>no</b> usarlo a diario, no para usarlo.",
+  },
 ];

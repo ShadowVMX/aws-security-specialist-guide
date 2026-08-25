@@ -1,7 +1,13 @@
 /**
  * Generic quiz engine. Expects a global array `QUIZ_DATA` defined by the
  * module page before this script runs, and a <div id="quiz-root"></div>
- * mount point. Each item: { tag, q, options: [string], correct: index, explain }
+ * mount point.
+ *
+ * Each item: { tag, q, options: [string], correct, explain }
+ *   correct: <index>   → single answer, picking an option answers it
+ *   correct: [i, j]    → multiple response ("choose TWO"), options toggle and
+ *                        a check button submits them; scored all-or-nothing,
+ *                        the way the real exam scores them.
  *
  * Progress is saved to localStorage so closing the tab doesn't lose it, and
  * the reset button clears the saved copy as well as the on-screen state.
@@ -20,6 +26,10 @@
       resetConfirm:
         "Esto borrará tus respuestas guardadas de este quiz. ¿Seguro?",
       saved: "Tu progreso se guarda en este navegador.",
+      choose: (n) => `Elige ${n}`,
+      check: "Comprobar respuesta",
+      pick: (n) => `Selecciona ${n} opciones`,
+      missed: "Faltaba esta",
     },
     en: {
       answered: (a, t) => `${a} / ${t} answered`,
@@ -29,11 +39,36 @@
       reset: "Reset quiz",
       resetConfirm: "This will erase your saved answers for this quiz. Sure?",
       saved: "Your progress is saved in this browser.",
+      choose: (n) => `Choose ${n}`,
+      check: "Check answer",
+      pick: (n) => `Select ${n} options`,
+      missed: "This one was required",
     },
   };
 
   const LANG = (document.documentElement.lang || "es").slice(0, 2);
   const T = STRINGS[LANG] || STRINGS.es;
+
+  /* ---- answer shape --------------------------------------------------- */
+
+  const isMulti = (item) => Array.isArray(item.correct);
+  const correctSet = (item) =>
+    isMulti(item) ? item.correct.slice().sort((a, b) => a - b) : [item.correct];
+
+  function sameAnswer(a, b) {
+    if (a === null || b === null) return false;
+    if (Array.isArray(a) !== Array.isArray(b)) return false;
+    if (!Array.isArray(a)) return a === b;
+    if (a.length !== b.length) return false;
+    const x = a.slice().sort((m, n) => m - n);
+    const y = b.slice().sort((m, n) => m - n);
+    return x.every((v, i) => v === y[i]);
+  }
+
+  function isRight(qi) {
+    const item = QUIZ_DATA[qi];
+    return sameAnswer(state[qi], isMulti(item) ? correctSet(item) : item.correct);
+  }
 
   /* ---- persistence ---------------------------------------------------- */
 
@@ -91,21 +126,75 @@
     }
   }
 
+  // A stored value is only accepted if it still fits the question it belongs
+  // to — a question that changed from single to multiple response, or lost an
+  // option, must not restore an answer that no longer makes sense.
+  function sanitise(v, item) {
+    const inRange = (n) =>
+      Number.isInteger(n) && n >= 0 && n < item.options.length;
+    if (isMulti(item)) {
+      if (!Array.isArray(v) || v.length !== item.correct.length) return null;
+      const uniq = Array.from(new Set(v));
+      return uniq.length === v.length && v.every(inRange) ? v : null;
+    }
+    return inRange(v) ? v : null;
+  }
+
   const saved = load();
-  const state = QUIZ_DATA.map((item, i) => {
-    const v = saved[keys[i]];
-    // ignore anything that isn't a valid option index for this question
-    return Number.isInteger(v) && v >= 0 && v < item.options.length ? v : null;
-  });
+  const state = QUIZ_DATA.map((item, i) => sanitise(saved[keys[i]], item));
+
+  // options toggled on a multiple-response question but not submitted yet
+  const pending = QUIZ_DATA.map(() => []);
 
   /* ---- rendering ------------------------------------------------------ */
 
   function score() {
-    return state.filter((v, i) => v === QUIZ_DATA[i].correct).length;
+    return state.reduce((n, v, i) => n + (isRight(i) ? 1 : 0), 0);
   }
 
   function answered() {
     return state.filter((v) => v !== null).length;
+  }
+
+  function renderOption(item, qi, oi, optText) {
+    const chosen = state[qi];
+    const btn = document.createElement("button");
+    btn.className = "quiz-opt";
+    btn.type = "button";
+    btn.textContent = optText;
+
+    const multi = isMulti(item);
+    const answeredNow = chosen !== null;
+
+    if (answeredNow) {
+      const wanted = correctSet(item);
+      const picked = multi ? chosen : [chosen];
+      btn.disabled = true;
+      if (wanted.includes(oi) && picked.includes(oi)) btn.classList.add("correct");
+      else if (picked.includes(oi)) btn.classList.add("incorrect");
+      else if (wanted.includes(oi)) {
+        // required but not picked — say so, or a wrong multi answer looks right
+        btn.classList.add("missed");
+        btn.setAttribute("data-note", T.missed);
+      }
+    } else if (multi) {
+      btn.setAttribute("aria-pressed", pending[qi].includes(oi) ? "true" : "false");
+      if (pending[qi].includes(oi)) btn.classList.add("selected");
+    }
+
+    btn.addEventListener("click", () => {
+      if (state[qi] !== null) return;
+      if (multi) {
+        const at = pending[qi].indexOf(oi);
+        if (at >= 0) pending[qi].splice(at, 1);
+        else pending[qi].push(oi);
+      } else {
+        state[qi] = oi;
+        save();
+      }
+      render();
+    });
+    return btn;
   }
 
   function render() {
@@ -120,6 +209,7 @@
 
     QUIZ_DATA.forEach((item, qi) => {
       const chosen = state[qi];
+      const multi = isMulti(item);
       const card = document.createElement("div");
       card.className = "quiz-item";
 
@@ -128,6 +218,13 @@
       tag.textContent = item.tag || "IAM";
       card.appendChild(tag);
 
+      if (multi) {
+        const badge = document.createElement("span");
+        badge.className = "quiz-multi";
+        badge.textContent = T.choose(item.correct.length);
+        card.appendChild(badge);
+      }
+
       const qEl = document.createElement("div");
       qEl.className = "quiz-q";
       qEl.textContent = `${qi + 1}. ${item.q}`;
@@ -135,29 +232,31 @@
 
       const opts = document.createElement("div");
       opts.className = "quiz-opts";
-      item.options.forEach((optText, oi) => {
-        const btn = document.createElement("button");
-        btn.className = "quiz-opt";
-        btn.type = "button";
-        btn.textContent = optText;
-        if (chosen !== null) {
-          btn.disabled = true;
-          if (oi === item.correct) btn.classList.add("correct");
-          else if (oi === chosen) btn.classList.add("incorrect");
-        }
-        btn.addEventListener("click", () => {
-          if (state[qi] !== null) return;
-          state[qi] = oi;
+      item.options.forEach((optText, oi) =>
+        opts.appendChild(renderOption(item, qi, oi, optText))
+      );
+      card.appendChild(opts);
+
+      if (multi && chosen === null) {
+        const need = item.correct.length;
+        const ready = pending[qi].length === need;
+        const check = document.createElement("button");
+        check.className = "quiz-check";
+        check.type = "button";
+        check.disabled = !ready;
+        check.textContent = ready ? T.check : T.pick(need);
+        check.addEventListener("click", () => {
+          if (pending[qi].length !== need) return;
+          state[qi] = pending[qi].slice();
           save();
           render();
         });
-        opts.appendChild(btn);
-      });
-      card.appendChild(opts);
+        card.appendChild(check);
+      }
 
       const explain = document.createElement("div");
       explain.className = "quiz-explain" + (chosen !== null ? " show" : "");
-      explain.innerHTML = `<b>${chosen === item.correct ? T.correct : T.explanation}</b> ${item.explain}`;
+      explain.innerHTML = `<b>${isRight(qi) ? T.correct : T.explanation}</b> ${item.explain}`;
       card.appendChild(explain);
 
       root.appendChild(card);
@@ -174,6 +273,7 @@
       // only worth confirming when there is something to lose
       if (answered() > 0 && !window.confirm(T.resetConfirm)) return;
       state.fill(null);
+      pending.forEach((p) => (p.length = 0));
       clearSaved();
       render();
     });
