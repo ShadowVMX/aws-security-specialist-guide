@@ -62,8 +62,7 @@ assets/
   css/style.css              → shared styles (automatic light/dark theme)
   img/banner.svg              → this README's banner
   js/app.js                   → diagram interaction + active sidebar
-  js/quiz.js                  → quiz engine — UI strings in Spanish
-  js/quiz.en.js                → same engine — UI strings in English
+  js/quiz.js                  → quiz engine + saved progress (ES/EN based on the page lang)
 modules/<domain>/
   index.html                → module content (Spanish)
   quiz-data.js               → quiz questions (Spanish)
