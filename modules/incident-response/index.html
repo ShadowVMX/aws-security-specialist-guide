@@ -40,6 +40,7 @@
     <a href="#validar-findings">Validar findings antes de actuar</a>
     <a href="#detective">Amazon Detective &amp; root cause</a>
     <a href="#recovery">Contención, erradicación &amp; recuperación</a>
+    <a href="#trampas">Trampas típicas</a>
     <h4>Práctica</h4>
     <a href="#quiz">Quiz (41 preguntas)</a>
   </aside>
@@ -182,6 +183,40 @@
 
     <p class="code-label">Recuperación regional controlada</p>
     <p>Para incidentes de disponibilidad a nivel de región (no solo compromiso de seguridad), <strong>Amazon Application Recovery Controller</strong> verifica continuamente que la región de respaldo está lista (readiness checks) y ofrece "routing controls" seguros para ejecutar el failover sin improvisar bajo presión.</p>
+
+    <h2 id="trampas">Trampas típicas del examen</h2>
+    <p class="lede">Los errores que más se repiten en este dominio. Si vas justo de tiempo antes del examen, repasa solo esto y el quiz.</p>
+
+    <div class="callout exam">
+      <b>Contener no es destruir</b>
+      Terminar la instancia comprometida corta la amenaza y <strong>destruye la evidencia</strong> a la vez. Lo correcto es aislarla por red (security group sin reglas), tomar snapshot de EBS y capturar memoria. Si una opción resuelve el incidente eliminando el recurso, casi siempre es la trampa.
+    </div>
+
+    <div class="callout exam">
+      <b>Parar o reiniciar borra la memoria</b>
+      El malware sin fichero vive en memoria. Un <code>reboot</code> o un <code>stop</code> la pierden, y con ella el caso. La captura de memoria va <strong>antes</strong> que cualquier acción que toque el ciclo de vida de la instancia.
+    </div>
+
+    <div class="callout exam">
+      <b>GuardDuty detecta, Detective investiga</b>
+      GuardDuty te dice <em>que</em> algo pasó. <strong>Amazon Detective</strong> te ayuda a entender <em>por qué</em> y qué alcance tuvo, correlacionando el histórico. Si la pregunta pide análisis de causa raíz o alcance, la respuesta es Detective, no más GuardDuty.
+    </div>
+
+    <div class="callout exam">
+      <b>Desactivar una clave no es lo mismo que borrarla</b>
+      Ante una access key filtrada se <strong>desactiva</strong> de inmediato y después se revisa CloudTrail para determinar el alcance. Borrarla también corta el acceso, pero conviene cortar primero y analizar después: lo urgente es que deje de funcionar, y las access keys de IAM <strong>no caducan solas</strong>.
+    </div>
+
+    <div class="callout exam">
+      <b>La evidencia se analiza sobre copias</b>
+      Trabajar sobre los volúmenes originales los modifica y rompe la cadena de custodia. Se analiza siempre sobre snapshots restaurados en una <strong>cuenta forense separada</strong>, con acceso restringido y registrado, y con hashes de integridad.
+    </div>
+
+    <div class="callout exam">
+      <b>Automatizar la respuesta no es solo Config</b>
+      AWS Config <strong>detecta</strong> la desviación; quien ejecuta la remediación es una <strong>SSM Automation</strong> disparada por Config o por una regla de EventBridge. Una opción que diga que Config "corrige" o "bloquea" por sí mismo confunde detección con actuación.
+    </div>
+
 
     <h2 id="quiz">Quiz de práctica — Incident Response</h2>
     <p class="lede">41 preguntas estilo examen. Elige una opción para ver si es correcta y por qué.</p>

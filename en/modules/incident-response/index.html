@@ -40,6 +40,7 @@
     <a href="#validar-findings">Validating findings before acting</a>
     <a href="#detective">Amazon Detective &amp; root cause</a>
     <a href="#recovery">Containment, eradication &amp; recovery</a>
+    <a href="#trampas">Classic traps</a>
     <h4>Practice</h4>
     <a href="#quiz">Quiz (41 questions)</a>
   </aside>
@@ -182,6 +183,40 @@
 
     <p class="code-label">Controlled regional recovery</p>
     <p>For availability incidents at the region level (not just a security compromise), <strong>Amazon Application Recovery Controller</strong> continuously verifies that the backup region is ready (readiness checks) and offers safe "routing controls" to execute failover without improvising under pressure.</p>
+
+    <h2 id="trampas">Classic exam traps</h2>
+    <p class="lede">The mistakes that repeat most in this domain. If you're short on time before the exam, review just this and the quiz.</p>
+
+    <div class="callout exam">
+      <b>Containing is not destroying</b>
+      Terminating the compromised instance stops the threat and <strong>destroys the evidence</strong> at the same time. The right move is network isolation (a security group with no rules), an EBS snapshot and a memory capture. If an option solves the incident by deleting the resource, it is almost always the trap.
+    </div>
+
+    <div class="callout exam">
+      <b>Stopping or rebooting wipes memory</b>
+      Fileless malware lives in memory. A <code>reboot</code> or <code>stop</code> loses it, and the case with it. Memory capture comes <strong>before</strong> any action that touches the instance lifecycle.
+    </div>
+
+    <div class="callout exam">
+      <b>GuardDuty detects, Detective investigates</b>
+      GuardDuty tells you <em>that</em> something happened. <strong>Amazon Detective</strong> helps you understand <em>why</em> and how far it went, by correlating history. If the question asks for root-cause or scope analysis, the answer is Detective, not more GuardDuty.
+    </div>
+
+    <div class="callout exam">
+      <b>Deactivating a key is not the same as deleting it</b>
+      For a leaked access key you <strong>disable</strong> it immediately, then review CloudTrail to establish scope. Deleting also cuts access, but cut first and analyze after: the urgent part is that it stops working, and IAM access keys <strong>never expire on their own</strong>.
+    </div>
+
+    <div class="callout exam">
+      <b>Evidence is analyzed on copies</b>
+      Working on the original volumes modifies them and breaks the chain of custody. Always analyze restored snapshots in a <strong>separate forensics account</strong>, with restricted and logged access, plus integrity hashes.
+    </div>
+
+    <div class="callout exam">
+      <b>Automating response isn't Config alone</b>
+      AWS Config <strong>detects</strong> the drift; what performs remediation is an <strong>SSM Automation</strong> triggered by Config or an EventBridge rule. An option saying Config "fixes" or "blocks" on its own confuses detection with enforcement.
+    </div>
+
 
     <h2 id="quiz">Practice quiz — Incident Response</h2>
     <p class="lede">41 exam-style questions. Choose an option to see whether it's correct and why.</p>

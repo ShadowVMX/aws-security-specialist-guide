@@ -49,6 +49,7 @@
     <a href="#access-analyzer">Access Analyzer &amp; Policy Simulator</a>
     <a href="#root">Root user &amp; MFA</a>
     <a href="#perimeter">Data perimeter</a>
+    <a href="#trampas">Trampas típicas</a>
     <h4>Práctica</h4>
     <a href="#quiz">Quiz (53 preguntas)</a>
   </aside>
@@ -489,6 +490,45 @@
       <tr><td>Recurso</td><td>¿Qué recursos son de confianza?</td><td>RCP/SCP con <code>aws:ResourceOrgID</code>, resource policies restrictivas</td></tr>
       <tr><td>Red</td><td>¿Desde qué red se accede?</td><td>VPC endpoint policies + <code>aws:SourceVpce</code> / <code>aws:SourceIp</code></td></tr>
     </table>
+
+    <h2 id="trampas">Trampas típicas del examen</h2>
+    <p class="lede">Los errores que más se repiten en este dominio. Si vas justo de tiempo antes del examen, repasa solo esto y el quiz.</p>
+
+    <div class="callout exam">
+      <b>Un Deny explícito gana siempre, venga de donde venga</b>
+      El orden es: <strong>Deny explícito &gt; Allow explícito &gt; Deny implícito</strong>. Ese Deny puede estar en la identity policy, en la resource policy, en una SCP, en una RCP, en un permission boundary o en una session policy. Ante un AccessDenied inexplicable, hay que mirar en las seis, no solo en la política del usuario.
+    </div>
+
+    <div class="callout exam">
+      <b>Las SCP no conceden nada</b>
+      Una SCP es un <strong>techo</strong>, no una concesión: aunque permita una acción, el usuario sigue necesitando un Allow en su política de identidad. Además <strong>no aplican a la management account</strong> — razón por la que AWS recomienda no alojar cargas de trabajo en ella.
+    </div>
+
+    <div class="callout exam">
+      <b>El permission boundary tampoco concede</b>
+      El permiso efectivo es la <strong>intersección</strong> entre la identity policy y el boundary. Un boundary con <code>AdministratorAccess</code> no convierte en administrador a nadie, y una identity policy amplia queda recortada por un boundary estrecho.
+    </div>
+
+    <div class="callout exam">
+      <b>Cross-account exige las dos puntas</b>
+      Para asumir un rol de otra cuenta hacen falta <strong>dos</strong> cosas: el trust policy del rol destino debe autorizar al principal, y ese principal debe tener permiso <code>sts:AssumeRole</code>. Lo mismo con una KMS key de otra cuenta: key policy en el propietario e identity policy en el consumidor. Un Allow en un solo lado nunca basta.
+    </div>
+
+    <div class="callout exam">
+      <b>Access Analyzer y Policy Simulator responden preguntas distintas</b>
+      <strong>Policy Simulator</strong> responde "esta política, ¿permitiría esta acción?" sobre un supuesto. <strong>Access Analyzer</strong> audita el acceso que <em>ya existe</em> en la cuenta (externo, sin usar, interno). Son complementarios, y el examen los ofrece como alternativas excluyentes.
+    </div>
+
+    <div class="callout exam">
+      <b>SCP protege identidades, RCP protege recursos</b>
+      Las SCP acotan lo que pueden hacer las identidades <em>de tu organización</em>: no alcanzan a un principal externo o anónimo que accede a tus recursos. Ese hueco lo cierran las <strong>RCP</strong>. Si el escenario habla de acceso desde fuera de la organización, la SCP no es la respuesta.
+    </div>
+
+    <div class="callout exam">
+      <b>El role chaining recorta la sesión a una hora</b>
+      Cuando un rol asume otro rol, la duración máxima de la sesión baja a <strong>1 hora</strong>, sin importar el <code>MaxSessionDuration</code> configurado. Es una causa típica de "las credenciales caducan antes de lo esperado".
+    </div>
+
 
     <h2 id="quiz">Quiz de práctica — IAM</h2>
     <p class="lede">53 preguntas estilo examen. Elige una opción para ver si es correcta y por qué.</p>

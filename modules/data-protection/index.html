@@ -46,6 +46,7 @@
     <a href="#imported-keys">Imported key material &amp; XKS</a>
     <a href="#masking">Masking de datos sensibles</a>
     <a href="#certs">Certificados multi-Region</a>
+    <a href="#trampas">Trampas típicas</a>
     <h4>Práctica</h4>
     <a href="#quiz">Quiz (46 preguntas)</a>
   </aside>
@@ -339,6 +340,45 @@
       <b>Cuidado si vienes de Azure</b>
       Azure Key Vault es un recurso <em>regional</em>: para tener alta disponibilidad multi-región de tus claves, replicas manualmente el Key Vault completo (o usas Managed HSM con su propio mecanismo). AWS KMS Multi-Region keys son conceptualmente distintas: no son "el mismo servicio replicado", son <strong>réplicas de UNA clave con material compartido</strong> gestionadas de forma nativa por KMS (<code>ReplicateKey</code>), con Key IDs distintos por región pero criptográficamente intercambiables. No asumas que es "lo mismo con otro nombre".
     </div>
+
+    <h2 id="trampas">Trampas típicas del examen</h2>
+    <p class="lede">Los errores que más se repiten en este dominio. Si vas justo de tiempo antes del examen, repasa solo esto y el quiz.</p>
+
+    <div class="callout exam">
+      <b>KMS no cifra ficheros grandes</b>
+      La operación directa <code>Encrypt</code> de KMS está limitada a <strong>4 KB</strong>. Todo lo demás usa <strong>envelope encryption</strong>: KMS cifra una data key y el cifrado masivo ocurre localmente. Cualquier opción que mande los datos a KMS para cifrarlos allí es falsa en cuanto el volumen es real.
+    </div>
+
+    <div class="callout exam">
+      <b>Las AWS managed keys no se comparten ni se personalizan</b>
+      Una <strong>AWS managed key</strong> no admite key policy propia, no se comparte entre cuentas y no controlas su rotación. En cuanto el escenario pide acceso cross-account, política a medida o rotación bajo tu control, la respuesta es una <strong>customer managed key</strong>.
+    </div>
+
+    <div class="callout exam">
+      <b>Compliance y governance no son lo mismo</b>
+      En S3 Object Lock, el modo <strong>compliance</strong> es realmente inmutable: ni el root puede borrar antes de que expire la retención. El modo <strong>governance</strong> admite excepción para quien tenga <code>s3:BypassGovernanceRetention</code>. Si el requisito es regulatorio y dice "nadie, en ninguna circunstancia", solo vale compliance. Y Object Lock exige <strong>versionado</strong>.
+    </div>
+
+    <div class="callout exam">
+      <b>Borrar una KMS key nunca es inmediato</b>
+      La eliminación programada tiene un periodo de espera obligatorio de <strong>7 a 30 días</strong>, precisamente porque perder una clave significa perder los datos. Si una opción promete borrado inmediato, es falsa. Para cortar el acceso ya, se <strong>deshabilita</strong> la clave.
+    </div>
+
+    <div class="callout exam">
+      <b>Las multi-Region keys no son una clave global</b>
+      Son <strong>réplicas</strong> que comparten material criptográfico, lo que permite descifrar en otra Región sin llamar a la original. Cada réplica sigue siendo una clave independiente, con su propia key policy y sus propios permisos. No es "una clave en todas partes".
+    </div>
+
+    <div class="callout exam">
+      <b>Con SSE-C, la clave es cosa tuya</b>
+      En SSE-C, AWS <strong>no almacena</strong> la clave: hay que enviarla en cada petición, y si la pierdes, los datos son irrecuperables. Es la diferencia clave frente a SSE-KMS, donde AWS custodia la clave y registra su uso en CloudTrail.
+    </div>
+
+    <div class="callout exam">
+      <b>Secrets Manager rota, Parameter Store no</b>
+      Si el escenario pide <strong>rotación automática</strong> de credenciales, es Secrets Manager. Parameter Store guarda parámetros y secretos cifrados de forma más barata, pero la rotación hay que construirla. El coste es la razón habitual del distractor.
+    </div>
+
 
     <h2 id="quiz">Quiz de práctica — Data Protection</h2>
     <p class="lede">46 preguntas estilo examen. Elige una opción para ver si es correcta y por qué.</p>
