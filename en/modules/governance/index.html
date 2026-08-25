@@ -96,7 +96,7 @@
       <p class="diagram-note">Multi-account governance structure with Control Tower</p>
     </div>
 
-    <table>
+    <table role="table">
       <tr><th></th><th>Preventive control</th><th>Detective control</th></tr>
       <tr><td><strong>What it does</strong></td><td>PREVENTS the non-compliant action from happening</td><td>IDENTIFIES resources that are already non-compliant, for later remediation</td></tr>
       <tr><td><strong>Implemented as</strong></td><td>SCP (denies the API call)</td><td>Config Rule (flags NON_COMPLIANT)</td></tr>
@@ -109,7 +109,7 @@
 
     <h2 id="org-policies">The 4 types of organization policy (6.1.3)</h2>
     <p class="lede">SCP and RCP were already covered in depth in the <a href="../iam/index.html">IAM module</a>. Here's the quick recap plus the two that were missing.</p>
-    <table>
+    <table role="table">
       <tr><th>Type</th><th>Controls</th></tr>
       <tr><td><strong>Service Control Policy (SCP)</strong></td><td>Ceiling on identity PERMISSIONS — which API actions an identity in the account can perform.</td></tr>
       <tr><td><strong>Resource Control Policy (RCP)</strong></td><td>Who can access RESOURCES, including external/anonymous principals.</td></tr>
@@ -136,7 +136,7 @@
     </div>
 
     <h2 id="iac">Infrastructure as Code at scale (6.2.1)</h2>
-    <table>
+    <table role="table">
       <tr><th>Tool</th><th>What it's for</th></tr>
       <tr><td><strong>CloudFormation StackSets</strong></td><td>Deploys/updates the SAME stack across hundreds of accounts/regions centrally; can integrate with Organizations to target new accounts automatically.</td></tr>
       <tr><td><strong>cfn-lint</strong></td><td>Linter: template syntax and general best practices.</td></tr>
@@ -161,7 +161,7 @@
     </div>
 
     <h2 id="sharing">Sharing resources across accounts (6.2.4)</h2>
-    <table>
+    <table role="table">
       <tr><th>Service</th><th>Shares</th></tr>
       <tr><td><strong>AWS Resource Access Manager (RAM)</strong></td><td>Specific resources (subnets of a shared VPC, Transit Gateway, Firewall Manager rules) directly between accounts, without duplicating them.</td></tr>
       <tr><td><strong>AWS Service Catalog</strong></td><td>PRE-APPROVED IaC templates as self-service "products," giving teams autonomy without granting broad resource-creation permissions.</td></tr>
@@ -184,7 +184,7 @@
   }]'</code></pre>
 
     <h2 id="audit">AWS Audit Manager vs AWS Artifact (6.3.2)</h2>
-    <table>
+    <table role="table">
       <tr><th></th><th>Collects</th><th>What it's for</th></tr>
       <tr><td><strong>Audit Manager</strong></td><td>Continuous evidence from YOUR OWN account (config, logs, policies)</td><td>Preparing YOUR audits, mapped against a framework (PCI-DSS, HIPAA...)</td></tr>
       <tr><td><strong>AWS Artifact</strong></td><td>AWS's OWN compliance reports as a provider (SOC 2, ISO 27001)</td><td>Demonstrating that AWS's underlying infrastructure meets those standards; also manages acceptance of agreements like the BAA</td></tr>

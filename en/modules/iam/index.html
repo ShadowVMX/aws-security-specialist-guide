@@ -57,7 +57,7 @@
     <h2 id="fundamentos">Policy types in IAM</h2>
     <p class="lede">Everything in IAM revolves around JSON policy documents evaluated against three questions: who (Principal)? what action? on what resource?</p>
 
-    <table>
+    <table role="table">
       <tr><th>Type</th><th>Attaches to</th><th>Key exam notes</th></tr>
       <tr><td><strong>Identity-based (managed)</strong></td><td>Users, Groups, Roles</td><td>AWS managed (predefined by AWS) or Customer managed (created by you). Reusable and versioned.</td></tr>
       <tr><td><strong>Identity-based (inline)</strong></td><td>A single User, Group, or Role</td><td>1:1 relationship, not reusable. Useful only for very specific edge cases; poor practice at scale.</td></tr>
@@ -162,7 +162,7 @@
     <h2 id="roles-sts">IAM Roles &amp; AWS STS</h2>
     <p class="lede">A Role is an identity with permission policies that has NO permanent credentials: it is "assumed" and generates temporary credentials via AWS STS (Security Token Service).</p>
 
-    <table>
+    <table role="table">
       <tr><th>STS API</th><th>When to use it</th></tr>
       <tr><td><code>AssumeRole</code></td><td>General case: an IAM User or Role (same account or cross-account) assumes another role.</td></tr>
       <tr><td><code>AssumeRoleWithSAML</code></td><td>Enterprise federation with a SAML 2.0 IdP (ADFS, Okta, Azure AD/Entra ID) without IAM users.</td></tr>
@@ -211,7 +211,7 @@
 
     <div class="callout azure">
       <b>Coming from Azure</b>
-      <table>
+      <table role="table">
         <tr><th>Azure</th><th>AWS</th><th>Key difference</th></tr>
         <tr><td><strong>Managed Identity</strong> (system/user-assigned) on a VM/Function App</td><td><strong>Instance Profile</strong> (EC2) / execution role (Lambda, ECS)</td><td>Practically identical: the SDK fetches credentials automatically, your code never manages or sees them.</td></tr>
         <tr><td><strong>Service Principal</strong> + client secret/certificate, token via MSAL</td><td>Manual <strong>sts:AssumeRole</strong> (with or without ExternalId)</td><td>Here you explicitly call the API yourself to exchange an identity for a temporary token/credential.</td></tr>
@@ -287,7 +287,7 @@
 
     <div class="callout azure">
       <b>Coming from Azure</b>
-      <table>
+      <table role="table">
         <tr><th>Azure</th><th>AWS</th><th>Key difference</th></tr>
         <tr><td><strong>Microsoft Entra ID</strong> (tenant)</td><td><strong>AWS Organization + IAM Identity Center</strong></td><td>In Azure the Entra ID tenant IS your central identity. In AWS these are two separate things: the Organization groups ACCOUNTS (closer to "subscriptions"), and Identity Center is the identity layer that connects on top of it.</td></tr>
         <tr><td>Entra ID group + Azure RBAC role assignment (scope: subscription/RG)</td><td>Group assigned to a <strong>Permission Set</strong> over one or more accounts</td><td>Conceptually almost identical: group + role + scope.</td></tr>
@@ -298,7 +298,7 @@
     <h2 id="cognito-directory">Amazon Cognito &amp; AWS Directory Service</h2>
     <p class="lede">Skill 4.1.1 explicitly groups IAM Identity Center, Cognito, and MFA as the three pieces for authenticating humans, applications, and systems. Identity Center covers human access to AWS accounts; Cognito covers end users of your own applications.</p>
 
-    <table>
+    <table role="table">
       <tr><th>Component</th><th>What it's for</th><th>Key detail</th></tr>
       <tr><td><strong>Cognito User Pools</strong></td><td>User directory for YOUR application (sign-up/sign-in, MFA, email/SMS verification)</td><td>Returns JSON Web Tokens (ID, Access, Refresh) after login. Does not grant AWS credentials by itself.</td></tr>
       <tr><td><strong>Cognito Identity Pools</strong></td><td>Exchanges an already-authenticated identity (from a User Pool, Google, SAML...) for <strong>temporary AWS credentials</strong></td><td>The recommended layer over <code>AssumeRoleWithWebIdentity</code> — it manages the exchange securely without exposing secrets on the client.</td></tr>
@@ -412,7 +412,7 @@
 
     <h2 id="org-guardrails">Organization guardrails: SCP, RCP, and Declarative Policies</h2>
 
-    <table>
+    <table role="table">
       <tr><th>Mechanism</th><th>What it limits</th><th>Applies to</th></tr>
       <tr><td><strong>Service Control Policy (SCP)</strong></td><td>The maximum permission the account's IDENTITIES can use (even if IAM says yes, if the SCP doesn't allow it, it's denied)</td><td>Accounts / OUs within the Organization</td></tr>
       <tr><td><strong>Resource Control Policy (RCP)</strong></td><td>Who can access the account's RESOURCES, including external and anonymous principals — closes the gap SCPs don't cover</td><td>Supported resources (S3, STS, KMS, SQS, Secrets Manager…) in accounts / OUs</td></tr>
@@ -444,7 +444,7 @@
 
     <h3>IAM Policy Simulator</h3>
     <p>A distinct, complementary tool: instead of analyzing the account's real posture (like Access Analyzer), it <strong>simulates whether a specific policy would allow or deny a given action</strong> BEFORE any real change is applied — without generating real API calls or leaving a trace in CloudTrail.</p>
-    <table>
+    <table role="table">
       <tr><th></th><th>IAM Policy Simulator</th><th>IAM Access Analyzer</th></tr>
       <tr><td><strong>Answers</strong></td><td>"Would this policy allow this specific action?"</td><td>"What EXTERNAL/UNUSED access exists right now in the account?"</td></tr>
       <tr><td><strong>When to use it</strong></td><td>Before deploying/debugging a specific policy</td><td>Continuous auditing of the account's real permission posture</td></tr>
@@ -482,7 +482,7 @@
 
     <h2 id="perimeter">Data perimeter</h2>
     <p class="lede">A cross-cutting concept heavily featured on the 2026 exam: guaranteeing that data never leaves your organization, even with valid, compromised credentials.</p>
-    <table>
+    <table role="table">
       <tr><th>Perimeter</th><th>Question it answers</th><th>Typical controls</th></tr>
       <tr><td>Identity</td><td>Who can access?</td><td>SCP/RCP with <code>aws:PrincipalOrgID</code></td></tr>
       <tr><td>Resource</td><td>Which resources are trusted?</td><td>RCP/SCP with <code>aws:ResourceOrgID</code>, restrictive resource policies</td></tr>

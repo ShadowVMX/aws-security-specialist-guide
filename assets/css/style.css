@@ -23,6 +23,10 @@
   --radius: 10px;
   --shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
   --max-width: 980px;
+  /* diagram surfaces — kept separate from --bg-card so the boxes stay
+     visible against the diagram panel in both themes */
+  --dbox-fill: #1a2433;
+  --dbox-stroke: #2a3648;
 }
 
 @media (prefers-color-scheme: light) {
@@ -33,16 +37,24 @@
     --border: #e2e6ec;
     --text: #1b2430;
     --text-dim: #4a5872;
-    --text-faint: #7c8aa0;
-    --accent: #d97f00;
-    --accent-dim: #b56b00;
-    --accent-soft: rgba(217, 127, 0, 0.10);
-    --blue-soft: rgba(37, 110, 194, 0.10);
-    --green-soft: rgba(20, 148, 96, 0.10);
-    --red-soft: rgba(214, 60, 60, 0.10);
-    --purple-soft: rgba(124, 82, 204, 0.10);
+    --text-faint: #6a7889;
+    --accent: #b56b00;
+    --accent-dim: #935700;
+    --accent-soft: rgba(217, 127, 0, 0.14);
+    /* the dark palette's blue/green/red/purple are tuned for a dark
+       background and wash out on white — these are their light twins */
+    --blue: #1462c4;
+    --blue-soft: rgba(20, 98, 196, 0.12);
+    --green: #0f7a52;
+    --green-soft: rgba(15, 122, 82, 0.12);
+    --red: #c0362c;
+    --red-soft: rgba(192, 54, 44, 0.12);
+    --purple: #6b3fc0;
+    --purple-soft: rgba(107, 63, 192, 0.12);
     --code-bg: #f0f2f5;
     --shadow: 0 4px 20px rgba(20, 30, 50, 0.08);
+    --dbox-fill: #e8eef6;
+    --dbox-stroke: #b3c1d4;
   }
 }
 
@@ -211,6 +223,10 @@ a:hover { text-decoration: underline; }
 }
 .sidebar a:hover, .sidebar a.active { color: var(--accent); text-decoration: none; }
 
+/* grid children default to min-width:auto, which lets a wide table or code
+   block stretch the whole page instead of scrolling inside itself */
+.content { min-width: 0; }
+
 .content h2 {
   font-size: 24px;
   margin: 48px 0 6px;
@@ -240,7 +256,12 @@ a:hover { text-decoration: underline; }
   font-size: 13px;
   font-family: "SF Mono", Menlo, Consolas, monospace;
   color: var(--accent);
+  /* long unbreakable tokens (ARNs, policy keys) otherwise force the whole
+     page wider than the viewport on phones */
+  overflow-wrap: anywhere;
 }
+/* code blocks scroll instead — breaking them mid-token would corrupt the sample */
+pre code { overflow-wrap: normal; }
 
 /* ---- callouts ---- */
 .callout {
@@ -329,13 +350,13 @@ td strong, td code { color: var(--text); }
 .dstep:hover rect, .dstep:hover polygon,
 .dstep.dstep-active rect, .dstep.dstep-active polygon { stroke: var(--accent); stroke-width: 2.5; }
 .dstep text { fill: var(--text); font-size: 12px; font-family: inherit; }
-.dbox { fill: var(--bg-card); stroke: var(--border); stroke-width: 1.5; }
+.dbox { fill: var(--dbox-fill); stroke: var(--dbox-stroke); stroke-width: 1.5; }
 .dbox-allow { fill: var(--green-soft); stroke: var(--green); stroke-width: 1.5; }
 .dbox-deny { fill: var(--red-soft); stroke: var(--red); stroke-width: 1.5; }
-.dline { stroke: #7c8aa0; stroke-width: 1.5; fill: none; }
-.dline-deny { stroke: #ff6b6b; stroke-width: 1.3; stroke-dasharray: 4 3; fill: none; }
+.dline { stroke: var(--text-faint); stroke-width: 1.5; fill: none; }
+.dline-deny { stroke: var(--red); stroke-width: 1.3; stroke-dasharray: 4 3; fill: none; }
 .dlabel { fill: var(--text-dim); font-size: 11px; font-family: inherit; }
-.dlabel-deny { fill: #ff6b6b; font-size: 10.5px; font-weight: 700; font-family: inherit; }
+.dlabel-deny { fill: var(--red); font-size: 10.5px; font-weight: 700; font-family: inherit; }
 .dtitle { fill: var(--text); font-size: 12.5px; font-weight: 600; font-family: inherit; }
 .dexplain {
   margin-top: 14px;
@@ -358,6 +379,9 @@ td strong, td code { color: var(--text); }
   margin: 14px 0;
 }
 .quiz-q { font-size: 15px; font-weight: 600; margin-bottom: 12px; }
+/* question and answer text carries long service names and ARNs; without this
+   a single unbreakable token widens the whole page on a phone */
+.quiz-q, .quiz-opt, .quiz-explain, .quiz-tag { overflow-wrap: anywhere; }
 .quiz-tag {
   display: inline-block;
   font-size: 10.5px;
@@ -439,6 +463,41 @@ footer {
 }
 
 @media (max-width: 780px) {
-  .module-layout { grid-template-columns: 1fr; }
+  .module-layout { grid-template-columns: 1fr; gap: 0; }
   .sidebar { position: static; display: none; }
+
+  /* wide content scrolls inside its own box instead of stretching the page */
+  table { display: block; overflow-x: auto; }
+  .diagram { overflow-x: auto; }
+  /* without a floor the SVG scales down with the viewport and its labels
+     become unreadable; below this it scrolls sideways instead */
+  .diagram svg { min-width: 560px; }
+}
+
+@media (max-width: 640px) {
+  .wrap { padding: 0 16px; }
+
+  .topbar .wrap {
+    flex-wrap: wrap;
+    height: auto;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    row-gap: 8px;
+  }
+  .brand { font-size: 14px; }
+  .topnav { flex-wrap: wrap; gap: 8px 14px; font-size: 13px; }
+
+  .hero { padding: 28px 0 18px; }
+  .hero h1 { font-size: 25px; }
+  .hero p { font-size: 15px; }
+
+  .grid { grid-template-columns: 1fr; padding-bottom: 40px; }
+
+  .module-layout { padding: 20px 0 60px; }
+  .content h2 { font-size: 21px; margin: 36px 0 6px; }
+  .content h3 { font-size: 16px; }
+
+  .diagram { padding: 14px; }
+  .quiz-item { padding: 16px 15px; }
+  pre { padding: 13px 14px; }
 }

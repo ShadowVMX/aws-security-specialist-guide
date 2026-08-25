@@ -55,7 +55,7 @@
 
     <h2 id="preparacion">Preparación: minimizar blast radius &amp; provisionar acceso (2.1.2)</h2>
     <p class="lede">La preparación ocurre ANTES del incidente. El examen la trata como una fase propia, no como un añadido.</p>
-    <table>
+    <table role="table">
       <tr><th>Práctica</th><th>Por qué importa</th></tr>
       <tr><td>Multi-account strategy + mínimo privilegio</td><td>Limita hasta dónde puede llegar un atacante si compromete una sola carga de trabajo.</td></tr>
       <tr><td>Rol de IR pre-provisionado y auditado</td><td>Evita crear permisos de emergencia con prisa (y con riesgo de sobre-otorgar) en medio de la crisis.</td></tr>
@@ -69,7 +69,7 @@
     </div>
 
     <h2 id="testing">Probar el plan: Fault Injection Service &amp; Resilience Hub (2.1.3)</h2>
-    <table>
+    <table role="table">
       <tr><th>Herramienta</th><th>Qué valida</th></tr>
       <tr><td><strong>Tabletop exercise</strong></td><td>Si el EQUIPO sabe qué hacer y se comunica bien (discusión, sin tocar sistemas reales).</td></tr>
       <tr><td><strong>AWS Fault Injection Service (FIS)</strong></td><td>Si la TECNOLOGÍA responde de verdad: experimentos de fallo controlados (caída de AZ, latencia, terminar instancias) con guardrails/stop conditions automáticas.</td></tr>
@@ -167,7 +167,7 @@
     </div>
 
     <h2 id="recovery">Contención, erradicación &amp; recuperación (2.2.4)</h2>
-    <table>
+    <table role="table">
       <tr><th>Fase</th><th>Acción típica</th></tr>
       <tr><td><strong>Contención</strong></td><td>Aislar por red (SG de cuarentena), revocar/rotar credenciales comprometidas, revocar sesiones activas (STS).</td></tr>
       <tr><td><strong>Erradicación</strong></td><td>Eliminar el vector de compromiso (parche, cerrar el permiso mal configurado que lo permitió).</td></tr>
