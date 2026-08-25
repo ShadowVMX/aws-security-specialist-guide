@@ -99,12 +99,12 @@ var QUIZ_DATA = [
     tag: "Captura de evidencia forense",
     q: "Al capturar evidencia forense de una instancia EC2 comprometida para su posterior análisis, ¿qué DOS artefactos son más valiosos capturar antes de cualquier otra acción?",
     options: [
-      "Un snapshot del volumen EBS y un volcado de la memoria RAM, tomados antes de tocar nada más",
-      "Los logs de CloudTrail de la cuenta y el historial de facturación del mes en el que ocurrió",
+      "Un snapshot del volumen EBS, tomado antes de detener o reiniciar la instancia",
+      "Un volcado de la memoria RAM, capturado con la instancia todavía en marcha",
       "Las métricas de CPU y de red de CloudWatch durante la ventana en la que se detectó el finding",
-      "El inventario de software de Systems Manager y la lista de parches pendientes de la instancia",
+      "El inventario de software de Systems Manager y la lista de parches pendientes",
     ],
-    correct: 0,
+    correct: [0, 1],
     explain: "El snapshot EBS preserva el estado del disco para el análisis posterior sin alterar la instancia original. El volcado de memoria (con herramientas como AVML, ejecutadas vía Systems Manager) preserva evidencia volátil que desaparece en cuanto la instancia se apaga o reinicia — ambos artefactos son prioritarios en la fase de contención y captura. <a href=\"https://docs.aws.amazon.com/ebs/latest/userguide/ebs-snapshots.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
   {
