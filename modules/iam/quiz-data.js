@@ -16,7 +16,7 @@ var QUIZ_DATA = [
     q: "¿Cuál es la diferencia clave entre una Service Control Policy (SCP) y una Resource Control Policy (RCP) en AWS Organizations?",
     options: [
       "No hay diferencia, son sinónimos del mismo mecanismo",
-      "Las SCP limitan lo que las identidades de la cuenta pueden hacer; las RCP limitan quién puede acceder a los recursos, incluidas identidades externas/anónimas",
+      "Las SCP limitan lo que las identidades de la cuenta pueden hacer",
       "Las SCP solo aplican a la cuenta de gestión (management account)",
       "Las RCP sustituyen completamente a las SCP desde 2023",
     ],
@@ -160,7 +160,7 @@ var QUIZ_DATA = [
     q: "¿Cuál es la diferencia entre el IAM Credential Report y el IAM Access Advisor?",
     options: [
       "Son el mismo informe con nombres distintos",
-      "El Credential Report lista el estado de credenciales (passwords, access keys, MFA) de todos los usuarios; Access Advisor muestra qué servicios/acciones ha usado realmente un principal y cuándo por última vez",
+      "El Credential Report lista el estado de credenciales (passwords, access keys, MFA) de todos los usuarios",
       "Access Advisor solo funciona a nivel de cuenta root",
       "El Credential Report requiere GuardDuty habilitado",
     ],
@@ -195,7 +195,7 @@ var QUIZ_DATA = [
     tag: "Session policies",
     q: "Cuando llamas a sts:AssumeRole pasando un parámetro --policy adicional (session policy), ¿cómo afecta esto a los permisos efectivos de la sesión resultante?",
     options: [
-      "La session policy actúa como filtro adicional: los permisos efectivos son la intersección entre los permisos del rol y la session policy",
+      "La session policy actúa como filtro adicional",
       "La session policy amplía los permisos del rol más allá de lo que ya tenía",
       "La session policy sustituye completamente a la identity policy del rol",
       "Las session policies solo aplican a usuarios, no a roles",
@@ -365,7 +365,7 @@ var QUIZ_DATA = [
     options: [
       "Las SCPs pasaron a poder otorgar permisos por sí mismas, igual que una identity-based policy",
       "Las SCPs pasaron a poder aplicarse a cuentas fuera de la organización",
-      "Soporte para el lenguaje completo de políticas IAM en SCPs: condiciones, ARNs de recurso individuales, el elemento NotAction combinado con Allow, wildcards al inicio/medio del elemento Action y NotResource",
+      "Soporte para el lenguaje completo de políticas IAM en SCPs",
       "Las SCPs sustituyeron por completo a las RCPs",
     ],
     correct: 2,
@@ -378,7 +378,7 @@ var QUIZ_DATA = [
       "Permission Sets tradicionales asignados directamente al analista",
       "Session policies aplicadas al rol de servicio de QuickSight",
       "AssumeRoleWithSAML clásico",
-      "Trusted Identity Propagation (TIP): propaga el contexto de identidad del usuario autenticado a través de la cadena de servicios de AWS, de modo que los permisos y los logs de auditoría reflejan a la persona real, no un rol compartido",
+      "Trusted Identity Propagation (TIP)",
     ],
     correct: 3,
     explain: "Trusted Identity Propagation añade el contexto de identidad del usuario de Identity Center a un IAM Role cuando un servicio (QuickSight, Athena, Redshift, EMR, OpenSearch, SageMaker Unified Studio...) llama a otro en su nombre. Así, los permisos de acceso a datos y los registros en CloudTrail reflejan la identidad corporativa real del usuario en lugar de un rol de servicio compartido, sin necesidad de crear un rol IAM por persona.",
@@ -413,7 +413,7 @@ var QUIZ_DATA = [
     options: [
       "Es un error de configuración: las RCPs siempre deben aplicar también a la cuenta de gestión",
       "El usuario tiene MFA activo, lo que le exime automáticamente de cualquier RCP",
-      "Las RCPs, por diseño, NO afectan a las solicitudes realizadas por identidades de la cuenta de gestión de la organización — solo restringen recursos en cuentas miembro",
+      "Las RCPs, por diseño, NO afectan a las solicitudes realizadas por identidades de la cuenta de gestión de la organización",
       "Las RCPs solo aplican a llamadas realizadas desde fuera de la región del bucket",
     ],
     correct: 2,
@@ -474,7 +474,7 @@ var QUIZ_DATA = [
       "Son sinónimos completamente intercambiables",
       "aws:PrincipalOrgID ya no existe desde 2025, fue reemplazada por aws:SourceOrgID",
       "aws:ResourceOrgID solo puede usarse en SCPs, nunca en RCPs",
-      "aws:PrincipalOrgID comprueba a qué organización pertenece la IDENTIDAD que hace la llamada (perímetro de identidad); aws:ResourceOrgID compara la organización del PRINCIPAL con la del propio recurso, útil para permitir acceso cross-account solo dentro de la misma organización sin necesitar listar cada cuenta",
+      "aws:PrincipalOrgID comprueba a qué organización pertenece la IDENTIDAD que hace la llamada (perímetro de identidad)",
     ],
     correct: 3,
     explain: "aws:PrincipalOrgID es la clave clásica del perímetro de identidad: compara la Organization ID del principal que llama contra un valor fijo. aws:ResourceOrgID (variable, se compara normalmente como '${aws:ResourceOrgID}' o de forma implícita en RCPs) permite expresar 'solo permite acceso si el principal pertenece a la MISMA organización que el propio recurso', un patrón muy usado en RCPs para bloquear el acceso desde fuera de la organización sin necesidad de mantener listas de cuentas.",
@@ -483,7 +483,7 @@ var QUIZ_DATA = [
     tag: "Access Analyzer – generación de políticas",
     q: "Un equipo lleva 6 meses operando un rol IAM con la política gestionada AdministratorAccess 'temporalmente', y ahora quiere generar una política de mínimo privilegio basada en lo que ese rol REALMENTE ha usado según su actividad registrada en CloudTrail, en vez de escribirla a mano desde cero. ¿Qué funcionalidad de IAM Access Analyzer resuelve esto directamente?",
     options: [
-      "La generación de políticas basada en actividad de acceso (policy generation): Access Analyzer analiza los eventos de CloudTrail del rol y propone una política IAM de mínimo privilegio con los servicios y acciones realmente utilizados",
+      "La generación de políticas basada en actividad de acceso (policy generation)",
       "External access findings",
       "Unused access findings, que genera automáticamente la política sustituta",
       "IAM Credential Report",
@@ -557,7 +557,7 @@ var QUIZ_DATA = [
     options: [
       "La SCP tiene un error de sintaxis",
       "S3 no soporta SCPs de ningún tipo",
-      "Las SCP solo restringen lo que pueden hacer las IDENTIDADES de la organización; no se aplican a principals externos que llegan directamente vía una resource-based policy del propio recurso, que es exactamente el hueco que las RCP están diseñadas para cerrar",
+      "Las SCP solo restringen lo que pueden hacer las IDENTIDADES de la organización",
       "Las SCP solo aplican a llamadas hechas desde la consola, no desde la API",
     ],
     correct: 2,
@@ -615,7 +615,7 @@ var QUIZ_DATA = [
     tag: "Permission boundaries",
     q: "Vas a permitir que los desarrolladores creen sus propios roles sin que puedan escalar privilegios. ¿Qué DOS afirmaciones sobre permission boundaries son correctas?",
     options: [
-      "Un permission boundary no concede permisos por sí mismo: define el máximo que una identity policy puede otorgar",
+      "Un permission boundary no concede permisos por sí mismo",
       "Se puede exigir, mediante una condición en la política del desarrollador, que todo rol que cree lleve un boundary concreto",
       "El permission boundary sustituye a la identity policy: basta con adjuntar el boundary",
       "Los permission boundaries se aplican a recursos, igual que las bucket policies",

@@ -3,7 +3,7 @@ var QUIZ_DATA = [
     tag: "Security Groups vs NACLs",
     q: "¿Cuál es la diferencia MÁS importante entre un Security Group y una Network ACL en cuanto a su comportamiento?",
     options: [
-      "El Security Group es STATEFUL (el tráfico de retorno se permite automáticamente) y solo admite reglas Allow; la NACL es STATELESS (hay que permitir explícitamente ida Y vuelta) y admite reglas Allow y Deny evaluadas en orden numérico",
+      "El Security Group es STATEFUL (el tráfico de retorno se permite automáticamente) y solo admite reglas Allow",
       "El Security Group es a nivel de subnet y la NACL a nivel de instancia",
       "Ambos son idénticos, solo cambia dónde se configuran en la consola",
       "La NACL solo filtra tráfico HTTP/HTTPS",
@@ -29,7 +29,7 @@ var QUIZ_DATA = [
     options: [
       "Inyección SQL únicamente",
       "Ataques que ya pasaron por CloudFront",
-      "Un volumen anómalamente alto de requests desde la misma IP (o clave de agregación) en una ventana de tiempo — por ejemplo, fuerza bruta de login o scraping agresivo",
+      "Un volumen anómalamente alto de requests desde la misma IP (o clave de agregación) en una ventana de tiempo",
       "Solo tráfico UDP",
     ],
     correct: 2,
@@ -90,7 +90,7 @@ var QUIZ_DATA = [
       "Son sinónimos exactos, se puede usar cualquiera de los dos términos indistintamente en la API",
       "El Instance Profile sustituye a la necesidad de tener un IAM Role",
       "Un Instance Profile puede contener múltiples IAM Roles simultáneamente",
-      "El Instance Profile es el CONTENEDOR que asocia un IAM Role a una instancia EC2 — es lo que realmente se adjunta a la instancia (la consola lo oculta creándolo automáticamente al 'asignar un rol')",
+      "El Instance Profile es el CONTENEDOR que asocia un IAM Role a una instancia EC2",
     ],
     correct: 3,
     explain: "Técnicamente no adjuntas un IAM Role directamente a una instancia EC2: adjuntas un Instance Profile, que a su vez referencia UN único IAM Role. La consola de AWS oculta esta distinción creando el Instance Profile automáticamente, pero la CLI/API la expone (aws iam create-instance-profile + add-role-to-instance-profile).",
@@ -99,7 +99,7 @@ var QUIZ_DATA = [
     tag: "Amazon Inspector",
     q: "¿Qué tipos de recursos puede escanear Amazon Inspector en busca de vulnerabilidades conocidas (CVEs)?",
     options: [
-      "Instancias EC2, imágenes de contenedor en Amazon ECR, y funciones Lambda (código y capas) — de forma continua, no solo bajo demanda",
+      "Instancias EC2, imágenes de contenedor en Amazon ECR, y funciones Lambda (código y capas)",
       "Solo instancias EC2",
       "Solo bases de datos RDS",
       "Solo buckets S3",
@@ -125,7 +125,7 @@ var QUIZ_DATA = [
     options: [
       "EC2 Instance Connect con IP pública",
       "Un bastion host tradicional con NAT Gateway",
-      "AWS Systems Manager Session Manager: crea un túnel a través del agente SSM, sin necesidad de puerto 22 abierto, bastion host, ni claves SSH, y registra cada comando ejecutado",
+      "AWS Systems Manager Session Manager",
       "Desactivar el Security Group temporalmente",
     ],
     correct: 2,
@@ -221,7 +221,7 @@ var QUIZ_DATA = [
     options: [
       "AWS Config Rules únicamente",
       "Amazon Macie",
-      "Amazon Inspector Network Reachability (o VPC Network Access Analyzer) — analiza toda la cadena de configuración de red para detectar rutas de acceso no intencionadas",
+      "Amazon Inspector Network Reachability (o VPC Network Access Analyzer)",
       "AWS Trusted Advisor exclusivamente",
     ],
     correct: 2,
@@ -243,7 +243,7 @@ var QUIZ_DATA = [
     tag: "WAF Fraud Control – ATP",
     q: "Tu equipo de seguridad detecta un aumento de intentos de login con credenciales robadas (credential stuffing) contra el endpoint de login de tu aplicación, servido detrás de CloudFront. Los atacantes usan pares email/contraseña filtrados en otras brechas, y muchos aciertan porque los usuarios reutilizan contraseñas. ¿Qué componente de AWS WAF Fraud Control resuelve específicamente este caso de uso?",
     options: [
-      "Account Takeover Prevention (ATP): compara los pares de credenciales enviados en el login contra una base de datos de credenciales filtradas actualizada regularmente, y detecta patrones anómalos de inicio de sesión (fuerza bruta, credential stuffing) en la página de login concreta",
+      "Account Takeover Prevention (ATP)",
       "AWS WAF Bot Control, para bloquear bots conocidos",
       "Una rate-based rule genérica sin más configuración",
       "Account Creation Fraud Prevention (ACFP), diseñado para páginas de registro",
@@ -304,7 +304,7 @@ var QUIZ_DATA = [
     q: "Necesitas que AWS Network Firewall inspeccione el contenido de las conexiones HTTPS salientes de tu VPC (no solo el SNI) para aplicar reglas de firma tipo IDS/IPS sobre el tráfico descifrado. ¿Qué debes configurar?",
     options: [
       "Nada adicional: Network Firewall inspecciona el payload cifrado de HTTPS de forma nativa sin configuración",
-      "Una TLS Inspection Configuration: Network Firewall descifra el tráfico con un certificado que administra, lo inspecciona en claro, y lo vuelve a cifrar antes de reenviarlo — configurable para tráfico de entrada (ingress) y/o de salida (egress)",
+      "Una TLS Inspection Configuration",
       "Activar únicamente reglas de dominio (FQDN), que no requieren descifrado",
       "Sustituir Network Firewall por AWS WAF, que sí inspecciona TLS de forma nativa",
     ],
@@ -317,7 +317,7 @@ var QUIZ_DATA = [
     options: [
       "Inspector Network Reachability, que analiza rutas de red",
       "Amazon Inspector solo puede escanear imágenes ya publicadas en ECR, nunca código fuente",
-      "Amazon Inspector Code Security: se integra nativamente con repositorios de GitHub y GitLab para escanear código fuente, dependencias e IaC en cada push/pull request o en el pipeline de CI/CD, mostrando los hallazgos tanto en la consola de Inspector como en la propia plataforma de control de versiones",
+      "Amazon Inspector Code Security",
       "Amazon CodeGuru Reviewer, que sustituyó a Inspector en 2025",
     ],
     correct: 2,
@@ -330,7 +330,7 @@ var QUIZ_DATA = [
       "Un Service Control Policy (SCP) que bloquee la desactivación de Inspector",
       "Tienes que activarlo manualmente en cada cuenta miembro, no existe gestión centralizada",
       "AWS Config conformance packs únicamente",
-      "Gestión de Amazon Inspector a través de políticas de AWS Organizations: permite configurar y aplicar de forma centralizada los tipos de escaneo (incluyendo Lambda Code Scanning y Code Security) en todas las cuentas, OUs seleccionadas, o cuentas individuales de la organización",
+      "Gestión de Amazon Inspector a través de políticas de AWS Organizations",
     ],
     correct: 3,
     explain: "Amazon Inspector añadió soporte para gestión centralizada mediante políticas de AWS Organizations, permitiendo a un administrador delegado definir qué escaneos (Lambda, EC2, ECR, Code Security) se activan por defecto en toda la organización o en OUs concretas, eliminando la necesidad de habilitarlo cuenta por cuenta.",
@@ -378,7 +378,7 @@ var QUIZ_DATA = [
       "Verified Access solo soporta tráfico HTTP(S); para SSH/RDP hay que usar Site-to-Site VPN",
       "Solo es posible mediante un Direct Connect dedicado",
       "Hay que migrar esas cargas a AWS Client VPN, que es el único servicio con soporte SSH/RDP",
-      "Soporte de Verified Access para protocolos no HTTP(S) (TCP genérico, incluyendo SSH y RDP): extiende las mismas políticas de acceso basadas en identidad y postura del dispositivo a recursos como bases de datos, repositorios git o instancias EC2 por SSH/RDP",
+      "Soporte de Verified Access para protocolos no HTTP(S) (TCP genérico, incluyendo SSH y RDP)",
     ],
     correct: 3,
     explain: "Desde su disponibilidad general (GA, febrero 2025), Verified Access extiende el modelo Zero Trust más allá de HTTP(S) a protocolos TCP genéricos como SSH y RDP, permitiendo centralizar políticas de acceso (identidad + postura del dispositivo) para bases de datos, repositorios de código o acceso administrativo a EC2 — sin gestionar credenciales SSH ni exponer un túnel de red completo.",
@@ -400,7 +400,7 @@ var QUIZ_DATA = [
     q: "Quieres garantizar que solo se puedan desplegar en tu clúster imágenes de contenedor que efectivamente provienen de tu pipeline de CI/CD autorizado, protegiendo la cadena de suministro de software frente a imágenes manipuladas o no verificadas. ¿Qué capacidad de Amazon ECR ayuda a esto?",
     options: [
       "ECR pull-through cache, que solo sirve para cachear imágenes de registros públicos",
-      "ECR managed image signing, integrado con AWS Signer: firma automáticamente las imágenes al hacer push a ECR, permitiendo verificar la firma (procedencia) antes del despliegue, como parte de la seguridad de la cadena de suministro de software",
+      "ECR managed image signing, integrado con AWS Signer",
       "Activar el escaneo mejorado de vulnerabilidades (enhanced scanning) — eso ya garantiza la procedencia",
       "Es una funcionalidad exclusiva de Docker Hub, no de ECR",
     ],
@@ -413,7 +413,7 @@ var QUIZ_DATA = [
     options: [
       "Una Service Control Policy (SCP) que deniegue la acción RunInstances si no se especifica IMDSv2",
       "AWS Config con remediación automática, que revierte la instancia después de creada",
-      "Una Declarative Policy de AWS Organizations para EC2: define el estado deseado (IMDSv2 obligatorio) de forma centralizada desde la cuenta de gestión o un delegado, y AWS mantiene esa configuración de forma persistente sin necesidad de reescribir la política ante nuevas APIs o cuentas",
+      "Una Declarative Policy de AWS Organizations para EC2",
       "Etiquetar todas las instancias como 'IMDSv2-only' manualmente",
     ],
     correct: 2,
@@ -426,7 +426,7 @@ var QUIZ_DATA = [
       "Los Network ACLs de cada VPC, que ya controlan esto por IP",
       "Una NAT Gateway compartida entre cuentas",
       "AWS Verified Access, que sustituye a VPC Lattice para este caso",
-      "Auth Policies de VPC Lattice: documentos de política estilo IAM adjuntos a nivel de service network o de servicio individual, que autorizan (o deniegan) el acceso de un principal concreto a rutas/métodos específicos — complementarios, no sustitutos, de los Security Groups",
+      "Auth Policies de VPC Lattice",
     ],
     correct: 3,
     explain: "VPC Lattice introduce autorización basada en identidad (auth policies tipo IAM) a nivel de service network o de servicio individual, permitiendo definir qué principal (rol/servicio) puede invocar qué operación — separando la responsabilidad de 'qué servicio puede llamar a cuál' (equipo de aplicaciones) de 'qué IP puede llegar a la red' (equipo de red/Security Groups). Para que la autorización tenga éxito, tanto la auth policy de Lattice como la política de identidad de IAM deben permitir explícitamente el acceso.",
@@ -435,7 +435,7 @@ var QUIZ_DATA = [
     tag: "Route 53 Resolver DNS Firewall Advanced",
     q: "Sospechas que un host comprometido dentro de tu VPC está usando un Domain Generation Algorithm (DGA) para generar nombres de dominio pseudoaleatorios y comunicarse con infraestructura de mando y control (C2), evadiendo las listas de bloqueo de dominios estáticas. ¿Qué servicio de AWS detecta este patrón específico en tiempo real?",
     options: [
-      "Route 53 Resolver DNS Firewall Advanced: analiza en tiempo real anomalías en los nombres de dominio consultados desde tus VPCs para detectar y bloquear patrones asociados a DGA (incluyendo variantes basadas en diccionario) y DNS tunneling, que las listas estáticas de dominios no pueden cubrir",
+      "Route 53 Resolver DNS Firewall Advanced",
       "Route 53 Resolver DNS Firewall (la versión estándar, basada solo en listas de dominios)",
       "AWS Network Firewall con reglas de dominio (FQDN) únicamente",
       "Amazon GuardDuty, que bloquea el tráfico automáticamente",
@@ -459,7 +459,7 @@ var QUIZ_DATA = [
     tag: "Security Groups vs NACLs",
     q: "Estás diseñando los controles de red de una VPC. ¿Qué DOS afirmaciones sobre security groups y network ACLs son correctas?",
     options: [
-      "Los security groups son stateful: el tráfico de vuelta se permite automáticamente aunque no haya regla de salida",
+      "Los security groups son stateful",
       "Las network ACLs son stateless y admiten reglas de Deny explícitas, evaluadas por número de regla",
       "Los security groups permiten reglas de Deny explícitas para bloquear IPs concretas",
       "Las network ACLs se aplican a la interfaz de red de la instancia, no a la subred",

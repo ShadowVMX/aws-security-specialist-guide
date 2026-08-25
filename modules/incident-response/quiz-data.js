@@ -77,7 +77,7 @@ var QUIZ_DATA = [
     options: [
       "El escaneo de vulnerabilidades continuo con Inspector",
       "La rotación de credenciales de IAM",
-      "Todo el flujo forense ante una instancia EC2 comprometida: aislamiento de red (SG de cuarentena), captura de snapshot EBS y memoria, etiquetado para cadena de custodia, y notificación al equipo de IR — sin intervención manual en cada paso",
+      "Todo el flujo forense ante una instancia EC2 comprometida",
       "El despliegue de parches en toda la flota",
     ],
     correct: 2,
@@ -99,7 +99,7 @@ var QUIZ_DATA = [
     tag: "Captura de evidencia forense",
     q: "Al capturar evidencia forense de una instancia EC2 comprometida para su posterior análisis, ¿qué DOS artefactos son más valiosos capturar antes de cualquier otra acción?",
     options: [
-      "Un snapshot del volumen EBS (estado del disco) y una captura de memoria (RAM) de la instancia — la memoria contiene evidencia volátil (procesos en ejecución, conexiones activas, claves en memoria) que se pierde al apagar la instancia",
+      "Un snapshot del volumen EBS (estado del disco) y una captura de memoria (RAM) de la instancia",
       "Solo los logs de CloudTrail de la cuenta",
       "Solo las métricas de CloudWatch de CPU",
       "El historial de facturación de la cuenta",
@@ -208,7 +208,7 @@ var QUIZ_DATA = [
     q: "¿Por qué es importante etiquetar y documentar (timestamp, quién, qué acción) cada artefacto forense capturado durante un incidente (snapshots, memory dumps, logs exportados)?",
     options: [
       "Solo por organización visual, no tiene impacto real",
-      "Para mantener la cadena de custodia: si el incidente termina en una acción legal/regulatoria, poder demostrar que la evidencia no fue alterada y quién tuvo acceso a ella en cada momento",
+      "Para mantener la cadena de custodia",
       "Porque AWS lo factura de forma distinta si está etiquetado",
       "No es relevante para el examen",
     ],
@@ -234,7 +234,7 @@ var QUIZ_DATA = [
       "AWS Trusted Advisor",
       "Amazon Detective",
       "AWS Systems Manager Incident Manager",
-      "AWS Security Incident Response (Security IR): monitoriza y triagea automáticamente los findings de GuardDuty (vía Security Hub), abre casos proactivos cuando confirma una amenaza real, y da acceso directo al AWS Customer Incident Response Team (CIRT) 24/7",
+      "AWS Security Incident Response (Security IR)",
     ],
     correct: 3,
     explain: "Security IR (GA diciembre 2024) combina monitorización y triage automatizado de findings de GuardDuty/Security Hub, herramientas de investigación asistidas por IA, y acceso directo al CIRT de AWS 24/7. Detective ayuda a investigar pero no da acceso a un equipo humano de AWS; Incident Manager gestiona el proceso operativo pero ya no admite altas de clientes nuevos (retirado desde nov. 2025); Trusted Advisor solo da recomendaciones de buenas prácticas.",
@@ -243,7 +243,7 @@ var QUIZ_DATA = [
     tag: "Security IR: casos proactivos vs. reactivos",
     q: "Tras habilitar AWS Security Incident Response en tu organización, ¿en qué se diferencia un caso 'reactivo' de un caso proactivo (con el prefijo '[Proactive case]')?",
     options: [
-      "Un caso reactivo lo abre el propio cliente cuando necesita ayuda (ej. sospecha un compromiso); un caso proactivo lo abre AUTOMÁTICAMENTE el servicio cuando su proceso de triage —que filtra automáticamente más del 99% de los findings entrantes— determina que un finding de GuardDuty/Security Hub es un verdadero positivo que requiere atención",
+      "Un caso reactivo lo abre el propio cliente cuando necesita ayuda (ej. sospecha un compromiso)",
       "No hay diferencia real, ambos términos son sinónimos en la consola",
       "Los casos proactivos solo se generan para instancias EC2 con Windows",
       "Los casos reactivos son gratuitos y los proactivos tienen coste adicional por finding",
@@ -256,7 +256,7 @@ var QUIZ_DATA = [
     q: "Estás diseñando el plan de respuesta a incidentes de una cuenta de AWS nueva en 2026 y valoras usar AWS Systems Manager Incident Manager para gestionar el ciclo de vida de los incidentes y el escalado del equipo. ¿Qué deberías tener en cuenta?",
     options: [
       "Es la opción que AWS recomienda activamente para cualquier cuenta nueva",
-      "Desde el 7 de noviembre de 2025, Incident Manager dejó de aceptar clientes nuevos y AWS no añadirá más funcionalidades al servicio; para cuentas nuevas, AWS recomienda usar Systems Manager OpsCenter para gestionar los problemas operativos, y soluciones de partners de AWS para el escalado y paging automatizado",
+      "Desde el 7 de noviembre de 2025, Incident Manager dejó de aceptar clientes nuevos y AWS no añadirá más funcionalidades al servicio",
       "Incident Manager ha sido renombrado oficialmente a Amazon Detective",
       "Incident Manager solo está disponible en la región us-east-1",
     ],
@@ -291,7 +291,7 @@ var QUIZ_DATA = [
     tag: "AWS Backup: bóveda lógicamente air-gapped",
     q: "Tu equipo de seguridad quiere una copia de backup que ni siquiera un atacante con credenciales de administrador root comprometidas dentro de la cuenta de la carga de trabajo pueda borrar o modificar. ¿Qué solución de AWS Backup cumple este requisito con mayor garantía?",
     options: [
-      "Una logically air-gapped vault de AWS Backup: almacena copias inmutables en una cuenta propiedad de AWS (fuera de tu cuenta de carga de trabajo), bloqueadas por defecto, con protección de borrado que ningún principal —ni siquiera el root de la cuenta propietaria— puede eludir dentro del periodo de retención",
+      "Una logically air-gapped vault de AWS Backup",
       "Snapshots EBS estándar, sin ninguna configuración adicional",
       "Un bucket S3 estándar con versioning activado, sin Object Lock",
       "AWS Backup Vault Lock en modo governance",
@@ -304,7 +304,7 @@ var QUIZ_DATA = [
     q: "Un ataque de ransomware deja la cuenta de AWS de la carga de trabajo completamente inaccesible (las credenciales root fueron comprometidas y rotadas por el atacante). ¿Qué funcionalidad reciente de AWS Backup permite recuperar los backups almacenados en una logically air-gapped vault en este escenario extremo?",
     options: [
       "Restaurar directamente usando las credenciales root comprometidas",
-      "Multi-party approval para logically air-gapped vaults en AWS Organizations: permite autorizar el acceso y la restauración de backups a cuentas aprobadas incluso cuando la cuenta propietaria original quedó inaccesible por un evento accidental o malicioso, sin depender de esa cuenta",
+      "Multi-party approval para logically air-gapped vaults en AWS Organizations",
       "Abrir un caso de soporte en el plan Basic de AWS Support",
       "No es posible recuperar los backups si la cuenta propietaria está comprometida",
     ],
@@ -317,7 +317,7 @@ var QUIZ_DATA = [
     options: [
       "Amazon Inspector, escaneando el backup directamente",
       "AWS Config, con un conformance pack de malware",
-      "Amazon GuardDuty Malware Protection for AWS Backup (GA noviembre 2025): escanea automáticamente los backups nuevos de EC2/EBS/S3, permite escaneos bajo demanda de backups existentes, verifica que un backup está limpio antes de restaurarlo, e identifica el último backup limpio conocido usando escaneo incremental sobre los datos que cambiaron",
+      "Amazon GuardDuty Malware Protection for AWS Backup (GA noviembre 2025)",
       "Amazon Macie, escaneando los metadatos del backup",
     ],
     correct: 2,
@@ -400,7 +400,7 @@ var QUIZ_DATA = [
     q: "Configuras un AWS Backup Vault Lock en modo COMPLIANCE con un periodo de gracia ('cooling-off') de 3 días. ¿Qué implica esto para la inmutabilidad de los backups en esa bóveda?",
     options: [
       "Es idéntico al modo governance: cualquier usuario con permisos IAM suficientes puede eliminar el lock en cualquier momento",
-      "Durante el periodo de gracia todavía puedes eliminar o modificar la configuración del lock; una vez transcurrido ese periodo, la bóveda y su configuración se vuelven inmutables y NO pueden ser eliminadas ni alteradas por ningún usuario —ni siquiera el root ni el propio AWS— hasta que expire la retención de cada recovery point",
+      "Durante el periodo de gracia todavía puedes eliminar o modificar la configuración del lock",
       "El modo compliance permite borrar recovery points individuales en cualquier momento, sin restricción",
       "El periodo de gracia solo aplica a bóvedas cifradas con una clave KMS gestionada por el cliente",
     ],
@@ -435,7 +435,7 @@ var QUIZ_DATA = [
     tag: "S3 Object Lock para evidencia exportada",
     q: "Tras exportar los memory dumps y snapshots analizados a un bucket de S3 como repositorio de evidencia a largo plazo (por un posible litigio), ¿qué combinación de características de S3 garantiza que esos objetos no puedan sobrescribirse ni eliminarse por NADIE, incluso si el periodo de retención configurado ya expiró pero el proceso judicial sigue abierto?",
     options: [
-      "S3 Object Lock en modo COMPLIANCE combinado con un Legal Hold: el modo compliance impide que cualquier usuario (incluido el root) modifique o elimine el objeto durante el periodo de retención, y el Legal Hold añade una restricción independiente, sin fecha de expiración, hasta que se retire explícitamente",
+      "S3 Object Lock en modo COMPLIANCE combinado con un Legal Hold",
       "Versioning de S3 por sí solo, sin ninguna otra configuración",
       "Server-Side Encryption con SSE-S3, sin ninguna otra configuración",
       "Una bucket policy que deniega DeleteObject a todos los principals excepto al administrador",

@@ -3,7 +3,7 @@ var QUIZ_DATA = [
     tag: "Envelope encryption",
     q: "¿Por qué KMS usa 'envelope encryption' (cifrar los datos con una data key, y esa data key con la CMK) en vez de cifrar directamente los datos con la KMS key?",
     options: [
-      "Porque las API de KMS tienen un límite de tamaño de payload muy pequeño (4KB para simétricas); envolver permite cifrar datos de cualquier tamaño localmente y solo enviar la data key (pequeña) a KMS",
+      "Porque las API de KMS tienen un límite de tamaño de payload muy pequeño (4KB para simétricas)",
       "Porque las KMS keys no pueden cifrar datos en absoluto, solo otras claves",
       "Porque es un requisito de cumplimiento de HIPAA exclusivamente",
       "Porque así se evita pagar por las llamadas a la API de KMS",
@@ -16,7 +16,7 @@ var QUIZ_DATA = [
     q: "Tras usar GenerateDataKey para cifrar un archivo grande localmente, ¿qué debe hacer la aplicación con la data key en texto plano una vez terminado el cifrado?",
     options: [
       "Guardarla junto al archivo cifrado para poder descifrar más rápido después",
-      "Eliminarla de memoria inmediatamente; solo se conserva la versión CIFRADA de la data key (el 'encrypted blob') junto a los datos",
+      "Eliminarla de memoria inmediatamente",
       "Enviarla de vuelta a KMS para que la almacene de forma segura",
       "Cifrarla con una segunda data key distinta (doble envuelta)",
     ],
@@ -77,7 +77,7 @@ var QUIZ_DATA = [
     options: [
       "No pueden usarse para cifrar datos, solo para firmar",
       "Solo pueden usarse con S3, no con otros servicios",
-      "No soportan la rotación automática anual gestionada por AWS; la rotación, si se quiere, hay que gestionarla manualmente re-importando material nuevo",
+      "No soportan la rotación automática anual gestionada por AWS",
       "No pueden tener key policy personalizada",
     ],
     correct: 2,
@@ -195,7 +195,7 @@ var QUIZ_DATA = [
     tag: "Client VPN vs Verified Access",
     q: "¿En qué se diferencia AWS Verified Access de AWS Client VPN?",
     options: [
-      "Client VPN establece un túnel de red tradicional (el usuario 'entra' a la VPC); Verified Access aplica un modelo Zero Trust evaluando identidad + postura del dispositivo en cada request a una aplicación específica, sin exponer un túnel de red completo",
+      "Client VPN establece un túnel de red tradicional (el usuario 'entra' a la VPC)",
       "Son el mismo servicio, Verified Access es solo el nombre nuevo de Client VPN",
       "Verified Access solo funciona con aplicaciones on-premises",
       "Client VPN no soporta MFA",
@@ -256,7 +256,7 @@ var QUIZ_DATA = [
     q: "En cifrado 'client-side' de un objeto S3, ¿dónde ocurre el cifrado de los datos?",
     options: [
       "En el lado del servidor de S3, antes de escribir a disco",
-      "En el cliente/aplicación, ANTES de enviar los datos a S3 — S3 recibe y almacena únicamente el objeto ya cifrado, sin ver nunca el texto plano",
+      "En el cliente/aplicación, ANTES de enviar los datos a S3",
       "En un proxy de KMS gestionado por AWS",
       "Es idéntico a SSE-S3, solo cambia el nombre",
     ],
@@ -269,7 +269,7 @@ var QUIZ_DATA = [
     options: [
       "SSE-C no requiere HTTPS",
       "SSE-C usa automáticamente KMS internamente",
-      "SSE-C es más seguro porque AWS nunca ve la clave; el cliente debe enviar la clave de cifrado en CADA solicitud (GET/PUT) por HTTPS, y AWS no la almacena — si pierdes la clave, pierdes el objeto para siempre",
+      "SSE-C es más seguro porque AWS nunca ve la clave",
       "SSE-C es la opción por defecto si no configuras nada",
     ],
     correct: 2,
@@ -330,7 +330,7 @@ var QUIZ_DATA = [
       "SSE-KMS estándar con S3 Bucket Keys habilitado",
       "SSE-C",
       "Cifrado client-side con el AWS Encryption SDK únicamente",
-      "DSSE-KMS (dual-layer server-side encryption): aplica dos capas independientes de cifrado AES-256 — una con una data key de KMS y otra con una clave adicional gestionada por S3",
+      "DSSE-KMS (dual-layer server-side encryption)",
     ],
     correct: 3,
     explain: "DSSE-KMS cifra el objeto dos veces de forma independiente: una capa con una data key generada por KMS y otra capa adicional con una clave gestionada por S3, cumpliendo guías CNSA de doble capa para cargas de trabajo altamente reguladas. No soporta S3 Bucket Keys y tiene un coste adicional por GB frente a SSE-KMS.",
@@ -352,7 +352,7 @@ var QUIZ_DATA = [
     q: "Una aplicación procesa datos altamente sensibles dentro de un AWS Nitro Enclave y necesita que KMS solo descifre datos para ESE enclave concreto (identificado por el hash de su imagen), no para ningún otro proceso de la instancia padre ni de otro enclave. ¿Qué mecanismo lo garantiza?",
     options: [
       "Un KMS grant estándar sin condiciones adicionales",
-      "Atestación criptográfica de KMS: la llamada a Decrypt/GenerateDataKey incluye un documento de atestación firmado por el hipervisor Nitro, y la key policy usa la condición kms:RecipientAttestation:ImageSha384 para verificar el PCR0 (hash de la imagen) antes de re-cifrar la respuesta con la clave pública del enclave",
+      "Atestación criptográfica de KMS",
       "El cifrado automático de memoria del Nitro System",
       "KMS Multi-Region keys",
     ],
@@ -378,7 +378,7 @@ var QUIZ_DATA = [
       "Un sensitive data discovery job programado sobre el 100% de los objetos de cada bucket",
       "GuardDuty S3 Protection",
       "AWS Config rules únicamente",
-      "Automated sensitive data discovery: Macie evalúa continuamente el inventario de buckets S3 y usa muestreo representativo de objetos para dar visibilidad amplia y una puntuación de sensibilidad por bucket, con menor coste que un escaneo completo",
+      "Automated sensitive data discovery",
     ],
     correct: 3,
     explain: "Macie ofrece dos modos: 'automated sensitive data discovery' (evaluación continua y muestreo representativo entre cuentas/buckets para visibilidad amplia y de bajo coste, con un data map interactivo y sensitivity score por bucket) y 'sensitive data discovery jobs' (análisis dirigido y más exhaustivo sobre buckets u objetos concretos, más costoso porque revisa más objetos).",
@@ -387,7 +387,7 @@ var QUIZ_DATA = [
     tag: "AWS Private CA — short-lived certificate mode",
     q: "Una plataforma emite cientos de miles de certificados de vida muy corta (7 días o menos) al mes para autenticar cargas de trabajo efímeras, y el coste mensual fijo de la CA en modo general-purpose resulta desproporcionado. ¿Qué opción reduce el coste?",
     options: [
-      "Usar AWS Private CA en modo short-lived certificate: coste fijo mensual de la CA mucho menor que el modo general-purpose, a cambio de que los certificados emitidos solo puedan tener una validez máxima de 7 días",
+      "Usar AWS Private CA en modo short-lived certificate",
       "Migrar a ACM público",
       "Desactivar la comprobación de revocación OCSP",
       "Usar CloudHSM para emitir los certificados directamente",
@@ -400,7 +400,7 @@ var QUIZ_DATA = [
     q: "Una aplicación con lectores en dos regiones necesita acceder al mismo secreto de base de datos con baja latencia en ambas, y que al rotar la credencial en la región primaria, el nuevo valor se propague automáticamente sin gestionar la rotación por separado en cada región. ¿Qué característica de Secrets Manager usas?",
     options: [
       "Cross-Region Replication de S3 aplicada a un export del secreto",
-      "Multi-Region secrets de Secrets Manager (ReplicateSecretToRegions): crea réplicas sincronizadas en otras regiones; al rotar el secreto primario, el nuevo valor se propaga automáticamente a todas las réplicas",
+      "Multi-Region secrets de Secrets Manager (ReplicateSecretToRegions)",
       "Crear secretos idénticos de forma manual e independiente en cada región",
       "KMS Multi-Region keys, que replican también el valor del secreto automáticamente",
     ],
@@ -413,7 +413,7 @@ var QUIZ_DATA = [
     options: [
       "Access keys IAM rotadas manualmente cada 90 días",
       "AWS Client VPN",
-      "IAM Roles Anywhere: registra tu CA (por ejemplo, una emitida por AWS Private CA o tu propia PKI) como trust anchor; el servidor presenta un certificado X.509 en una llamada CreateSession y recibe credenciales temporales vía STS, asumiendo un rol IAM",
+      "IAM Roles Anywhere: registra tu CA (por ejemplo, una emitida por AWS Private CA o tu propia PKI) como trust anchor",
       "Amazon Cognito Identity Pools",
     ],
     correct: 2,
@@ -426,7 +426,7 @@ var QUIZ_DATA = [
       "Se cifran automáticamente la próxima vez que se adjuntan a una instancia",
       "Se eliminan automáticamente por incumplimiento de política",
       "Se cifran automáticamente en el siguiente snapshot programado",
-      "No se ven afectados: la configuración solo aplica a los volúmenes y copias de snapshot creados DESPUÉS de activarla; los existentes permanecen sin cifrar y no pueden cifrarse retroactivamente sin crear un nuevo volumen o snapshot",
+      "No se ven afectados: la configuración solo aplica a los volúmenes y copias de snapshot creados DESPUÉS de activarla",
     ],
     correct: 3,
     explain: "'EBS encryption by default' es una configuración a nivel de región que solo afecta a los volúmenes y copias de snapshot creados a partir de ese momento. Un volumen o snapshot solo puede cifrarse en el momento de su creación — no existe forma de cifrar retroactivamente uno ya existente sin crear una copia cifrada nueva a partir de él.",
@@ -435,7 +435,7 @@ var QUIZ_DATA = [
     tag: "RDS encryption at rest",
     q: "Tienes una instancia RDS de producción creada SIN cifrado en reposo (storage encryption deshabilitado). ¿Cómo puedes habilitar el cifrado sin perder los datos?",
     options: [
-      "No es posible modificar el cifrado de una instancia existente: hay que crear un snapshot, copiar ese snapshot habilitando cifrado (con una KMS key), restaurar una nueva instancia a partir del snapshot cifrado, y redirigir la aplicación a la nueva instancia",
+      "No es posible modificar el cifrado de una instancia existente",
       "Modificando la instancia directamente con 'aws rds modify-db-instance --storage-encrypted'",
       "Habilitando SSE-KMS en la instancia",
       "Activando 'EBS encryption by default' en la región",
@@ -461,7 +461,7 @@ var QUIZ_DATA = [
     options: [
       "Configurar manualmente Secrets Manager y una Lambda de rotación después de crear la instancia",
       "Usar Parameter Store SecureString con una política de rotación",
-      "Activar 'Manage master credentials in AWS Secrets Manager' al crear (o modificar) la instancia: RDS genera la contraseña, la almacena directamente en Secrets Manager (nunca la ves en claro) y gestiona la rotación automática (cada 7 días por defecto) sin Lambda propia",
+      "Activar 'Manage master credentials in AWS Secrets Manager' al crear (o modificar) la instancia",
       "Deshabilitar la autenticación con contraseña y usar solo IAM database authentication",
     ],
     correct: 2,
@@ -474,7 +474,7 @@ var QUIZ_DATA = [
       "Un retention period en modo Compliance con una fecha muy lejana en el futuro (ej. año 2099)",
       "Glacier Vault Lock",
       "S3 Versioning con MFA Delete",
-      "Legal Hold: aplica la misma protección WORM que un retention period pero SIN fecha de expiración; permanece activo hasta que un principal con permisos explícitos lo retira, y es independiente del modo Governance/Compliance",
+      "Legal Hold: aplica la misma protección WORM que un retention period pero SIN fecha de expiración",
     ],
     correct: 3,
     explain: "Un Legal Hold ofrece la misma protección WORM que un retention period, pero sin fecha de expiración: permanece activo hasta que alguien con el permiso s3:PutObjectLegalHold lo retira explícitamente. Un objeto puede tener retention period, legal hold, ambos o ninguno — son mecanismos independientes entre sí.",
@@ -520,7 +520,7 @@ var QUIZ_DATA = [
     q: "¿Qué DOS afirmaciones describen correctamente el envelope encryption tal y como lo implementa AWS KMS?",
     options: [
       "Los datos se cifran con una data key, y esa data key se cifra a su vez con la KMS key",
-      "La data key en claro se usa en memoria y se descarta; solo se almacena su versión cifrada junto al dato",
+      "La data key en claro se usa en memoria y se descarta",
       "Los datos viajan a KMS para ser cifrados allí, sin importar su tamaño",
       "La KMS key sale del servicio para cifrar los datos en el cliente",
     ],
@@ -531,7 +531,7 @@ var QUIZ_DATA = [
     tag: "Retención inmutable en S3",
     q: "Un requisito regulatorio exige que ciertos objetos de S3 no puedan borrarse durante 7 años. ¿Qué DOS afirmaciones sobre S3 Object Lock son correctas?",
     options: [
-      "En modo compliance, ningún usuario — incluido el root de la cuenta — puede borrar el objeto antes de que expire la retención",
+      "En modo compliance, ningún usuario",
       "Object Lock requiere que el versionado esté habilitado en el bucket",
       "En modo governance nadie puede sobrescribir la retención bajo ninguna circunstancia",
       "Object Lock puede activarse sobre objetos ya existentes sin ninguna configuración previa del bucket",

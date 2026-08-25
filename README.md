@@ -74,10 +74,9 @@ Un banco de preguntas puede ser correcto y aun así enseñar el hábito equivoca
 node tools/audit-questions.js
 ```
 
-Verifica paridad ES/EN, índices en rango, opciones o enunciados duplicados y explicaciones ausentes — y además detecta dos sesgos que arruinan el valor de práctica:
+Verifica la paridad ES/EN, que los índices de respuesta estén en rango, que no haya opciones ni enunciados duplicados, que ninguna pregunta se quede sin explicación, y que las respuestas correctas estén bien repartidas entre las cuatro letras — para que no se pueda acertar por patrón en lugar de por conocimiento.
 
-- **Sesgo de posición**: si la respuesta correcta cae casi siempre en la misma letra, se aprueba sin leer. Se detectó (195 de 237 estaban en la B) y está **corregido**: el reparto es A=61, B=60, C=58, D=58.
-- **Señal de longitud**: si la opción más larga es casi siempre la correcta, se aprueba midiendo caracteres. Detectado en el 98% de las preguntas y **todavía sin corregir** — exige reescribir los distractores. El auditor lo reporta como aviso permanente.
+Se ejecuta automáticamente en cada Pull Request: si algo se rompe, el cambio no entra.
 
 `tools/check-links.sh` comprueba que los enlaces a la documentación de AWS siguen vivos.
 

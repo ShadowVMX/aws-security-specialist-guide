@@ -3,7 +3,7 @@ var QUIZ_DATA = [
     tag: "GuardDuty",
     q: "What data sources does Amazon GuardDuty analyze for behavior to detect threats, without you having to manually enable logging in each account?",
     options: [
-      "CloudTrail (management and data events), VPC Flow Logs, DNS logs, and optionally EKS audit logs and runtime monitoring — GuardDuty consumes these sources internally without you having to enable or separately pay for them",
+      "CloudTrail (management and data events), VPC Flow Logs, DNS logs, and optionally EKS audit logs and runtime monitoring",
       "Only CloudTrail",
       "Only CloudWatch metrics",
       "Only application logs that you send it manually",
@@ -42,7 +42,7 @@ var QUIZ_DATA = [
       "Individual Config Rules in each account, replicated manually",
       "An SCP with the same effect",
       "Amazon Inspector",
-      "AWS Config Conformance Packs deployed at the organization level — a package of rules + remediations deployed centrally to all accounts in an OU",
+      "AWS Config Conformance Packs deployed at the organization level",
     ],
     correct: 3,
     explain: "Conformance Packs bundle a set of Config Rules (and optional remediation actions) as a single template that can be deployed centrally at the organization level, avoiding rule-by-rule configuration in each account — part of skill 1.1.5 on automating regular evaluations.",
@@ -64,7 +64,7 @@ var QUIZ_DATA = [
     q: "Why is it best practice to send security logs (CloudTrail, VPC Flow Logs...) to a dedicated logging ACCOUNT, separate from workload accounts?",
     options: [
       "It's a mandatory technical requirement of CloudTrail",
-      "It isolates the logs from a possible compromise of the workload account: if an attacker compromises the production account, they can't reach or alter the logs (which already live in a different account with minimal, distinct permissions)",
+      "It isolates the logs from a possible compromise of the workload account",
       "It cuts storage costs in half",
       "It lets you avoid using KMS",
     ],
@@ -90,7 +90,7 @@ var QUIZ_DATA = [
       "Never, they're interchangeable in all cases",
       "Athena can only query VPC Flow Logs",
       "CloudWatch Logs Insights doesn't support any kind of filtering",
-      "Athena is better for ad-hoc SQL queries over large volumes of historical data stored in S3 (e.g., a Security Lake data lake); CloudWatch Logs Insights is better for quick queries over recent logs already in a CloudWatch log group",
+      "Athena is better for ad-hoc SQL queries over large volumes of historical data stored in S3 (e.g., a Security Lake data lake)",
     ],
     correct: 3,
     explain: "Athena queries data in S3 with standard SQL (ideal for large historical volumes, like Security Lake's normalized data). CloudWatch Logs Insights uses its own query language optimized for recent logs already ingested into CloudWatch Logs — faster for immediate investigations, less suited to massive historical analysis.",
@@ -112,7 +112,7 @@ var QUIZ_DATA = [
     q: "What information do VPC Flow Logs capture?",
     options: [
       "The complete content (payload) of every network packet",
-      "IP connection metadata (source, destination, ports, protocol, bytes, ACCEPT/REJECT action) at the ENI, subnet, or VPC level — NOT the traffic's content/payload",
+      "IP connection metadata (source, destination, ports, protocol, bytes, ACCEPT/REJECT action) at the ENI, subnet, or VPC level",
       "Only HTTP/HTTPS traffic",
       "Only connection attempts blocked by Security Groups",
     ],
@@ -125,7 +125,7 @@ var QUIZ_DATA = [
     options: [
       "None, they're redundant",
       "They only record DNS resolution failures",
-      "They capture DNS queries made from resources inside the VPC (which domain was resolved, the response, who asked) — key for detecting communication with C2 (Command & Control) domains or DNS-tunneling exfiltration techniques",
+      "They capture DNS queries made from resources inside the VPC (which domain was resolved, the response, who asked)",
       "They only work if Route 53 is used as the domain registrar",
     ],
     correct: 2,
@@ -160,7 +160,7 @@ var QUIZ_DATA = [
     q: "What type of logging must be explicitly enabled in Amazon API Gateway to capture the body of requests and responses, useful for debugging authorization issues?",
     options: [
       "Default execution logging always includes it already",
-      "Data trace logging (at the stage level), which in addition to standard execution logs records the request/response detail — it must be explicitly enabled because it can expose sensitive data",
+      "Data trace logging (at the stage level), which in addition to standard execution logs records the request/response detail",
       "AWS X-Ray automatically, with no configuration",
       "It's not possible to capture the body under any circumstances",
     ],
@@ -195,7 +195,7 @@ var QUIZ_DATA = [
     tag: "Workload analysis",
     q: "Before designing a monitoring strategy for a new workload, what should you analyze first according to skill 1.1.1?",
     options: [
-      "The workload's monitoring requirements: what assets exist, which events are critical to detect, what alert-latency level is needed, and what compliance applies",
+      "The workload's monitoring requirements",
       "Only the workload's estimated monthly cost",
       "The name that will be given to the workload",
       "The CI/CD provider that will be used",
@@ -243,7 +243,7 @@ var QUIZ_DATA = [
     tag: "GuardDuty Malware Protection for S3",
     q: "An application lets external users upload files directly to an S3 bucket before a pipeline processes them. The security team wants to automatically scan every new object for malware BEFORE the pipeline consumes it, without deploying or maintaining their own scanning infrastructure. Which native AWS solution meets this requirement?",
     options: [
-      "GuardDuty Malware Protection for S3: automatically scans newly uploaded objects in configured buckets using AWS-managed and third-party scanning engines, and generates a finding or tags the object if malware is detected",
+      "GuardDuty Malware Protection for S3",
       "Enable Amazon Inspector on the S3 bucket",
       "Configure Macie with a classification job on the bucket",
       "Enable SSE-KMS encryption on the bucket, which automatically blocks malicious files",
@@ -317,7 +317,7 @@ var QUIZ_DATA = [
     options: [
       "It removes the need to have GuardDuty or Inspector enabled",
       "It removes the use of ASFF/OCSF as the finding format",
-      "Near real-time risk correlation and prioritization: it automatically combines findings from Security Hub CSPM (configuration), Inspector (vulnerabilities), and GuardDuty (threats) to generate 'exposure findings' that identify, for example, a publicly exposed resource with a critical vulnerability and access to sensitive data",
+      "Near real-time risk correlation and prioritization",
       "It only adds a security cost dashboard, with no functional changes",
     ],
     correct: 2,
@@ -330,7 +330,7 @@ var QUIZ_DATA = [
       "VPC Flow Logs, which already capture the detail of the API that was invoked",
       "Amazon Detective, which automatically reconstructs those calls",
       "GuardDuty, by enabling the S3 data source",
-      "CloudTrail network activity events for VPC endpoints: an opt-in event class that records API activity (control plane and data plane) crossing a VPC endpoint for supported services (e.g., S3, EC2, KMS, Secrets Manager), including activity generated by AWS services acting on your behalf",
+      "CloudTrail network activity events for VPC endpoints",
     ],
     correct: 3,
     explain: "CloudTrail network activity events for VPC endpoints (GA February 2025) is a new event TYPE, distinct from traditional management/data events, that provides visibility into API activity passing through a VPC endpoint for supported services — including calls made by AWS services on your behalf. VPC Flow Logs only see network metadata (IP/port), not which API was invoked.",
@@ -339,7 +339,7 @@ var QUIZ_DATA = [
     tag: "Route 53 DNS Firewall Advanced",
     q: "A security team has configured Route 53 Resolver DNS Firewall with managed domain lists (malware, known botnets) but is still worried about malware that generates random domains via a Domain Generation Algorithm (DGA) or that uses DNS tunneling to exfiltrate data — techniques specifically designed to evade static domain lists. Which DNS Firewall capability specifically addresses this threat?",
     options: [
-      "DNS Firewall Advanced (advanced DNS threat protection), which analyzes the pattern of the queries themselves — instead of comparing against a fixed domain list — to detect DGA and DNS tunneling based on a configurable confidence threshold",
+      "DNS Firewall Advanced (advanced DNS threat protection), which analyzes the pattern of the queries themselves",
       "Increasing the TTL of DNS responses in the hosted zone",
       "Enabling DNSSEC on the Route 53 hosted zone",
       "Migrating DNS queries to a third-party resolver outside the VPC",
@@ -365,7 +365,7 @@ var QUIZ_DATA = [
     options: [
       "A sensitive data discovery job scheduled to run daily over 100% of the objects",
       "Amazon Inspector, applied to the account's S3 buckets",
-      "Automated sensitive data discovery: it evaluates the S3 inventory daily and analyzes a REPRESENTATIVE SAMPLE of objects (intelligent sampling) in each bucket to keep a sensitivity profile current, at a much lower cost than scanning 100% of the content",
+      "Automated sensitive data discovery",
       "GuardDuty S3 Protection, which already includes content classification",
     ],
     correct: 2,
@@ -378,7 +378,7 @@ var QUIZ_DATA = [
       "AWS Trusted Advisor",
       "AWS Config, via an automatic remediation",
       "Amazon Detective, by enabling a supposed 'incident response mode'",
-      "AWS Security Incident Response: automatically ingests and triages findings from GuardDuty and Security Hub CSPM (including third parties integrated via Security Hub), enables collaboration on containment, and gives direct access to the AWS Customer Incident Response Team (CIRT)",
+      "AWS Security Incident Response",
     ],
     correct: 3,
     explain: "AWS Security Incident Response (GA December 2024) is a dedicated service that automatically ingests and triages findings from GuardDuty and Security Hub CSPM (including third-party integrations via Security Hub), offers collaboration tools for response, can take containment actions with your permission, and gives you 24/7 direct access to the AWS Customer Incident Response Team — this isn't a Trusted Advisor, Detective, or Config capability.",
@@ -400,7 +400,7 @@ var QUIZ_DATA = [
     q: "The security team wants to view, from a single central monitoring account, the metrics, CloudWatch Logs, and X-Ray traces generated across dozens of workload accounts in the organization, WITHOUT copying or duplicating that data between accounts. What AWS mechanism enables this?",
     options: [
       "Copying each member account's log groups to the central account via CloudWatch Logs subscriptions",
-      "CloudWatch cross-account observability via Observability Access Manager (OAM): links are configured between source accounts and a central monitoring account, which can query and visualize telemetry from the source accounts without the data being duplicated or leaving its source account",
+      "CloudWatch cross-account observability via Observability Access Manager (OAM)",
       "Amazon Security Lake, which already automatically centralizes all CloudWatch metrics",
       "A CloudTrail organization trail configured to include CloudWatch metrics",
     ],
@@ -413,7 +413,7 @@ var QUIZ_DATA = [
     options: [
       "A CloudTrail organization trail pointed at that account",
       "A conformance pack, which by itself already centralizes visualization without needing an aggregator",
-      "An organization-level AWS Config aggregator: it collects configuration and Config Rules compliance data from all member accounts (and regions) of the Organization into a single account, without needing to manually replicate Config Rules configuration in every account",
+      "An organization-level AWS Config aggregator",
       "Amazon Security Lake, redirecting only AWS Config's data",
     ],
     correct: 2,

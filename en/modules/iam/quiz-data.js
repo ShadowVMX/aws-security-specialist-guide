@@ -16,7 +16,7 @@ var QUIZ_DATA = [
     q: "What is the key difference between a Service Control Policy (SCP) and a Resource Control Policy (RCP) in AWS Organizations?",
     options: [
       "There's no difference, they're synonyms for the same mechanism",
-      "SCPs limit what the account's identities can do; RCPs limit who can access the resources, including external/anonymous identities",
+      "SCPs limit what the account's identities can do",
       "SCPs only apply to the management account",
       "RCPs completely replace SCPs as of 2023",
     ],
@@ -29,7 +29,7 @@ var QUIZ_DATA = [
     options: [
       "Everything, because AdministratorAccess always wins",
       "Nothing, because the boundary and the policy conflict and everything is denied",
-      "Only S3 and DynamoDB actions: the permission boundary acts as the maximum ceiling, the intersection with the identity policy",
+      "Only S3 and DynamoDB actions",
       "It depends on the order in which the policies were attached",
     ],
     correct: 2,
@@ -160,7 +160,7 @@ var QUIZ_DATA = [
     q: "What is the difference between the IAM Credential Report and IAM Access Advisor?",
     options: [
       "They're the same report with different names",
-      "The Credential Report lists the credential status (passwords, access keys, MFA) of every user; Access Advisor shows which services/actions a principal has actually used and when it last used them",
+      "The Credential Report lists the credential status (passwords, access keys, MFA) of every user",
       "Access Advisor only works at the root account level",
       "The Credential Report requires GuardDuty to be enabled",
     ],
@@ -195,7 +195,7 @@ var QUIZ_DATA = [
     tag: "Session policies",
     q: "When you call sts:AssumeRole passing an additional --policy parameter (session policy), how does this affect the effective permissions of the resulting session?",
     options: [
-      "The session policy acts as an additional filter: the effective permissions are the intersection between the role's permissions and the session policy",
+      "The session policy acts as an additional filter",
       "The session policy expands the role's permissions beyond what it already had",
       "The session policy completely replaces the role's identity policy",
       "Session policies only apply to users, not roles",
@@ -365,7 +365,7 @@ var QUIZ_DATA = [
     options: [
       "SCPs became able to grant permissions on their own, just like an identity-based policy",
       "SCPs became able to apply to accounts outside the organization",
-      "Support for the full IAM policy language in SCPs: conditions, individual resource ARNs, the NotAction element combined with Allow, wildcards at the start/middle of the Action element, and NotResource",
+      "Support for the full IAM policy language in SCPs",
       "SCPs completely replaced RCPs",
     ],
     correct: 2,
@@ -378,7 +378,7 @@ var QUIZ_DATA = [
       "Traditional Permission Sets assigned directly to the analyst",
       "Session policies applied to QuickSight's service role",
       "Classic AssumeRoleWithSAML",
-      "Trusted Identity Propagation (TIP): propagates the authenticated user's identity context across the chain of AWS services, so that permissions and audit logs reflect the real person, not a shared role",
+      "Trusted Identity Propagation (TIP)",
     ],
     correct: 3,
     explain: "Trusted Identity Propagation adds the Identity Center user's identity context to an IAM Role when one service (QuickSight, Athena, Redshift, EMR, OpenSearch, SageMaker Unified Studio...) calls another on their behalf. This means data access permissions and CloudTrail records reflect the user's actual corporate identity instead of a shared service role, without needing to create an IAM role per person.",
@@ -413,7 +413,7 @@ var QUIZ_DATA = [
     options: [
       "It's a misconfiguration: RCPs must always apply to the management account too",
       "The user has MFA enabled, which automatically exempts them from any RCP",
-      "By design, RCPs do NOT affect requests made by identities from the organization's management account — they only restrict resources in member accounts",
+      "By design, RCPs do NOT affect requests made by identities from the organization's management account",
       "RCPs only apply to calls made from outside the bucket's region",
     ],
     correct: 2,
@@ -474,7 +474,7 @@ var QUIZ_DATA = [
       "They're fully interchangeable synonyms",
       "aws:PrincipalOrgID no longer exists as of 2025, replaced by aws:SourceOrgID",
       "aws:ResourceOrgID can only be used in SCPs, never in RCPs",
-      "aws:PrincipalOrgID checks which organization the calling IDENTITY belongs to (identity perimeter); aws:ResourceOrgID compares the PRINCIPAL's organization against the resource's own organization, useful for allowing cross-account access only within the same organization without listing every account",
+      "aws:PrincipalOrgID checks which organization the calling IDENTITY belongs to (identity perimeter)",
     ],
     correct: 3,
     explain: "aws:PrincipalOrgID is the classic identity-perimeter key: it compares the calling principal's Organization ID against a fixed value. aws:ResourceOrgID (a variable, typically compared as '${aws:ResourceOrgID}' or implicitly in RCPs) lets you express 'only allow access if the principal belongs to the SAME organization as the resource itself' — a pattern widely used in RCPs to block access from outside the organization without maintaining account lists.",
@@ -483,7 +483,7 @@ var QUIZ_DATA = [
     tag: "Access Analyzer – policy generation",
     q: "A team has been running an IAM role with the AdministratorAccess managed policy 'temporarily' for 6 months, and now wants to generate a least-privilege policy based on what that role has ACTUALLY used according to its CloudTrail activity, instead of writing one by hand from scratch. Which IAM Access Analyzer feature solves this directly?",
     options: [
-      "Policy generation based on access activity: Access Analyzer analyzes the role's CloudTrail events and proposes a least-privilege IAM policy covering the services and actions actually used",
+      "Policy generation based on access activity",
       "External access findings",
       "Unused access findings, which automatically generates the replacement policy",
       "IAM Credential Report",
@@ -557,7 +557,7 @@ var QUIZ_DATA = [
     options: [
       "The SCP has a syntax error",
       "S3 doesn't support SCPs of any kind",
-      "SCPs only restrict what IDENTITIES belonging to the organization can do; they don't apply to external principals who arrive directly via the resource's own resource-based policy — exactly the gap RCPs are designed to close",
+      "SCPs only restrict what IDENTITIES belonging to the organization can do",
       "SCPs only apply to calls made from the console, not from the API",
     ],
     correct: 2,
