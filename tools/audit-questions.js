@@ -35,6 +35,20 @@ function load(relPath) {
   return new Function("window", src + "; return QUIZ_DATA;")({});
 }
 
+// The sentence that actually asks something: everything after the last "¿" in
+// Spanish, the last sentence otherwise. A stem can mention "DOS capas de
+// cifrado" as part of the scenario without asking for two answers, and only
+// the asking clause tells them apart.
+function askClause(text) {
+  const q = String(text).trim();
+  const open = q.lastIndexOf("\u00bf");
+  if (open >= 0) return q.slice(open);
+  const parts = q.split(/(?<=[.?])\s+/);
+  return parts[parts.length - 1];
+}
+
+const ASKS_SEVERAL = /\b(DOS|TRES|TWO|THREE)\b/;
+
 function norm(s) {
   return String(s).toLowerCase().replace(/\s+/g, " ").replace(/[^\w áéíóúüñ]/gi, "").trim();
 }
@@ -88,6 +102,22 @@ for (const mod of MODULES) {
         err(`${where}: índices correctos duplicados`);
       }
     }
+
+    /* ---- the stem and the answer type must agree ----
+       A stem that asks for TWO answers but stores a single correct index
+       submits on the first click: the reader picks one, the quiz closes the
+       question and marks the other as missed. It reads as a broken quiz,
+       because it is one. */
+    [["ES", q], ["EN", en[i]]].forEach(([lang, v]) => {
+      if (!v || !v.q) return;
+      const asksSeveral = ASKS_SEVERAL.test(askClause(v.q));
+      const storedMulti = Array.isArray(v.correct);
+      if (asksSeveral && !storedMulti) {
+        err(`${where} ${lang}: el enunciado pide varias respuestas pero solo hay un índice correcto`);
+      } else if (storedMulti && !asksSeveral) {
+        warn(`${where} ${lang}: es de respuesta múltiple pero el enunciado no dice cuántas`);
+      }
+    });
 
     /* ---- duplicate options inside one question ---- */
     const optNorm = q.options.map(norm);

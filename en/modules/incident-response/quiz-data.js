@@ -99,12 +99,12 @@ var QUIZ_DATA = [
     tag: "Capturing forensic evidence",
     q: "When capturing forensic evidence from a compromised EC2 instance for later analysis, which TWO artifacts are most valuable to capture before any other action?",
     options: [
-      "A snapshot of the EBS volume and a dump of the instance's RAM, taken before touching anything else",
-      "The account's CloudTrail logs and the detailed billing history for the month the incident happened",
+      "A snapshot of the EBS volume, taken before the instance is stopped or rebooted",
+      "A dump of the instance's RAM, captured while the instance is still running",
       "The CloudWatch CPU and network metrics for the window in which the finding was detected",
-      "The Systems Manager software inventory and the list of patches still pending on the instance",
+      "The Systems Manager software inventory and the list of patches still pending",
     ],
-    correct: 0,
+    correct: [0, 1],
     explain: "The EBS snapshot preserves disk state for later analysis without altering the original instance. The memory dump (using tools such as AVML, run through Systems Manager) preserves volatile evidence that disappears the moment the instance is powered off or restarted — both artifacts are top priority during the containment and capture phase. <a href=\"https://docs.aws.amazon.com/ebs/latest/userguide/ebs-snapshots.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
   {
