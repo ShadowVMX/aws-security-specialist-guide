@@ -1,4 +1,4 @@
-const QUIZ_DATA = [
+var QUIZ_DATA = [
   {
     tag: "AWS Organizations",
     q: "What does AWS Organizations enable that doesn't exist when managing AWS accounts completely independently?",
@@ -480,3 +480,6 @@ const QUIZ_DATA = [
     explain: "The basics are <b>MFA and no access keys</b> on root, and <b>centralized root access management</b> lets you remove those credentials from member accounts entirely, leaving root-only tasks to scoped sessions via <code>sts:AssumeRoot</code>. Creating root access keys is the exact opposite of the guidance. And while it is true SCPs don't restrict the management account's root, that is a reason <b>not</b> to use it daily, not a reason to use it.",
   },
 ];
+
+// Registrado para el simulacro de examen, que carga los seis bancos a la vez.
+(window.QUIZ_BANK = window.QUIZ_BANK || {})["governance"] = QUIZ_DATA;

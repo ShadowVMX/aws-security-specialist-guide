@@ -1,4 +1,4 @@
-const QUIZ_DATA = [
+var QUIZ_DATA = [
   {
     tag: "Envelope encryption",
     q: "Why does KMS use 'envelope encryption' (encrypting the data with a data key, and that data key with the CMK) instead of encrypting the data directly with the KMS key?",
@@ -552,3 +552,6 @@ const QUIZ_DATA = [
     explain: "Rotation relies on a <b>Lambda</b> (AWS ships templates for supported databases) and a <b>schedule</b>. Secrets Manager keeps secret versions with staging labels such as AWSCURRENT and AWSPREVIOUS inside the service itself, encrypted with KMS: it never writes plaintext credentials to a bucket. And Config <b>evaluates</b> configuration, it does not rotate credentials.",
   },
 ];
+
+// Registrado para el simulacro de examen, que carga los seis bancos a la vez.
+(window.QUIZ_BANK = window.QUIZ_BANK || {})["data-protection"] = QUIZ_DATA;

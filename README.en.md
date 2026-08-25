@@ -19,7 +19,7 @@
 
 <p align="center">
   An <b>interactive</b> study guide for the <b>AWS Certified Security — Specialty (SCS-C03)</b> exam.<br>
-  Structured theory, clickable diagrams, real CLI/JSON commands, Azure comparisons, and 262 practice questions. No build step: plain HTML/CSS/JS.
+  Structured theory, clickable diagrams, real CLI/JSON commands, Azure comparisons, 262 practice questions and a timed exam simulation. No build step: plain HTML/CSS/JS.
 </p>
 
 <br>
@@ -58,11 +58,14 @@ Every module includes: theory organized around the exam guide's official task st
 ```
 index.html                 → ES hub with cards for all domains
 en/index.html               → EN hub (same content, in English)
+examen/index.html           → full exam simulation (ES)
+en/exam/index.html          → full exam simulation (EN)
 assets/
   css/style.css              → shared styles (automatic light/dark theme)
   img/banner.svg              → this README's banner
   js/app.js                   → diagram interaction + active sidebar
   js/quiz.js                  → quiz engine + saved progress (ES/EN based on the page lang)
+  js/exam.js                  → timed 65-question exam simulation
 modules/<domain>/
   index.html                → module content (Spanish)
   quiz-data.js               → quiz questions (Spanish)

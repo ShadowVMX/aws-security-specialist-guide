@@ -1,4 +1,4 @@
-const QUIZ_DATA = [
+var QUIZ_DATA = [
   {
     tag: "Runbooks & OpsCenter",
     q: "¿Qué papel juega AWS Systems Manager OpsCenter en un plan de respuesta a incidentes?",
@@ -492,3 +492,6 @@ const QUIZ_DATA = [
     explain: "El <b>aislamiento en una cuenta forense</b> con acceso auditado y los <b>hashes de integridad</b> son lo que permite demostrar que la evidencia no se alteró. Trabajar sobre los volúmenes originales los modifica y arruina la cadena de custodia: se analiza siempre sobre copias. Y el correo no ofrece ni control de acceso ni prueba de integridad.",
   },
 ];
+
+// Registrado para el simulacro de examen, que carga los seis bancos a la vez.
+(window.QUIZ_BANK = window.QUIZ_BANK || {})["incident-response"] = QUIZ_DATA;

@@ -1,4 +1,4 @@
-const QUIZ_DATA = [
+var QUIZ_DATA = [
   {
     tag: "Policy evaluation",
     q: "A user has an identity policy that allows s3:GetObject on a bucket, but the bucket has a bucket policy with an explicit Deny for that same user. What happens?",
@@ -637,3 +637,6 @@ const QUIZ_DATA = [
     explain: "<b>Identity Center</b> with <b>permission sets</b> assigned to groups is the recommended pattern at scale, and federation always issues <b>temporary STS credentials</b>. Creating 3,000 users across 60 accounts is exactly the problem federation removes (180,000 identities to maintain). Sharing one key between people destroys attribution: it is never the answer.",
   },
 ];
+
+// Registrado para el simulacro de examen, que carga los seis bancos a la vez.
+(window.QUIZ_BANK = window.QUIZ_BANK || {})["iam"] = QUIZ_DATA;
