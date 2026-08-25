@@ -50,9 +50,19 @@ function terms(s) {
     String(s)
       .toLowerCase()
       .replace(/<[^>]+>/g, " ")
-      .replace(/[^a-z0-9áéíóúüñ\s-]/g, " ")
+      // "Región" and "Region" are the same word to a reader, so strip accents
+      // before comparing or a Spanish question never matches an English page.
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9\s-]/g, " ")
       .split(/[\s-]+/)
-      .filter((w) => w.length >= 4 && !STOP.has(w))
+      // three letters is the length of the acronyms this exam is made of —
+      // rcp, scp, iam, kms, mfa, ebs, vpc — and they are the most specific
+      // words a question can share with its page.
+      .filter((w) => w.length >= 3 && !STOP.has(w))
+      // a question writes "RCP" where the page title writes "RCPs"; count the
+      // bare singular too so a plural does not hide a real match
+      .flatMap((w) => (w.length > 3 && w.endsWith("s") ? [w, w.slice(0, -1)] : [w]))
   );
 }
 
