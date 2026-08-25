@@ -165,7 +165,7 @@ var QUIZ_DATA = [
       "The Credential Report needs GuardDuty enabled before it can be generated",
     ],
     correct: 1,
-    explain: "The Credential Report is an account-level CSV auditing the STATE of every IAM user's credentials (password age, access keys, MFA). Access Advisor shows the HISTORY of services a user or role has actually reached, and is the tool for trimming unused permissions. Neither depends on GuardDuty, and neither is limited to root. <a href=\"https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_access-advisor.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+    explain: "The Credential Report is an account-level CSV auditing the STATE of every IAM user's credentials (password age, access keys, MFA). Access Advisor shows the HISTORY of services a user or role has actually reached, and is the tool for trimming unused permissions. Neither depends on GuardDuty, and neither is limited to root. <a href=\"https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies_last-accessed.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
   {
     tag: "Cross-account trust policy",
@@ -465,7 +465,7 @@ var QUIZ_DATA = [
       "It depends on whether the original user authenticated with MFA",
     ],
     correct: 2,
-    explain: "AWS STS explicitly caps role chaining: if you use the temporary credentials from one AssumeRole to call AssumeRole again, the resulting session lasts at most 1 hour, regardless of the MaxSessionDuration configured on the target role — asking for more returns an error. It is a heavily tested detail because it contradicts the expectation that the role's setting wins. <a href=\"https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_terms-and-concepts.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+    explain: "AWS STS explicitly caps role chaining: if you use the temporary credentials from one AssumeRole to call AssumeRole again, the resulting session lasts at most 1 hour, regardless of the MaxSessionDuration configured on the target role — asking for more returns an error. It is a heavily tested detail because it contradicts the expectation that the role's setting wins. <a href=\"https://docs.aws.amazon.com/STS/latest/APIReference/API_AssumeRole.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
   {
     tag: "RCP – aws:PrincipalOrgID vs aws:ResourceOrgID",

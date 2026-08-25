@@ -393,7 +393,7 @@ var QUIZ_DATA = [
       "Solo para tráfico UDP; el tráfico TCP sigue exigiendo rangos CIDR estáticos",
     ],
     correct: 0,
-    explain: "Con el <em>security group referencing support</em> activado en el transit gateway o en el attachment, una regla de <strong>entrada</strong> puede citar un security group de otra VPC adjunta al mismo TGW, en lugar de rangos CIDR frágiles de mantener. Ojo a los límites: solo reglas de entrada, y no funciona a través de peering entre transit gateways. <a href=\"https://docs.aws.amazon.com/vpc/latest/tgw/tgw-sg-updates.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+    explain: "Con el <em>security group referencing support</em> activado en el transit gateway o en el attachment, una regla de <strong>entrada</strong> puede citar un security group de otra VPC adjunta al mismo TGW, en lugar de rangos CIDR frágiles de mantener. Ojo a los límites: solo reglas de entrada, y no funciona a través de peering entre transit gateways. <a href=\"https://docs.aws.amazon.com/vpc/latest/tgw/tgw-transit-gateways.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
   {
     tag: "ECR Image Signing",

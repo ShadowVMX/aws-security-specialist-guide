@@ -393,7 +393,7 @@ var QUIZ_DATA = [
       "Only for UDP traffic; TCP traffic still requires static CIDR ranges in the rule",
     ],
     correct: 0,
-    explain: "With <em>security group referencing support</em> enabled on the transit gateway or on the attachment, an <strong>inbound</strong> rule can name a security group from another VPC attached to the same TGW instead of brittle CIDR ranges. Mind the limits: inbound rules only, and it does not work across transit gateway peering. <a href=\"https://docs.aws.amazon.com/vpc/latest/tgw/tgw-sg-updates.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+    explain: "With <em>security group referencing support</em> enabled on the transit gateway or on the attachment, an <strong>inbound</strong> rule can name a security group from another VPC attached to the same TGW instead of brittle CIDR ranges. Mind the limits: inbound rules only, and it does not work across transit gateway peering. <a href=\"https://docs.aws.amazon.com/vpc/latest/tgw/tgw-transit-gateways.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
   {
     tag: "ECR Image Signing",

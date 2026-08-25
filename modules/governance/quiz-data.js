@@ -237,7 +237,7 @@ var QUIZ_DATA = [
       "Una Declarative Policy que active VPC Block Public Access a nivel de OU u organización",
     ],
     correct: 3,
-    explain: "Las Declarative Policies cubren EC2/VPC/EBS a escala forzando un <strong>estado</strong> de configuración, no solo bloqueando llamadas de API como una SCP. VPC Block Public Access bloquea el ingress público vía internet gateway de forma centralizada, no destructiva y reversible, aplicándose también a VPCs futuras. Una SCP sobre ec2:CreateInternetGateway no cambia el estado de los IGW <em>ya existentes</em>. <a href=\"https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_declarative.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+    explain: "Las Declarative Policies cubren EC2/VPC/EBS a escala forzando un <strong>estado</strong> de configuración, no solo bloqueando llamadas de API como una SCP. VPC Block Public Access bloquea el ingress público vía internet gateway de forma centralizada, no destructiva y reversible, aplicándose también a VPCs futuras. Una SCP sobre ec2:CreateInternetGateway no cambia el estado de los IGW <em>ya existentes</em>. <a href=\"https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_declarative_policies.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
   {
     tag: "Declarative Policies: proveedores de AMI permitidos",
@@ -249,7 +249,7 @@ var QUIZ_DATA = [
       "Un permission boundary de IAM en cada rol que pueda lanzar instancias EC2",
     ],
     correct: 0,
-    explain: "'Allowed AMIs' es una de las configuraciones de EC2 soportadas por las Declarative Policies: define qué proveedores de AMI son válidos para toda la organización, bloqueando el lanzamiento y <strong>ocultando en consola y CLI</strong> cualquier AMI de un proveedor no permitido. Es preventivo y heredable; la Config Rule llega tarde y los boundaries hay que mantenerlos rol a rol. <a href=\"https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_declarative.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+    explain: "'Allowed AMIs' es una de las configuraciones de EC2 soportadas por las Declarative Policies: define qué proveedores de AMI son válidos para toda la organización, bloqueando el lanzamiento y <strong>ocultando en consola y CLI</strong> cualquier AMI de un proveedor no permitido. Es preventivo y heredable; la Config Rule llega tarde y los boundaries hay que mantenerlos rol a rol. <a href=\"https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_declarative_policies.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
   {
     tag: "Tag Policies: enforcement en IaC",
@@ -417,7 +417,7 @@ var QUIZ_DATA = [
       "No hay diferencia práctica: ambas deniegan las mismas llamadas de API de EC2",
     ],
     correct: 2,
-    explain: "Las Declarative Policies están pensadas para configuración duradera de un servicio ('set and forget'): definido el estado deseado (ej. IMDSv2 obligatorio), se mantiene automáticamente aunque el servicio añada nuevas APIs o funcionalidades relacionadas. Una SCP opera sobre <strong>permisos de API concretos</strong>: si aparece una nueva forma de llegar al resultado no deseado, hay que actualizarla a mano. <a href=\"https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_declarative.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+    explain: "Las Declarative Policies están pensadas para configuración duradera de un servicio ('set and forget'): definido el estado deseado (ej. IMDSv2 obligatorio), se mantiene automáticamente aunque el servicio añada nuevas APIs o funcionalidades relacionadas. Una SCP opera sobre <strong>permisos de API concretos</strong>: si aparece una nueva forma de llegar al resultado no deseado, hay que actualizarla a mano. <a href=\"https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_declarative_policies.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
   {
     tag: "AWS Config conformance packs: expansión regional",

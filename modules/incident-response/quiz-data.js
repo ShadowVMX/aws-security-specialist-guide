@@ -21,7 +21,7 @@ var QUIZ_DATA = [
       "Desactivar CloudTrail en las cuentas de desarrollo para que el ruido no oculte los eventos importantes",
     ],
     correct: 1,
-    explain: "Minimizar el blast radius es una actividad de PREPARACIÓN (skill 2.1.2): separar cargas de trabajo en cuentas distintas, aplicar mínimo privilegio y evitar credenciales compartidas limita cuánto puede alcanzar un atacante si compromete un solo componente — mucho más barato hacerlo antes del incidente que durante. <a href=\"https://docs.aws.amazon.com/whitepapers/latest/aws-security-incident-response-guide/preparation.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+    explain: "Minimizar el blast radius es una actividad de PREPARACIÓN (skill 2.1.2): separar cargas de trabajo en cuentas distintas, aplicar mínimo privilegio y evitar credenciales compartidas limita cuánto puede alcanzar un atacante si compromete un solo componente — mucho más barato hacerlo antes del incidente que durante. <a href=\"https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/sec_securely_operate_multi_accounts.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
   {
     tag: "Provisionar acceso de emergencia",
@@ -33,7 +33,7 @@ var QUIZ_DATA = [
       "Solo aporta ventaja si la organización usa IAM Identity Center en lugar de usuarios IAM locales",
     ],
     correct: 2,
-    explain: "El skill 2.1.2 menciona explícitamente 'provisioning access' como parte de la preparación: un rol de IR con permisos de solo lectura amplios más acciones de contención específicas (aislar un SG, crear un snapshot), ya probado y auditado de antemano, evita improvisar permisos bajo presión — que es exactamente cuando más fácil resulta cometer un error de sobre-privilegio. <a href=\"https://docs.aws.amazon.com/whitepapers/latest/aws-security-incident-response-guide/prepare-processes.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+    explain: "El skill 2.1.2 menciona explícitamente 'provisioning access' como parte de la preparación: un rol de IR con permisos de solo lectura amplios más acciones de contención específicas (aislar un SG, crear un snapshot), ya probado y auditado de antemano, evita improvisar permisos bajo presión — que es exactamente cuando más fácil resulta cometer un error de sobre-privilegio. <a href=\"https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/sec_incident_response_pre_provision_access.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
   {
     tag: "AWS Fault Injection Service",
@@ -225,7 +225,7 @@ var QUIZ_DATA = [
       "El tabletop exige interrumpir producción, mientras que FIS trabaja siempre sobre entornos aislados",
     ],
     correct: 2,
-    explain: "Ambos son formas válidas de 'test and validate' (skill 2.1.3) mencionadas en el exam guide, mutuamente complementarias: el tabletop valida que el EQUIPO sabe qué hacer y se comunica bien; FIS valida que la TECNOLOGÍA (alarmas, automatizaciones, runbooks ejecutables) responde de verdad como se diseñó, con guardrails para no provocar un incidente real por accidente. <a href=\"https://docs.aws.amazon.com/whitepapers/latest/aws-security-incident-response-guide/develop-and-test-incident-response-plan.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+    explain: "Ambos son formas válidas de 'test and validate' (skill 2.1.3) mencionadas en el exam guide, mutuamente complementarias: el tabletop valida que el EQUIPO sabe qué hacer y se comunica bien; FIS valida que la TECNOLOGÍA (alarmas, automatizaciones, runbooks ejecutables) responde de verdad como se diseñó, con guardrails para no provocar un incidente real por accidente. <a href=\"https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/sec_incident_response_run_game_days.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
   {
     tag: "AWS Security Incident Response",
@@ -285,7 +285,7 @@ var QUIZ_DATA = [
       "Detective investigations, que analiza el ARN con ML y threat intel y devuelve sus IoCs y TTPs",
     ],
     correct: 3,
-    explain: "Detective investigations aplica machine learning y threat intelligence para analizar recursos IAM por su ARN y generar un informe con los indicadores de compromiso y las TTPs asociadas a comportamientos anómalos como el 'impossible travel' o el uso desde IPs marcadas — disponible desde la consola de Detective o su API, y complementa (no sustituye) a Access Analyzer, que se enfoca en accesos no deseados por diseño de políticas, no en comportamiento anómalo en el tiempo. <a href=\"https://docs.aws.amazon.com/detective/latest/userguide/detective-investigations.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+    explain: "Detective investigations aplica machine learning y threat intelligence para analizar recursos IAM por su ARN y generar un informe con los indicadores de compromiso y las TTPs asociadas a comportamientos anómalos como el 'impossible travel' o el uso desde IPs marcadas — disponible desde la consola de Detective o su API, y complementa (no sustituye) a Access Analyzer, que se enfoca en accesos no deseados por diseño de políticas, no en comportamiento anómalo en el tiempo. <a href=\"https://docs.aws.amazon.com/detective/latest/userguide/investigations-about.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
   {
     tag: "AWS Backup: bóveda lógicamente air-gapped",
