@@ -106,6 +106,7 @@
   const MOD = moduleId();
   const ANSWER_KEY = `scs-c03:quiz:${LANG}:${MOD}`;
   const PREFS_KEY = `scs-c03:quizprefs:${LANG}:${MOD}`;
+  const SUMMARY_KEY = `scs-c03:summary:${LANG}:${MOD}`;
 
   // Answers are stored against a hash of the question text rather than its
   // index, so adding or reordering questions later doesn't silently shift
@@ -186,6 +187,19 @@
       if (v !== null) out[keys[i]] = v;
     });
     writeJSON(ANSWER_KEY, out);
+    saveSummary();
+  }
+
+  // A tiny roll-up the hub can read on its own. Without it the hub would have
+  // to load all six question banks (~300 KB) just to know how many questions
+  // each module has.
+  function saveSummary() {
+    writeJSON(SUMMARY_KEY, {
+      total: QUIZ_DATA.length,
+      answered: answered(),
+      correct: score(),
+      ts: Date.now(),
+    });
   }
 
   /* ---- shuffling ------------------------------------------------------ */
@@ -495,6 +509,7 @@
       prefs.flags.length = 0;
       savePrefs();
       removeKey(ANSWER_KEY);
+      removeKey(SUMMARY_KEY);
       view.mode = "all";
       view.tag = "all";
       render();
@@ -510,4 +525,5 @@
   }
 
   render();
+  saveSummary();
 })();

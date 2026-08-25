@@ -138,6 +138,7 @@
   const LANG = (document.documentElement.lang || "es").slice(0, 2);
   const T = STRINGS[LANG] || STRINGS.es;
   const STORE_KEY = `scs-c03:exam:${LANG}`;
+  const EXAM_SUMMARY_KEY = `scs-c03:examsummary:${LANG}`;
 
   /* ---- helpers -------------------------------------------------------- */
 
@@ -577,6 +578,15 @@
 
     const pct = list.length ? Math.round((correct / list.length) * 100) : 0;
     const passed = pct >= PASS_PERCENT;
+
+    // leave a roll-up for the hub so the last result is visible from there
+    writeJSON(EXAM_SUMMARY_KEY, {
+      correct,
+      total: list.length,
+      pct,
+      passed,
+      ts: session.submittedAt || Date.now(),
+    });
 
     root.innerHTML = "";
 
