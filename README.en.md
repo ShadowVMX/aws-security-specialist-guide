@@ -98,6 +98,7 @@ assets/
 tools/
   audit-questions.js          → question bank quality audit
   check-links.sh              → external link checker
+  check-internal-links.sh      → internal links that survive a rename
 modules/<domain>/
   index.html                → module content (Spanish)
   quiz-data.js               → quiz questions (Spanish)

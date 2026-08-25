@@ -1,0 +1,72 @@
+name: Quality
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  questions:
+    name: Question bank
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Syntax of every quiz bank
+        run: |
+          for f in modules/*/quiz-data.js en/modules/*/quiz-data.js; do
+            node -c "$f" || { echo "::error file=$f::syntax error"; exit 1; }
+          done
+
+      - name: Syntax of every script
+        run: |
+          for f in assets/js/*.js tools/*.js; do
+            node -c "$f" || { echo "::error file=$f::syntax error"; exit 1; }
+          done
+
+      # Structure, ES/EN parity and the answer-position bias that lets someone
+      # pass the quiz without reading the questions.
+      - name: Audit the question bank
+        run: node tools/audit-questions.js
+
+  pages:
+    name: Pages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Every Spanish page must have its English twin and vice versa, or the
+      # language switch sends people to a 404.
+      - name: ES/EN page parity
+        run: |
+          fail=0
+          for f in modules/*/index.html; do
+            twin="en/$f"
+            [ -f "$twin" ] || { echo "::error file=$f::missing $twin"; fail=1; }
+          done
+          for f in en/modules/*/index.html; do
+            twin="${f#en/}"
+            [ -f "$twin" ] || { echo "::error file=$f::missing $twin"; fail=1; }
+          done
+          exit $fail
+
+      # A relative href pointing at a file that isn't there is a dead click.
+      - name: Internal links resolve
+        run: bash tools/check-internal-links.sh
+
+      - name: Every page declares a viewport and a color scheme
+        run: |
+          fail=0
+          for f in index.html en/index.html examen/index.html en/exam/index.html \
+                   modules/*/index.html en/modules/*/index.html; do
+            grep -q 'name="viewport"' "$f" || { echo "::error file=$f::no viewport"; fail=1; }
+            grep -q 'name="color-scheme"' "$f" || { echo "::error file=$f::no color-scheme"; fail=1; }
+          done
+          exit $fail
