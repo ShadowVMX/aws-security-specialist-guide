@@ -41,6 +41,7 @@
     <a href="#network-logs">VPC Flow Logs &amp; Route 53 Resolver</a>
     <h4>1.3 Troubleshooting</h4>
     <a href="#troubleshoot">Diagnosticar logging roto</a>
+    <a href="#fuentes">Fuentes oficiales</a>
     <a href="#trampas">Trampas típicas</a>
     <h4>Práctica</h4>
     <a href="#quiz">Quiz (40 preguntas)</a>
@@ -269,6 +270,21 @@ aws cloudtrail get-trail-status --name org-security-trail
 
 # Si el error es AccessDenied sobre KMS, revisar que la key policy
 # permita a cloudtrail.amazonaws.com la acción kms:GenerateDataKey*</code></pre>
+
+    <h2 id="fuentes">Fuentes oficiales</h2>
+    <p class="lede">Documentación de AWS en la que se apoya este módulo. Si algo no te cuadra o quieres profundizar, empieza por aquí: es la única fuente que manda.</p>
+    <ul class="sources">
+      <li><a href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html" target="_blank" rel="noopener">AWS CloudTrail — guía de usuario ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/awscloudtrail/latest/userguide/logging-data-events-with-cloudtrail.html" target="_blank" rel="noopener">CloudTrail — data events ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html" target="_blank" rel="noopener">Amazon GuardDuty ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_finding-types-active.html" target="_blank" rel="noopener">GuardDuty — tipos de finding ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html" target="_blank" rel="noopener">AWS Security Hub ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/security-lake/latest/userguide/what-is-security-lake.html" target="_blank" rel="noopener">Amazon Security Lake ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html" target="_blank" rel="noopener">VPC Flow Logs ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html" target="_blank" rel="noopener">AWS Config ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html" target="_blank" rel="noopener">Amazon Macie ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/aws-certification/latest/security-specialty-03/security-specialty-03.html" target="_blank" rel="noopener">Exam guide oficial SCS-C03 ↗</a></li>
+    </ul>
 
     <h2 id="trampas">Trampas típicas del examen</h2>
     <p class="lede">Los errores que más se repiten en este dominio. Si vas justo de tiempo antes del examen, repasa solo esto y el quiz.</p>
