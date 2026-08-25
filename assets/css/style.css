@@ -591,9 +591,86 @@ footer {
   font-size: 12.5px;
 }
 
+/* ---- collapsible index (phones only; the sidebar covers desktop) ---- */
+.mobile-toc { display: none; }
+.mobile-toc summary {
+  cursor: pointer;
+  padding: 11px 14px;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  border-radius: var(--radius);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  list-style: none;
+}
+.mobile-toc summary::-webkit-details-marker { display: none; }
+.mobile-toc summary::after {
+  content: " ▾";
+  color: var(--text-faint);
+  float: right;
+}
+.mobile-toc[open] summary { border-radius: var(--radius) var(--radius) 0 0; }
+.mobile-toc[open] summary::after { content: " ▴"; }
+.mobile-toc nav {
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 var(--radius) var(--radius);
+  padding: 8px 14px 14px;
+  background: var(--bg-elevated);
+}
+.mobile-toc h4 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-faint);
+  margin: 14px 0 6px;
+}
+.mobile-toc h4:first-child { margin-top: 6px; }
+.mobile-toc a {
+  display: block;
+  padding: 7px 0;
+  font-size: 14px;
+  color: var(--text-dim);
+}
+.mobile-toc a:hover { color: var(--accent); text-decoration: none; }
+
+/* ---- back to top ---- */
+.to-top {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  color: var(--text-dim);
+  font-size: 18px;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+  z-index: 60;
+  box-shadow: var(--shadow);
+}
+.to-top.show { opacity: 1; pointer-events: auto; }
+.to-top:hover { border-color: var(--accent); color: var(--accent); }
+
+/* keyboard users must be able to see where they are on the diagrams */
+.dstep:focus-visible { outline: none; }
+.dstep:focus-visible rect,
+.dstep:focus-visible polygon {
+  stroke: var(--accent);
+  stroke-width: 3;
+}
+
 @media (max-width: 780px) {
   .module-layout { grid-template-columns: 1fr; gap: 0; }
   .sidebar { position: static; display: none; }
+  /* the sidebar is gone here, so this is the only way to jump between
+     sections without scrolling a 500-line module by hand */
+  .mobile-toc { display: block; margin-bottom: 24px; }
 
   /* wide content scrolls inside its own box instead of stretching the page */
   table { display: block; overflow-x: auto; }
