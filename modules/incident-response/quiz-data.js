@@ -213,7 +213,7 @@ var QUIZ_DATA = [
       "Porque sin etiquetas Systems Manager no puede ejecutar runbooks de Automation sobre esos recursos",
     ],
     correct: 1,
-    explain: "La cadena de custodia (chain of custody) es un requisito frecuente en investigaciones que pueden derivar en acciones legales o reportes regulatorios: sin un registro claro de captura, acceso y manejo de cada artefacto forense, la evidencia puede perder validez. Soluciones como Automated Forensics Orchestrator automatizan este etiquetado y su registro desde el primer paso. <a href=\"https://docs.aws.amazon.com/solutions/latest/automated-forensics-orchestrator-for-amazon-ec2/forensic-investigation-and-reporting-service.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+    explain: "La cadena de custodia (chain of custody) es un requisito frecuente en investigaciones que pueden derivar en acciones legales o reportes regulatorios: sin un registro claro de captura, acceso y manejo de cada artefacto forense, la evidencia puede perder validez. Soluciones como Automated Forensics Orchestrator automatizan este etiquetado y su registro desde el primer paso. <a href=\"https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/sec_incident_response_prepare_forensic.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
   {
     tag: "IR plan testing",
@@ -489,7 +489,7 @@ var QUIZ_DATA = [
       "Comprimir la evidencia y enviarla por correo al equipo legal externo de la empresa",
     ],
     correct: [1, 2],
-    explain: "El <strong>aislamiento en una cuenta forense</strong> con acceso auditado y los <strong>hashes de integridad</strong> son lo que permite demostrar que la evidencia no se alteró. Trabajar sobre los volúmenes originales los modifica y arruina la cadena de custodia: se analiza siempre sobre copias. Y el correo no ofrece ni control de acceso ni prueba de integridad. <a href=\"https://docs.aws.amazon.com/solutions/latest/automated-forensics-orchestrator-for-amazon-ec2/forensic-investigation-and-reporting-service.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+    explain: "El <strong>aislamiento en una cuenta forense</strong> con acceso auditado y los <strong>hashes de integridad</strong> son lo que permite demostrar que la evidencia no se alteró. Trabajar sobre los volúmenes originales los modifica y arruina la cadena de custodia: se analiza siempre sobre copias. Y el correo no ofrece ni control de acceso ni prueba de integridad. <a href=\"https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/sec_incident_response_prepare_forensic.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
 ];
 

@@ -141,7 +141,7 @@ var QUIZ_DATA = [
       "Una regla de AWS Config que marca el recurso como no conforme tras desplegarlo",
     ],
     correct: 1,
-    explain: "La clave del enunciado es <strong>cuándo</strong> se detecta, no con qué servicio. Las otras tres opciones son controles reales y útiles, pero todos actúan <em>después</em>: GuardDuty observa la instancia en ejecución, Inspector escanea la imagen cuando ya está publicada en ECR y Config evalúa el recurso una vez desplegado. Solo el análisis dentro del pipeline impide que el artefacto llegue a publicarse. Amazon Inspector cubre hoy esa fase con Code Security, integrable en CI/CD y en los pull requests. <a href=\"https://docs.aws.amazon.com/inspector/latest/user/what-is-inspector.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+    explain: "La clave del enunciado es <strong>cuándo</strong> se detecta, no con qué servicio. Las otras tres opciones son controles reales y útiles, pero todos actúan <em>después</em>: GuardDuty observa la instancia en ejecución, Inspector escanea la imagen cuando ya está publicada en ECR y Config evalúa el recurso una vez desplegado. Solo el análisis dentro del pipeline impide que el artefacto llegue a publicarse. Amazon Inspector cubre hoy esa fase con Code Security, integrable en CI/CD y en los pull requests. <a href=\"https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/sec_appsec_automate_testing_throughout_lifecycle.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
   {
     tag: "Guardrails para GenAI",

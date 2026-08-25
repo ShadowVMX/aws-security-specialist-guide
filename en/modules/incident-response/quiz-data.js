@@ -213,7 +213,7 @@ var QUIZ_DATA = [
       "Because without tags Systems Manager cannot run Automation runbooks against those resources",
     ],
     correct: 1,
-    explain: "Chain of custody is a frequent requirement in investigations that may lead to legal action or regulatory reporting: without a clear record of capture, access, and handling for each forensic artifact, the evidence can lose validity. Solutions like Automated Forensics Orchestrator automate that tagging and its logging from the very first step. <a href=\"https://docs.aws.amazon.com/solutions/latest/automated-forensics-orchestrator-for-amazon-ec2/forensic-investigation-and-reporting-service.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+    explain: "Chain of custody is a frequent requirement in investigations that may lead to legal action or regulatory reporting: without a clear record of capture, access, and handling for each forensic artifact, the evidence can lose validity. Solutions like Automated Forensics Orchestrator automate that tagging and its logging from the very first step. <a href=\"https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/sec_incident_response_prepare_forensic.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
   {
     tag: "IR plan testing",
@@ -489,7 +489,7 @@ var QUIZ_DATA = [
       "Compress the evidence and email it over to the company's external legal team",
     ],
     correct: [1, 2],
-    explain: "<strong>Isolation in a forensics account</strong> with audited access and <strong>integrity hashes</strong> are what let you prove the evidence wasn't altered. Working on the original volumes modifies them and ruins the chain of custody: always analyze copies. Email provides neither access control nor proof of integrity. <a href=\"https://docs.aws.amazon.com/solutions/latest/automated-forensics-orchestrator-for-amazon-ec2/forensic-investigation-and-reporting-service.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+    explain: "<strong>Isolation in a forensics account</strong> with audited access and <strong>integrity hashes</strong> are what let you prove the evidence wasn't altered. Working on the original volumes modifies them and ruins the chain of custody: always analyze copies. Email provides neither access control nor proof of integrity. <a href=\"https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/sec_incident_response_prepare_forensic.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
 ];
 
