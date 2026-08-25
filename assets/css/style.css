@@ -1,6 +1,12 @@
 /* ===== AWS Security Specialist Study Guide — shared styles ===== */
 
 :root {
+  /* declares that this page ships its own light and dark themes: it themes
+     native UI (scrollbars, form controls) to match and is the standard signal
+     for a browser's auto-dark to stand down. Some mobile browsers force-invert
+     anyway, so the diagram tokens below defend against that on their own. */
+  color-scheme: light dark;
+
   --bg: #0f1620;
   --bg-elevated: #161f2c;
   --bg-card: #1a2433;
@@ -23,10 +29,14 @@
   --radius: 10px;
   --shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
   --max-width: 980px;
-  /* diagram surfaces — kept separate from --bg-card so the boxes stay
-     visible against the diagram panel in both themes */
-  --dbox-fill: #1a2433;
-  --dbox-stroke: #2a3648;
+  /* Diagram surfaces — kept separate from --bg-card so the boxes stay visible
+     against the diagram panel in both themes. Deliberately semi-transparent:
+     Android's auto-dark recolors the SVG label text but leaves opaque shape
+     fills alone, which turns light boxes into invisible text. A translucent
+     fill composites over whatever the panel actually paints, so the box
+     follows the background in either direction. */
+  --dbox-fill: rgba(255, 255, 255, 0.04);
+  --dbox-stroke: rgba(255, 255, 255, 0.12);
 }
 
 @media (prefers-color-scheme: light) {
@@ -53,8 +63,8 @@
     --purple-soft: rgba(107, 63, 192, 0.12);
     --code-bg: #f0f2f5;
     --shadow: 0 4px 20px rgba(20, 30, 50, 0.08);
-    --dbox-fill: #e8eef6;
-    --dbox-stroke: #b3c1d4;
+    --dbox-fill: rgba(23, 48, 92, 0.10);
+    --dbox-stroke: rgba(23, 48, 92, 0.30);
   }
 }
 
