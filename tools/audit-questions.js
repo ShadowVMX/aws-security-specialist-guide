@@ -49,6 +49,7 @@ let grandTotal = 0;
 const positionCounts = {};
 let longestIsCorrect = 0;
 let longestComparable = 0;
+const multiPairs = [];
 
 for (const mod of MODULES) {
   const es = load(`modules/${mod}/quiz-data.js`);
@@ -122,6 +123,11 @@ for (const mod of MODULES) {
     /* ---- answer-position bias (single answer only) ---- */
     if (!multi) {
       positionCounts[q.correct] = (positionCounts[q.correct] || 0) + 1;
+    } else {
+      // Multiple-response questions have their own version of the same tell:
+      // if every one of them answers [0,1], "tick the first two" scores full
+      // marks without reading a word.
+      multiPairs.push(correct.slice().sort((a, b) => a - b).join(","));
     }
 
     /* ---- "longest option is the answer" tell ---- */
@@ -183,6 +189,26 @@ if (longestPct > 45) {
   );
 } else {
   console.log("  -> sin señal explotable\n");
+}
+
+if (multiPairs.length > 1) {
+  const spread = {};
+  multiPairs.forEach((p) => (spread[p] = (spread[p] || 0) + 1));
+  const worstPair = Math.max(...Object.values(spread));
+  console.log("\nPreguntas de respuesta múltiple:");
+  console.log(
+    "  " +
+      Object.entries(spread)
+        .map(([p, n]) => `[${p}]=${n}`)
+        .join("  ")
+  );
+  if (worstPair / multiPairs.length > 0.6) {
+    warn(
+      `${worstPair} de ${multiPairs.length} multi-respuesta comparten la misma combinación: se pueden acertar sin leer`
+    );
+  } else {
+    console.log("  -> combinaciones repartidas\n");
+  }
 }
 
 if (warnings.length) {
