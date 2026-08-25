@@ -66,7 +66,14 @@ async function titleOf(url, attempt = 0) {
     const html = await res.text();
     const m = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i);
     if (!m) return { error: "sin <title>" };
-    return { title: m[1].replace(/\s+/g, " ").trim(), final: res.url };
+    // Some AWS guides render the page title in the browser, so the served
+    // <title> is just the guide name. The h1 is in the HTML either way.
+    const h = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i);
+    return {
+      title: m[1].replace(/\s+/g, " ").trim(),
+      h1: h ? h[1].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim() : "",
+      final: res.url,
+    };
   } catch (e) {
     // AWS throttles a burst of requests; one retry separates a rate limit
     // from a page that is really gone.
@@ -115,13 +122,27 @@ async function titleOf(url, attempt = 0) {
     process.exit(2);
   }
 
+  // A page AWS has retired often answers 200 after redirecting to the guide's
+  // front page. That is a dead source dressed as a live one, and the only way
+  // to see it is to compare the url asked for with the url that answered.
+  const redirected = urls.filter((u) => {
+    const t = titles.get(u);
+    return t.final && t.final.replace(/#.*$/, "") !== u;
+  });
+
   if (DUMP) {
     console.log("::group::Título de cada página enlazada");
     urls.forEach((u) => {
       const t = titles.get(u);
-      console.log(`${u}\t${t.error ? "ERROR " + t.error : t.title}`);
+      console.log(`${u}\t${t.error ? "ERROR " + t.error : t.title}\t${t.h1 || ""}`);
     });
     console.log("::endgroup::");
+    console.log("");
+  }
+
+  if (redirected.length) {
+    console.log("REDIRIGIDAS — la página pedida no es la que responde:");
+    redirected.forEach((u) => console.log(`  ${u}\n     -> ${titles.get(u).final}`));
     console.log("");
   }
 
@@ -140,12 +161,14 @@ async function titleOf(url, attempt = 0) {
       `${q.tag} ${q.q} ${correct.map((j) => q.options[j]).join(" ")}`
     );
     // the URL slug is written by AWS and describes the page as well as the title
-    const page = terms(`${got.title} ${url.split("/").slice(3).join(" ")}`);
+    const page = terms(
+      `${got.title} ${got.h1 || ""} ${url.split("/").slice(3).join(" ")}`
+    );
     const shared = [...page].filter((w) => asked.has(w));
 
     if (!shared.length) {
       suspect.push(
-        `[${mod}/${i}] ${q.tag}\n      pregunta: ${q.q.slice(0, 100)}\n      página  : ${got.title}\n      ${url}`
+        `[${mod}/${i}] ${q.tag}\n      pregunta: ${q.q.slice(0, 100)}\n      página  : ${got.h1 || got.title}\n      ${url}`
       );
     }
   });
@@ -154,6 +177,7 @@ async function titleOf(url, attempt = 0) {
   console.log(`páginas inalcanzables : ${unreachable}`);
   console.log(`preguntas sin enlace  : ${missing.length}`);
   console.log(`enlaces rotos         : ${broken.length}`);
+  console.log(`redirigidas           : ${redirected.length}`);
   console.log(`sin relación aparente : ${suspect.length} de ${linked.length}`);
 
   if (missing.length) {
