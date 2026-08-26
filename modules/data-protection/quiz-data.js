@@ -336,16 +336,16 @@ var QUIZ_DATA = [
     explain: "DSSE-KMS cifra el objeto dos veces de forma independiente: una capa con una data key de KMS y otra con una clave gestionada por S3, que es lo que exigen las guías de doble capa para cargas altamente reguladas. La clave de bucket de S3 Bucket Keys solo deriva data keys de una única capa, y envolver una data key dos veces (client-side) no equivale a cifrar dos veces el dato. DSSE-KMS no admite Bucket Keys y cuesta más por GB. <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingDSSEncryption.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
   {
-    tag: "AWS Payment Cryptography",
-    q: "Una fintech migra su procesamiento de tarjetas de pago (validación de PIN, generación de criptogramas, gestión de claves conforme a estándares de la industria de pagos) desde HSMs on-premises. ¿Qué servicio de AWS está diseñado específicamente para sustituir esos HSMs de pago, cumpliendo PCI PIN y PCI P2PE?",
+    tag: "Custom key store con CloudHSM",
+    q: "Una entidad financiera exige que el material de sus claves de cifrado viva en HSM de un solo inquilino bajo su control exclusivo, pero quiere seguir usando la integración nativa de KMS con S3, EBS y RDS. ¿Qué diseño lo permite?",
     options: [
-      "AWS Payment Cryptography, con HSM certificados PCI PTS para operaciones de pagos",
-      "AWS KMS con customer managed keys, que ya soporta los formatos de clave de pagos",
-      "AWS CloudHSM genérico, cuyos HSM traen el firmware de banca de serie activado",
-      "AWS Secrets Manager, que custodia y rota las claves de zona de cada terminal",
+      "Un custom key store de KMS respaldado por un clúster de CloudHSM",
+      "CloudHSM a secas, cifrando en la aplicación antes de escribir en cada servicio",
+      "Una KMS key gestionada por el cliente con la rotación automática anual activada",
+      "Importar a KMS el material de clave generado en el HSM on-premises cada 90 días",
     ],
     correct: 0,
-    explain: "AWS Payment Cryptography es un servicio gestionado para operaciones criptográficas de pagos —traducción de PIN entre claves, generación y validación de CVV/CVV2/ARQC, MAC— sobre hardware certificado PCI PTS HSM v3 y FIPS 140-2 Level 3, con paquetes de conformidad PCI PIN y PCI P2PE disponibles en AWS Artifact. KMS y CloudHSM son de propósito general y no implementan los formatos de clave ni los flujos del sector de pagos. <a href=\"https://docs.aws.amazon.com/payment-cryptography/latest/userguide/what-is.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+    explain: "Un <b>custom key store</b> mantiene el material de clave dentro de un clúster de CloudHSM que es tuyo y de un solo inquilino, mientras KMS sigue siendo la API: S3, EBS y RDS se integran exactamente igual que antes, sin que la aplicación sepa dónde está la clave. CloudHSM a secas obliga a cifrar en la aplicación y pierde todas esas integraciones. Una customer managed key normal vive en los HSM compartidos de KMS. Y el material importado sigue residiendo en KMS: cambiar el origen a EXTERNAL decide quién genera la clave, no dónde se custodia. <a href=\"https://docs.aws.amazon.com/kms/latest/developerguide/keystore-cloudhsm.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
   {
     tag: "Nitro Enclaves & atestación KMS",
@@ -550,6 +550,54 @@ var QUIZ_DATA = [
     ],
     correct: [1, 2],
     explain: "La rotación se apoya en una <strong>Lambda</strong> (AWS provee plantillas para las bases de datos soportadas) y una <strong>programación</strong> expresada con <code>cron()</code> o <code>rate()</code>. Secrets Manager mantiene las versiones del secreto con etiquetas como AWSCURRENT y AWSPREVIOUS dentro del propio servicio y cifradas con KMS: jamás escribe credenciales en claro en un bucket. Y AWS Config <strong>evalúa</strong> configuración, no rota credenciales. <a href=\"https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+  },
+  {
+    tag: "Enmascarado en mensajes de SNS",
+    q: "Un tema de SNS reparte eventos a varios equipos y el cuerpo del mensaje incluye a veces correos electrónicos de clientes. Quieres que los suscriptores no autorizados los reciban ofuscados, sin cambiar el publicador. ¿Qué aplicas?",
+    options: [
+      "Una política de protección de datos del tema, con una acción de enmascarado",
+      "Cifrado en reposo del tema con una KMS key gestionada por el cliente",
+      "Un filtro de suscripción que descarte los mensajes con datos personales",
+      "Una política de protección de datos del grupo de CloudWatch Logs del publicador",
+    ],
+    correct: 0,
+    explain: "Las <b>data protection policies</b> de SNS inspeccionan el cuerpo del mensaje contra identificadores de datos gestionados y aplican una acción —auditar, ofuscar o bloquear— por suscriptor, de modo que unos reciben el dato y otros no. El cifrado en reposo protege el mensaje mientras espera, pero el suscriptor lo recibe en claro igual. Un filtro de suscripción decide qué mensajes llegan, no qué partes. Y la política de CloudWatch Logs afecta a lo que se registra, no a lo que se entrega. <a href=\"https://docs.aws.amazon.com/sns/latest/dg/message-data-protection.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+  },
+  {
+    tag: "Ciclo de vida en EFS",
+    q: "Un sistema de archivos EFS guarda evidencias forenses que casi nunca se leen pasada la primera semana, pero que deben conservarse accesibles durante años. ¿Qué reduce el coste sin sacarlas del sistema de archivos?",
+    options: [
+      "Una regla de ciclo de vida de EFS hacia Infrequent Access",
+      "Copiarlas a S3 Glacier Deep Archive con una tarea programada de DataSync",
+      "Una política de ciclo de vida de S3 sobre el bucket que respalda el EFS",
+      "Reducir el rendimiento provisionado del sistema de archivos a modo ráfaga",
+    ],
+    correct: 0,
+    explain: "EFS tiene <b>gestión del ciclo de vida</b> propia: pasado el número de días configurado sin acceso, el fichero baja a Infrequent Access o a Archive y sigue estando en la misma ruta, se lee igual y cuesta bastante menos. Copiar a Glacier con DataSync los saca del sistema de archivos, que es lo que el enunciado excluye. EFS no está respaldado por un bucket de S3, así que no hay política de S3 que aplicar. Y el modo de rendimiento cambia la velocidad, no el precio del almacenamiento. <a href=\"https://docs.aws.amazon.com/efs/latest/ug/lifecycle-management-efs.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+  },
+  {
+    tag: "Copias de FSx for Lustre",
+    q: "Un clúster de cómputo usa Amazon FSx for Lustre con datos sensibles y necesitas copias diarias con retención definida, cifradas, sin detener el sistema de archivos. ¿Qué usas?",
+    options: [
+      "Snapshots de EBS de los volúmenes que respaldan el sistema de archivos",
+      "Las copias automáticas diarias de FSx, con su ventana y su retención",
+      "Una tarea de DataSync que replique el contenido a otro sistema de archivos",
+      "El versionado del bucket S3 vinculado por data repository association",
+    ],
+    correct: 1,
+    explain: "FSx for Lustre trae <b>copias automáticas diarias</b> con ventana y periodo de retención configurables, coherentes con el sistema de archivos y cifradas con la misma clave, sin interrumpir el servicio. No hay volúmenes de EBS que fotografiar: el almacenamiento no se expone así. DataSync copia ficheros, pero no da un punto de recuperación consistente ni una política de retención. Y el versionado de S3 protege los objetos del repositorio vinculado, no los metadatos ni el estado del sistema de archivos. <a href=\"https://docs.aws.amazon.com/fsx/latest/LustreGuide/using-backups-fsx.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+  },
+  {
+    tag: "DataSync y cifrado en tránsito",
+    q: "Vas a copiar 40 TB desde un NAS on-premises a S3 y el requisito es que los datos viajen cifrados de extremo a extremo por la conexión de Direct Connect. ¿Qué es cierto de AWS DataSync?",
+    options: [
+      "Hay que montar un túnel IPsec propio, porque DataSync viaja en claro",
+      "Cifra en tránsito con TLS entre el agente y el servicio, siempre",
+      "El cifrado en tránsito solo se activa si el destino es un bucket con SSE-KMS",
+      "Requiere una VPN de sitio a sitio además de Direct Connect para cifrar",
+    ],
+    correct: 1,
+    explain: "El agente de DataSync habla con el servicio siempre por <b>TLS</b>, incluida la ruta por Direct Connect a través de un VPC endpoint, así que el cifrado en tránsito no es opcional ni hay que configurarlo. No hace falta ni túnel IPsec ni VPN encima: eso sería cifrar dos veces. Y el cifrado del destino —SSE-S3 o SSE-KMS— es una decisión sobre el dato <em>en reposo</em>, independiente de cómo viajó. <a href=\"https://docs.aws.amazon.com/datasync/latest/userguide/encryption-in-transit.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
 ];
 

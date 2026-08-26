@@ -635,6 +635,18 @@ var QUIZ_DATA = [
     correct: [2, 3],
     explain: "<b>Identity Center</b> with <b>permission sets</b> assigned to groups is the recommended pattern at scale, and federation always issues <b>temporary STS credentials</b>. Creating 3,000 users across 60 accounts is exactly the problem federation removes (180,000 identities to maintain). Sharing one key between people destroys attribution: it is never the answer. <a href=\"https://docs.aws.amazon.com/singlesignon/latest/userguide/permissionsetsconcept.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
+  {
+    tag: "Active Directory and access to AWS",
+    q: "A company with on-premises Active Directory wants employees to sign in to AWS with corporate credentials and, on top of that, wants its Windows applications on EC2 to join a domain managed inside AWS. Which combination fits?",
+    options: [
+      "Creating one IAM user per employee and syncing them with a script against AD",
+      "AWS Managed Microsoft AD as the directory, federated into IAM Identity Center",
+      "Amazon Cognito with a user pool replicating the domain accounts",
+      "AD Connector as the directory and one IAM role per group in the local domain",
+    ],
+    correct: 1,
+    explain: "The two requirements pull in different directions and only one option covers both. For console access <b>AD Connector</b> would do, proxying authentication to the on-premises AD without storing anything in AWS; but <em>domain-joining instances</em> needs a real directory inside AWS, and that is <b>AWS Managed Microsoft AD</b>, which also plugs into IAM Identity Center as an identity source and can trust the corporate domain. Hand-synced IAM users are duplicated credentials. And Cognito is built for your application's identities, not your employees. <a href=\"https://docs.aws.amazon.com/directoryservice/latest/admin-guide/directory_microsoft_ad.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+  },
 ];
 
 // Registrado para el simulacro de examen, que carga los seis bancos a la vez.

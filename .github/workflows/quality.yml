@@ -36,6 +36,18 @@ jobs:
       - name: Audit the question bank
         run: node tools/audit-questions.js
 
+      # The exam guide is the specification. This fails if a skill AWS
+      # publishes has no questions, if a service it lists as out of scope is
+      # the correct answer to something, or if the counts and weights the
+      # pages print stop matching the banks.
+      - name: Coverage of the official SCS-C03 outline
+        run: node tools/check-coverage.js
+
+      # The task and skill list printed on each module page is generated from
+      # the same data; this catches a page edited by hand.
+      - name: Printed syllabus matches the guide
+        run: node tools/render-syllabus.js --check
+
   pages:
     name: Pages
     runs-on: ubuntu-latest

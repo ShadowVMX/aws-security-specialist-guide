@@ -4,16 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light dark">
-<meta name="description" content="Free interactive study guide for the AWS Certified Security — Specialty (SCS-C03) exam: theory by domain, interactive diagrams, 262 practice questions and a timed simulation.">
+<meta name="description" content="Free interactive study guide for the AWS Certified Security — Specialty (SCS-C03) exam: theory by domain, interactive diagrams, 286 practice questions and a timed simulation.">
 <link rel="icon" href="../../../assets/img/favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Security Foundations &amp; Governance — AWS Security Specialist (SCS-C03)">
-<meta property="og:description" content="Free interactive study guide for the AWS Certified Security — Specialty (SCS-C03) exam: theory by domain, interactive diagrams, 262 practice questions and a timed simulation.">
+<meta property="og:description" content="Free interactive study guide for the AWS Certified Security — Specialty (SCS-C03) exam: theory by domain, interactive diagrams, 286 practice questions and a timed simulation.">
 <meta property="og:url" content="https://shadowvmx.github.io/aws-security-specialist-guide/en/modules/governance/">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary">
 <title>Security Foundations &amp; Governance — AWS Security Specialist (SCS-C03)</title>
-<link rel="stylesheet" href="../../../assets/css/style.css?v=6">
+<link rel="stylesheet" href="../../../assets/css/style.css?v=8">
 </head>
 <body>
 
@@ -55,8 +55,9 @@
     <a href="#well-architected">Well-Architected Tool</a>
     <a href="#fuentes">Official sources</a>
     <a href="#trampas">Classic traps</a>
+    <a href="#temario">Official exam content</a>
     <h4>Practice</h4>
-    <a href="#quiz">Quiz (40 questions)</a>
+    <a href="#quiz">Quiz (41 questions)</a>
   </aside>
 
   <main class="content">
@@ -352,6 +353,35 @@ aws configservice get-aggregate-compliance-details-by-config-rule \
     </div>
 
 
+    <!-- temario:inicio -->
+    <h2 id="temario">Official exam content covered</h2>
+    <p class="lede">The tasks and skills AWS publishes for domain 6 in the exam guide. 14% of the exam's questions come from here.</p>
+    <div class="syllabus">
+      <h4>Task 6.1 — Develop a strategy to centrally deploy and manage AWS accounts</h4>
+      <ul class="skills">
+        <li><span class="skill-id">6.1.1</span> <span>Deploy and configure organizations by using AWS Organizations</span></li>
+        <li><span class="skill-id">6.1.2</span> <span>Implement and manage Control Tower in new and existing environments, and deploy optional and custom controls</span></li>
+        <li><span class="skill-id">6.1.3</span> <span>Implement organization policies to manage permissions (SCPs, RCPs, AI service opt-out policies, declarative policies)</span></li>
+        <li><span class="skill-id">6.1.4</span> <span>Centrally manage security services (delegated administrator accounts)</span></li>
+        <li><span class="skill-id">6.1.5</span> <span>Manage AWS account root user credentials (centralized root access, MFA, break-glass)</span></li>
+      </ul>
+      <h4>Task 6.2 — Implement a secure and consistent deployment strategy for cloud resources</h4>
+      <ul class="skills">
+        <li><span class="skill-id">6.2.1</span> <span>Use infrastructure as code to deploy resources consistently (CloudFormation StackSets, third-party IaC, CloudFormation Guard, cfn-lint)</span></li>
+        <li><span class="skill-id">6.2.2</span> <span>Use tags to organize AWS resources into groups for management</span></li>
+        <li><span class="skill-id">6.2.3</span> <span>Deploy and enforce policies and configurations from a central source (Firewall Manager)</span></li>
+        <li><span class="skill-id">6.2.4</span> <span>Securely share resources across AWS accounts (Service Catalog, Resource Access Manager)</span></li>
+      </ul>
+      <h4>Task 6.3 — Evaluate the compliance of AWS resources</h4>
+      <ul class="skills">
+        <li><span class="skill-id">6.3.1</span> <span>Create or enable rules to detect and remediate noncompliant resources and send notifications (AWS Config, Security Hub)</span></li>
+        <li><span class="skill-id">6.3.2</span> <span>Use AWS audit services to collect and organize evidence (Audit Manager, Artifact)</span></li>
+        <li><span class="skill-id">6.3.3</span> <span>Use AWS services to evaluate architecture against best practices (Well-Architected Tool)</span></li>
+      </ul>
+      <p class="syllabus-note">Wording as published by AWS in the exam guide. SCS-C03 (guía oficial, edición 2026).</p>
+    </div>
+<!-- temario:fin -->
+
     <h2 id="quiz">Practice quiz — Security Foundations &amp; Governance</h2>
     <p class="lede">40 exam-style questions. Pick an option to see if it's correct and why.</p>
     <div id="quiz-root"></div>
@@ -364,7 +394,7 @@ aws configservice get-aggregate-compliance-details-by-config-rule \
 </footer>
 
 <script src="quiz-data.js"></script>
-<script src="../../../assets/js/quiz.js?v=6"></script>
-<script src="../../../assets/js/app.js?v=6"></script>
+<script src="../../../assets/js/quiz.js?v=8"></script>
+<script src="../../../assets/js/app.js?v=8"></script>
 </body>
 </html>

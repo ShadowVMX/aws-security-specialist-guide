@@ -304,6 +304,64 @@ a:hover { text-decoration: underline; }
 pre code { overflow-wrap: normal; }
 
 /* ---- callouts ---- */
+/* Official exam content: the tasks and skills copied from the AWS exam guide.
+   Styled as a reference block rather than prose — it is a checklist the
+   student ticks against the guide, not something to read top to bottom. */
+.syllabus {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px 10px;
+  margin: 18px 0 28px;
+  background: var(--bg-card);
+}
+.syllabus h4 {
+  margin: 14px 0 6px;
+  font-size: 14px;
+  color: var(--accent);
+  font-weight: 600;
+}
+.syllabus h4:first-child { margin-top: 0; }
+.syllabus .skills {
+  list-style: none;
+  margin: 0 0 4px;
+  padding: 0;
+}
+.syllabus .skills li {
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  padding: 5px 0;
+  border-top: 1px solid var(--border);
+  font-size: 14px;
+  line-height: 1.5;
+}
+.syllabus .skills li:first-child { border-top: 0; }
+.skill-id {
+  flex: 0 0 auto;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 12px;
+  color: var(--text-dim);
+  min-width: 34px;
+}
+.skill-new {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--accent-dim);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  vertical-align: 1px;
+}
+.syllabus-note {
+  margin: 14px 0 8px;
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
 .callout {
   border: 1px solid var(--border);
   border-left: 3px solid var(--blue);

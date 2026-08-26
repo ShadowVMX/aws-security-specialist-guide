@@ -491,6 +491,42 @@ var QUIZ_DATA = [
     correct: [1, 2],
     explain: "El <strong>aislamiento en una cuenta forense</strong> con acceso auditado y los <strong>hashes de integridad</strong> son lo que permite demostrar que la evidencia no se alteró. Trabajar sobre los volúmenes originales los modifica y arruina la cadena de custodia: se analiza siempre sobre copias. Y el correo no ofrece ni control de acceso ni prueba de integridad. <a href=\"https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/sec_incident_response_prepare_forensic.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
+  {
+    tag: "Validar un finding antes de actuar",
+    q: "GuardDuty levanta un finding de minería de criptomonedas sobre una instancia EC2 de producción. Antes de aislarla, ¿qué paso establece el alcance y el impacto reales del evento?",
+    options: [
+      "Archivar el finding para que no vuelva a aparecer en la consola de GuardDuty",
+      "Correlacionar el finding con los VPC Flow Logs y el CloudTrail de esa instancia",
+      "Subir la severidad del finding en Security Hub para que escale al equipo de guardia",
+      "Suprimir ese tipo de finding con una regla, porque suele tratarse de un falso positivo",
+    ],
+    correct: 1,
+    explain: "Un finding es una <b>hipótesis</b>, no un veredicto: dice qué vio el servicio, no cuánto ha pasado. Validarlo es cruzarlo con otras fuentes —los Flow Logs muestran con qué destinos habló la instancia y durante cuánto tiempo, CloudTrail muestra qué hizo su rol— y de ahí sale el alcance. Archivar o suprimir cierra el caso sin mirarlo, y subir la severidad escala una conclusión que todavía no se ha comprobado. <a href=\"https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_findings.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+  },
+  {
+    tag: "Evaluación continua de la recuperación",
+    q: "Además de los ejercicios de mesa, quieres una evaluación continua de si la arquitectura cumple los objetivos de recuperación (RTO y RPO) que has declarado para la aplicación. ¿Qué servicio?",
+    options: [
+      "AWS Fault Injection Service, que inyecta fallos controlados en la carga",
+      "AWS Resilience Hub, que evalúa la aplicación frente a los RTO y RPO fijados",
+      "AWS Backup, cuyos planes definen la frecuencia y la retención de las copias",
+      "Amazon CloudWatch Synthetics, que ejecuta canarios contra el endpoint público",
+    ],
+    correct: 1,
+    explain: "<b>Resilience Hub</b> hace lo que ninguna de las otras: se le declaran RTO y RPO, analiza la arquitectura y dice si los cumple, con recomendaciones y una puntuación que se sigue en el tiempo. FIS <em>provoca</em> el fallo pero no juzga la política de recuperación. AWS Backup ejecuta las copias que Resilience Hub evalúa. Y Synthetics comprueba disponibilidad, que no es lo mismo que capacidad de recuperación. <a href=\"https://docs.aws.amazon.com/resilience-hub/latest/userguide/what-is.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+  },
+  {
+    tag: "Desvío de tráfico tras contener",
+    q: "Tras contener un incidente que afecta a una Región, necesitas desviar el tráfico a la Región secundaria con una acción explícita y auditada, sin que la decisión dependa de los health checks. ¿Qué usas?",
+    options: [
+      "Cambiar a mano los registros de Route 53 en la zona alojada pública",
+      "Amazon Application Recovery Controller y sus routing controls",
+      "Un despliegue azul/verde de CodeDeploy sobre la Región secundaria",
+      "Reducir el TTL de los registros DNS para que el cambio se propague antes",
+    ],
+    correct: 1,
+    explain: "Los <b>routing controls</b> de Application Recovery Controller son interruptores de conmutación con un plano de datos de alta disponibilidad: se accionan a propósito, quedan registrados y cuentan con reglas de seguridad que impiden apagar las dos Regiones a la vez. Editar Route 53 a mano funciona hasta que la consola es justo lo que está degradado. CodeDeploy despliega versiones, no desvía tráfico entre Regiones. Y bajar el TTL ayuda a propagar, pero no es el mecanismo de decisión. <a href=\"https://docs.aws.amazon.com/r53recovery/latest/dg/what-is-route53-recovery.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+  },
 ];
 
 // Registrado para el simulacro de examen, que carga los seis bancos a la vez.

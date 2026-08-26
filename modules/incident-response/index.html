@@ -4,16 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light dark">
-<meta name="description" content="Guía interactiva y gratuita para el examen AWS Certified Security — Specialty (SCS-C03): teoría por dominios, diagramas interactivos, 262 preguntas de práctica y simulacro cronometrado.">
+<meta name="description" content="Guía interactiva y gratuita para el examen AWS Certified Security — Specialty (SCS-C03): teoría por dominios, diagramas interactivos, 286 preguntas de práctica y simulacro cronometrado.">
 <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Incident Response — AWS Security Specialist (SCS-C03)">
-<meta property="og:description" content="Guía interactiva y gratuita para el examen AWS Certified Security — Specialty (SCS-C03): teoría por dominios, diagramas interactivos, 262 preguntas de práctica y simulacro cronometrado.">
+<meta property="og:description" content="Guía interactiva y gratuita para el examen AWS Certified Security — Specialty (SCS-C03): teoría por dominios, diagramas interactivos, 286 preguntas de práctica y simulacro cronometrado.">
 <meta property="og:url" content="https://shadowvmx.github.io/aws-security-specialist-guide/modules/incident-response/">
 <meta property="og:locale" content="es_ES">
 <meta name="twitter:card" content="summary">
 <title>Incident Response — AWS Security Specialist (SCS-C03)</title>
-<link rel="stylesheet" href="../../assets/css/style.css?v=6">
+<link rel="stylesheet" href="../../assets/css/style.css?v=8">
 </head>
 <body>
 
@@ -51,8 +51,9 @@
     <a href="#recovery">Contención, erradicación &amp; recuperación</a>
     <a href="#fuentes">Fuentes oficiales</a>
     <a href="#trampas">Trampas típicas</a>
+    <a href="#temario">Temario oficial</a>
     <h4>Práctica</h4>
-    <a href="#quiz">Quiz (41 preguntas)</a>
+    <a href="#quiz">Quiz (44 preguntas)</a>
   </aside>
 
   <main class="content">
@@ -318,8 +319,31 @@ aws cloudtrail lookup-events \
     </div>
 
 
+    <!-- temario:inicio -->
+    <h2 id="temario">Temario oficial cubierto</h2>
+    <p class="lede">Las tareas y skills que AWS publica para el dominio 2 en la guía del examen. El 14% de las preguntas del examen sale de aquí.</p>
+    <div class="syllabus">
+      <h4>Tarea 2.1 — Diseñar y probar un plan de respuesta a incidentes</h4>
+      <ul class="skills">
+        <li><span class="skill-id">2.1.1</span> <span>Diseñar planes de respuesta y runbooks (Systems Manager OpsCenter, notebooks de SageMaker AI)</span></li>
+        <li><span class="skill-id">2.1.2</span> <span>Preparar los servicios para el incidente (provisionar acceso, desplegar herramientas, reducir el blast radius, Shield Advanced)</span></li>
+        <li><span class="skill-id">2.1.3</span> <span>Recomendar procedimientos para probar y validar el plan de respuesta (Fault Injection Service, Resilience Hub)</span></li>
+        <li><span class="skill-id">2.1.4</span> <span>Remediar incidentes automáticamente (Systems Manager, Automated Forensics Orchestrator, Step Functions, Application Recovery Controller, Lambda)</span></li>
+      </ul>
+      <h4>Tarea 2.2 — Responder a eventos de seguridad</h4>
+      <ul class="skills">
+        <li><span class="skill-id">2.2.1</span> <span>Capturar y almacenar logs de sistema y de aplicación como artefactos forenses</span></li>
+        <li><span class="skill-id">2.2.2</span> <span>Buscar y correlacionar logs de eventos de seguridad entre aplicaciones y servicios</span></li>
+        <li><span class="skill-id">2.2.3</span> <span>Validar los findings de los servicios de seguridad para establecer alcance e impacto <span class="skill-new" title="Contenido que AWS añadió al pasar de SCS-C02 a SCS-C03">nuevo en C03</span></span></li>
+        <li><span class="skill-id">2.2.4</span> <span>Contener y erradicar la amenaza y recuperar los recursos (contención de red, restauración de copias)</span></li>
+        <li><span class="skill-id">2.2.5</span> <span>Describir métodos de análisis de causa raíz (Amazon Detective)</span></li>
+      </ul>
+      <p class="syllabus-note">Redacción adaptada al español; la versión normativa es la de la guía oficial de AWS. SCS-C03 (guía oficial, edición 2026).</p>
+    </div>
+<!-- temario:fin -->
+
     <h2 id="quiz">Quiz de práctica — Incident Response</h2>
-    <p class="lede">41 preguntas estilo examen. Elige una opción para ver si es correcta y por qué.</p>
+    <p class="lede">44 preguntas estilo examen. Elige una opción para ver si es correcta y por qué.</p>
     <div id="quiz-root"></div>
 
   </main>
@@ -330,7 +354,7 @@ aws cloudtrail lookup-events \
 </footer>
 
 <script src="quiz-data.js"></script>
-<script src="../../assets/js/quiz.js?v=6"></script>
-<script src="../../assets/js/app.js?v=6"></script>
+<script src="../../assets/js/quiz.js?v=8"></script>
+<script src="../../assets/js/app.js?v=8"></script>
 </body>
 </html>

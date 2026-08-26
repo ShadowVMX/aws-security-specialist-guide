@@ -4,16 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light dark">
-<meta name="description" content="Free interactive study guide for the AWS Certified Security — Specialty (SCS-C03) exam: theory by domain, interactive diagrams, 262 practice questions and a timed simulation.">
+<meta name="description" content="Free interactive study guide for the AWS Certified Security — Specialty (SCS-C03) exam: theory by domain, interactive diagrams, 286 practice questions and a timed simulation.">
 <link rel="icon" href="../../../assets/img/favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="website">
 <meta property="og:title" content="IAM & Identity Management — AWS Security Specialist (SCS-C03)">
-<meta property="og:description" content="Free interactive study guide for the AWS Certified Security — Specialty (SCS-C03) exam: theory by domain, interactive diagrams, 262 practice questions and a timed simulation.">
+<meta property="og:description" content="Free interactive study guide for the AWS Certified Security — Specialty (SCS-C03) exam: theory by domain, interactive diagrams, 286 practice questions and a timed simulation.">
 <meta property="og:url" content="https://shadowvmx.github.io/aws-security-specialist-guide/en/modules/iam/">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary">
 <title>IAM & Identity Management — AWS Security Specialist (SCS-C03)</title>
-<link rel="stylesheet" href="../../../assets/css/style.css?v=6">
+<link rel="stylesheet" href="../../../assets/css/style.css?v=8">
 </head>
 <body>
 
@@ -60,13 +60,14 @@
     <a href="#perimeter">Data perimeter</a>
     <a href="#fuentes">Official sources</a>
     <a href="#trampas">Classic traps</a>
+    <a href="#temario">Official exam content</a>
     <h4>Practice</h4>
-    <a href="#quiz">Quiz (53 questions)</a>
+    <a href="#quiz">Quiz (54 questions)</a>
   </aside>
 
   <main class="content">
 
-    <h2 id="fundamentos">Policy types in IAM</h2>
+    <h2 id="fundamentos">Policy types in IAM (4.2.3)</h2>
     <p class="lede">Everything in IAM revolves around JSON policy documents evaluated against three questions: who (Principal)? what action? on what resource?</p>
 
     <table role="table">
@@ -85,7 +86,7 @@
       If a question describes "I want to cap what a developer can do even though their role has broad permissions" → <strong>permission boundary</strong>. If it describes "I want a guardrail that applies to an entire OU no matter what policy each user has" → <strong>SCP</strong> (identities) or <strong>RCP</strong> (resources).
     </div>
 
-    <h2 id="evaluacion">Policy evaluation logic</h2>
+    <h2 id="evaluacion">Policy evaluation logic (4.2.4)</h2>
     <p class="lede">A near-guaranteed exam question. Click each step of the diagram to see the detail.</p>
 
     <div class="diagram">
@@ -171,7 +172,7 @@
       If that Deny didn't exist, we'd keep going: does her OU's SCP allow <code>s3:DeleteObject</code>? Does Ana have an explicit Allow in her identity policy? Does her permission boundary also allow it? Only if all FOUR questions come back green does the delete go through.
     </div>
 
-    <h2 id="roles-sts">IAM Roles &amp; AWS STS</h2>
+    <h2 id="roles-sts">IAM Roles &amp; AWS STS (4.1.2)</h2>
     <p class="lede">A Role is an identity with permission policies that has NO permanent credentials: it is "assumed" and generates temporary credentials via AWS STS (Security Token Service).</p>
 
     <table role="table">
@@ -230,7 +231,7 @@
       </table>
     </div>
 
-    <h2 id="cross-account">Cross-account access &amp; confused deputy</h2>
+    <h2 id="cross-account">Cross-account access &amp; confused deputy (4.2.1)</h2>
     <p class="lede">The most-tested pattern on the exam: a user in Account A needs to operate on resources in Account B.</p>
 
     <div class="diagram">
@@ -288,7 +289,7 @@
       The closest equivalent here is <strong>Azure Lighthouse</strong>: it lets a management tenant (e.g. an MSP) operate resources within your tenant without switching context. The important difference for the exam: in Azure Lighthouse the delegation is <em>persistent and visible</em> directly in the managing tenant's portal (there's no explicit "assume" on every operation); in AWS, cross-account access is <em>always</em> an explicit call to <code>sts:AssumeRole</code> that generates temporary, expiring credentials — a model actually closer to requesting a token for a Service Principal with permissions delegated in your tenant via Azure AD.
     </div>
 
-    <h2 id="identity-center">IAM Identity Center</h2>
+    <h2 id="identity-center">IAM Identity Center (4.1.1)</h2>
     <p class="lede">Successor to AWS SSO. It's AWS's recommended way to manage multi-account human access in 2026, over creating individual IAM Users.</p>
     <ul>
       <li><strong>Permission Sets</strong>: permission templates (managed or customer policies + permission boundaries) defined once and assigned to accounts/groups. Identity Center automatically provisions the underlying IAM Roles in each account.</li>
@@ -307,7 +308,7 @@
       </table>
     </div>
 
-    <h2 id="cognito-directory">Amazon Cognito &amp; AWS Directory Service</h2>
+    <h2 id="cognito-directory">Amazon Cognito &amp; AWS Directory Service (4.1.1 / 4.1.3)</h2>
     <p class="lede">Skill 4.1.1 explicitly groups IAM Identity Center, Cognito, and MFA as the three pieces for authenticating humans, applications, and systems. Identity Center covers human access to AWS accounts; Cognito covers end users of your own applications.</p>
 
     <table role="table">
@@ -327,7 +328,7 @@
       <strong>Cognito User Pools</strong> is the equivalent of <strong>Azure AD B2C / Microsoft Entra External ID</strong>: identity management for customers/end users of YOUR application, separate from the corporate tenant. <strong>Cognito Identity Pools</strong> has no direct analog in Azure — the usual way there to grant an authenticated external user access to resources is through a token validated by your own backend, which then uses ITS OWN identity (Managed Identity or Service Principal) to touch the resources, rather than "swapping" the end user's token for cloud credentials the way Cognito Identity Pools does.
     </div>
 
-    <h2 id="roles-anywhere">IAM Roles Anywhere</h2>
+    <h2 id="roles-anywhere">IAM Roles Anywhere (4.2.1)</h2>
     <p class="lede">Extends IAM roles to workloads running OUTSIDE of AWS: on-premises servers, other cloud providers, edge devices.</p>
     <ul>
       <li>Requires a <strong>trusted private CA</strong> (ACM Private CA or another CA registered as a trust anchor) that issues X.509 certificates to each server/workload.</li>
@@ -335,7 +336,7 @@
       <li>Removes the need for long-lived access keys manually distributed to servers outside AWS.</li>
     </ul>
 
-    <h2 id="auth-troubleshooting">Authentication troubleshooting</h2>
+    <h2 id="auth-troubleshooting">Authentication troubleshooting (4.1.3)</h2>
     <p class="lede">Skill 4.1.3, explicit in the exam guide: knowing where to look when someone "can't log in" is just as testable as configuring it.</p>
     <ul>
       <li><strong>CloudTrail</strong>: the first place to check for a failed <code>AssumeRole</code>/<code>ConsoleLogin</code> event and its exact reason (<code>errorCode</code>, <code>errorMessage</code>) — includes attempts denied by trust policy, missing MFA, or an SCP.</li>
@@ -344,7 +345,7 @@
       <li><strong>AWS Directory Service</strong>: network connectivity issues (Security Groups, NACLs) between the VPC and on-premises DCs are the most common cause of AD Connector failures.</li>
     </ul>
 
-    <h2 id="boundaries">Permission boundaries, session policies &amp; IAM paths</h2>
+    <h2 id="boundaries">Permission boundaries, session policies &amp; IAM paths (4.2.3)</h2>
     <p class="lede">Both mechanisms share the same rule: <strong>they never widen permissions, only narrow them</strong> via intersection with the identity/resource policy.</p>
 
     <p class="code-label">Permission boundary — a developer can only touch S3 and DynamoDB, never IAM</p>
@@ -381,7 +382,7 @@
       <li>A typical exam scenario: delegating role creation to a platform team scoped only to their own path, combined with a mandatory permission boundary — a double least-privilege control.</li>
     </ul>
 
-    <h2 id="abac">ABAC &amp; RBAC — attribute-based vs. role-based access control</h2>
+    <h2 id="abac">ABAC &amp; RBAC — attribute-based vs. role-based access control (4.2.2)</h2>
     <p class="lede">RBAC (role-based) is the classic model: one policy per business role/function. ABAC (attribute-based) compares tags on the principal with tags on the resource — scaling without rewriting policies as the number of resources grows.</p>
 
     <p class="code-label">ABAC policy: access only to resources with the same "project" as the user</p>
@@ -410,7 +411,7 @@
       Azure also has <strong>ABAC</strong>, but with much narrower scope: in Azure, attribute-based role conditions are only supported on <strong>Blob Storage and a handful of specific resource types</strong> (e.g. "read-only access to blobs tagged Project=Finance"). In AWS, ABAC works across most services (EC2, S3, KMS, Secrets Manager...) because it's implemented directly as conditions within any IAM policy, rather than as a separate capability of one particular service.
     </div>
 
-    <h2 id="verified-permissions">Amazon Verified Permissions</h2>
+    <h2 id="verified-permissions">Amazon Verified Permissions (4.2.1)</h2>
     <p class="lede">Everything above (identity-based, resource-based, ABAC) authorizes access to the AWS API. Amazon Verified Permissions solves a different problem: <strong>fine-grained authorization inside YOUR OWN applications</strong> (can this user view this document? can they edit this order?), outside the AWS control plane.</p>
     <ul>
       <li>A managed authorization engine based on <strong>Cedar</strong>, AWS's open-source policy language: readable policies like <code>permit(principal == User::"ana", action == Action::"viewDocument", resource in Folder::"finance")</code>.</li>
@@ -441,7 +442,7 @@
       "Service Control Policy" sounds like <strong>Azure Policy</strong>, but they are NOT the same thing. Azure Policy mainly audits/enforces the <em>configuration</em> of resources as they're created (e.g. "every storage account must require HTTPS") — that's actually much closer to AWS <strong>Declarative Policies</strong> or Config Rules. An SCP, by contrast, is a ceiling on <em>IAM permissions</em> (what actions an identity can execute), and its closest Azure equivalent is <strong>deny assignments</strong> (used in Blueprints/Landing Zones), which block actions at the Management Group level regardless of what RBAC role the user has been assigned. If you see "SCP" on the exam, think denied permissions, not configuration compliance.
     </div>
 
-    <h2 id="access-analyzer">IAM Access Analyzer &amp; Policy Simulator</h2>
+    <h2 id="access-analyzer">IAM Access Analyzer &amp; Policy Simulator (4.2.4 / 4.2.5)</h2>
     <p class="lede">Skill 4.2.4 explicitly names both tools for analyzing authorization failures — they answer different questions.</p>
     <ul>
       <li><strong>External access findings</strong>: detects resources (buckets, roles, KMS keys, snapshots...) accessible from outside your "zone of trust" (account or organization). An analyzer is defined with the desired scope.</li>
@@ -492,7 +493,7 @@
       Here the gap runs the opposite way from usual: in Azure, <strong>Conditional Access</strong> is a centralized engine that evaluates signals (location, user risk, device compliance...) and decides in one place whether to require MFA, block access, or force a managed device, applied uniformly across the whole tenant. AWS <strong>has no equivalent centralized engine</strong>: the <code>aws:MultiFactorAuthPresent</code> condition has to be added policy by policy (or centrally via SCP/RCP, but it's still a yes/no condition, not an adaptive risk engine). If an exam question sounds like "adaptive, risk-based conditional access policies," the correct answer probably combines several services (IAM + GuardDuty + Identity Center), not a single service equivalent to Conditional Access.
     </div>
 
-    <h2 id="perimeter">Data perimeter</h2>
+    <h2 id="perimeter">Data perimeter (4.2.1)</h2>
     <p class="lede">A cross-cutting concept heavily featured on the 2026 exam: guaranteeing that data never leaves your organization, even with valid, compromised credentials.</p>
     <table role="table">
       <tr><th>Perimeter</th><th>Question it answers</th><th>Typical controls</th></tr>
@@ -555,6 +556,28 @@
     </div>
 
 
+    <!-- temario:inicio -->
+    <h2 id="temario">Official exam content covered</h2>
+    <p class="lede">The tasks and skills AWS publishes for domain 4 in the exam guide. 20% of the exam's questions come from here.</p>
+    <div class="syllabus">
+      <h4>Task 4.1 — Design, implement, and troubleshoot authentication strategies</h4>
+      <ul class="skills">
+        <li><span class="skill-id">4.1.1</span> <span>Design identity solutions for human, application and system authentication (IAM Identity Center, Cognito, MFA, IdP integration)</span></li>
+        <li><span class="skill-id">4.1.2</span> <span>Configure mechanisms to issue temporary credentials (STS, S3 presigned URLs)</span></li>
+        <li><span class="skill-id">4.1.3</span> <span>Troubleshoot authentication issues (CloudTrail, Cognito, IAM Identity Center permission sets, Directory Service)</span></li>
+      </ul>
+      <h4>Task 4.2 — Design, implement, and troubleshoot authorization strategies</h4>
+      <ul class="skills">
+        <li><span class="skill-id">4.2.1</span> <span>Design and evaluate authorization controls (Verified Permissions, IAM paths, IAM Roles Anywhere, resource policies, role trust policies)</span></li>
+        <li><span class="skill-id">4.2.2</span> <span>Design attribute-based (ABAC) and role-based (RBAC) access control strategies</span></li>
+        <li><span class="skill-id">4.2.3</span> <span>Design and implement IAM policies following least privilege (permission boundaries, session policies)</span></li>
+        <li><span class="skill-id">4.2.4</span> <span>Analyze authorization failures to determine causes or effects (IAM Policy Simulator, IAM Access Analyzer)</span></li>
+        <li><span class="skill-id">4.2.5</span> <span>Investigate and correct unintended permissions or privileges (IAM Access Analyzer)</span></li>
+      </ul>
+      <p class="syllabus-note">Wording as published by AWS in the exam guide. SCS-C03 (guía oficial, edición 2026).</p>
+    </div>
+<!-- temario:fin -->
+
     <h2 id="quiz">Practice quiz — IAM</h2>
     <p class="lede">53 exam-style questions. Pick an option to see if it's correct and why.</p>
     <div id="quiz-root"></div>
@@ -567,7 +590,7 @@
 </footer>
 
 <script src="quiz-data.js"></script>
-<script src="../../../assets/js/quiz.js?v=6"></script>
-<script src="../../../assets/js/app.js?v=6"></script>
+<script src="../../../assets/js/quiz.js?v=8"></script>
+<script src="../../../assets/js/app.js?v=8"></script>
 </body>
 </html>

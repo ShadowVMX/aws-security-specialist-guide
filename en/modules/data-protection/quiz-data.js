@@ -336,16 +336,16 @@ var QUIZ_DATA = [
     explain: "DSSE-KMS encrypts the object twice, independently: one layer under a KMS data key and another under a key managed by S3, which is what dual-layer guidance for highly regulated workloads demands. The S3 Bucket Key only derives data keys for a single layer, and wrapping a data key twice (client-side) is not the same as encrypting the data twice. DSSE-KMS does not support Bucket Keys and costs more per GB. <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingDSSEncryption.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
   {
-    tag: "AWS Payment Cryptography",
-    q: "A fintech is migrating its payment card processing (PIN validation, cryptogram generation, key management aligned with payment industry standards) off on-premises HSMs. Which AWS service is purpose-built to replace those payment HSMs while meeting PCI PIN and PCI P2PE?",
+    tag: "CloudHSM custom key store",
+    q: "A financial institution requires its encryption key material to live in single-tenant HSMs under its exclusive control, but wants to keep using the native KMS integration with S3, EBS and RDS. Which design allows that?",
     options: [
-      "AWS Payment Cryptography, with PCI PTS-certified HSMs for payment operations",
-      "AWS KMS with customer managed keys, which already supports payment key formats",
-      "Generic AWS CloudHSM, whose HSMs ship with banking firmware enabled by default",
-      "AWS Secrets Manager, which stores and rotates the zone keys of each terminal",
+      "A KMS custom key store backed by a CloudHSM cluster",
+      "Plain CloudHSM, encrypting in the application before writing to each service",
+      "A customer managed KMS key with automatic annual rotation enabled",
+      "Importing key material generated in the on-premises HSM into KMS every 90 days",
     ],
     correct: 0,
-    explain: "AWS Payment Cryptography is a managed service for payment cryptographic operations — PIN translation between keys, generation and validation of CVV/CVV2/ARQC, MACs — on hardware certified to PCI PTS HSM v3 and FIPS 140-2 Level 3, with PCI PIN and PCI P2PE compliance packages available in AWS Artifact. KMS and CloudHSM are general-purpose and implement neither the payment key formats nor the industry's workflows. <a href=\"https://docs.aws.amazon.com/payment-cryptography/latest/userguide/what-is.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+    explain: "A <b>custom key store</b> keeps key material inside a CloudHSM cluster that is yours and single-tenant, while KMS remains the API: S3, EBS and RDS integrate exactly as before, and the application never needs to know where the key lives. Plain CloudHSM forces the application to do the crypto and loses every one of those integrations. An ordinary customer managed key lives in the shared KMS HSMs. And imported key material still resides in KMS: setting the origin to EXTERNAL decides who generates the key, not where it is held. <a href=\"https://docs.aws.amazon.com/kms/latest/developerguide/keystore-cloudhsm.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
   {
     tag: "Nitro Enclaves & KMS attestation",
@@ -550,6 +550,54 @@ var QUIZ_DATA = [
     ],
     correct: [1, 2],
     explain: "Rotation relies on a <strong>Lambda</strong> (AWS ships templates for supported databases) and a <strong>schedule</strong> expressed with <code>cron()</code> or <code>rate()</code>. Secrets Manager keeps secret versions with staging labels such as AWSCURRENT and AWSPREVIOUS inside the service itself, encrypted with KMS: it never writes plaintext credentials to a bucket. And AWS Config <strong>evaluates</strong> configuration, it does not rotate credentials. <a href=\"https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+  },
+  {
+    tag: "Masking in SNS messages",
+    q: "An SNS topic fans events out to several teams and the message body sometimes contains customer email addresses. You want unauthorized subscribers to receive them obfuscated, without changing the publisher. What do you apply?",
+    options: [
+      "A data protection policy on the topic, with a masking action",
+      "Encryption at rest on the topic with a customer managed KMS key",
+      "A subscription filter that drops messages containing personal data",
+      "A CloudWatch Logs data protection policy on the publisher's log group",
+    ],
+    correct: 0,
+    explain: "SNS <b>data protection policies</b> inspect the message body against managed data identifiers and apply an action — audit, de-identify or deny — per subscriber, so some receive the value and others do not. Encryption at rest protects the message while it waits, but the subscriber still receives it in the clear. A subscription filter decides which messages arrive, not which parts. And the CloudWatch Logs policy affects what is logged, not what is delivered. <a href=\"https://docs.aws.amazon.com/sns/latest/dg/message-data-protection.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+  },
+  {
+    tag: "EFS lifecycle management",
+    q: "An EFS file system holds forensic evidence that is almost never read after the first week but must stay accessible for years. What reduces cost without moving it out of the file system?",
+    options: [
+      "An EFS lifecycle rule into Infrequent Access",
+      "Copying it to S3 Glacier Deep Archive with a scheduled DataSync task",
+      "An S3 lifecycle policy on the bucket that backs the EFS file system",
+      "Lowering the file system's provisioned throughput to bursting mode",
+    ],
+    correct: 0,
+    explain: "EFS has its own <b>lifecycle management</b>: after the configured number of days without access, a file drops to Infrequent Access or Archive, stays at the same path, reads the same way and costs considerably less. Copying to Glacier with DataSync moves it out of the file system, which the question rules out. EFS is not backed by an S3 bucket, so there is no S3 policy to apply. And throughput mode changes speed, not the price of storage. <a href=\"https://docs.aws.amazon.com/efs/latest/ug/lifecycle-management-efs.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+  },
+  {
+    tag: "FSx for Lustre backups",
+    q: "A compute cluster uses Amazon FSx for Lustre with sensitive data and you need daily backups with a defined retention, encrypted, without stopping the file system. What do you use?",
+    options: [
+      "EBS snapshots of the volumes backing the file system",
+      "The FSx automatic daily backups, with their window and retention",
+      "A DataSync task replicating the contents to another file system",
+      "Versioning on the S3 bucket linked by a data repository association",
+    ],
+    correct: 1,
+    explain: "FSx for Lustre ships <b>automatic daily backups</b> with a configurable window and retention period, consistent with the file system and encrypted with the same key, without interrupting service. There are no EBS volumes to snapshot: the storage is not exposed that way. DataSync copies files but gives you neither a consistent recovery point nor a retention policy. And S3 versioning protects the objects in the linked repository, not the file system's metadata or state. <a href=\"https://docs.aws.amazon.com/fsx/latest/LustreGuide/using-backups-fsx.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+  },
+  {
+    tag: "DataSync and encryption in transit",
+    q: "You are copying 40 TB from an on-premises NAS to S3 and the requirement is that data travels encrypted end to end over the Direct Connect link. What is true of AWS DataSync?",
+    options: [
+      "You must build your own IPsec tunnel, because DataSync travels in the clear",
+      "It encrypts in transit with TLS between agent and service, always",
+      "Encryption in transit only applies when the destination bucket uses SSE-KMS",
+      "It requires a site-to-site VPN on top of Direct Connect in order to encrypt",
+    ],
+    correct: 1,
+    explain: "The DataSync agent always talks to the service over <b>TLS</b>, including the Direct Connect path through a VPC endpoint, so encryption in transit is neither optional nor something you configure. No IPsec tunnel or VPN is needed on top: that would encrypt twice. And destination encryption — SSE-S3 or SSE-KMS — is a decision about the data <em>at rest</em>, independent of how it travelled. <a href=\"https://docs.aws.amazon.com/datasync/latest/userguide/encryption-in-transit.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
 ];
 
