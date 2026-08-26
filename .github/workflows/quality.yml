@@ -100,6 +100,3 @@ jobs:
       # so a KMS question can't quietly cite a VPC page.
       - name: Sources match the question that cites them
         run: node tools/check-sources.js --titles
-
-      - name: Probe candidate replacement pages
-        run: node tools/.probe.tmp.js

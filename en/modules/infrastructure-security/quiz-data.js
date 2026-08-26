@@ -537,19 +537,19 @@ var QUIZ_DATA = [
       "Private subnets with a proxy instance filtering the allowed domains",
     ],
     correct: 1,
-    explain: "An <b>isolated</b> subnet is one with no route to an internet gateway or a NAT: traffic to AWS services goes through <b>VPC endpoints</b>, which resolve to private addresses and never leave the AWS network. With a NAT gateway there is outbound internet access, however tightly the security group is written. Public subnets are the opposite of the requirement. And a proxy still needs its own egress, besides becoming the box you now have to harden. <a href=\"https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+    explain: "An <b>isolated</b> subnet is one with no route to an internet gateway or a NAT: traffic to AWS services goes through <b>VPC endpoints</b>, which resolve to private addresses and never leave the AWS network. With a NAT gateway there is outbound internet access, however tightly the security group is written. Public subnets are the opposite of the requirement. And a proxy still needs its own egress, besides becoming the box you now have to harden. <a href=\"https://docs.aws.amazon.com/vpc/latest/privatelink/privatelink-access-aws-services.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
   {
     tag: "Vulnerabilities before the commit",
     q: "The team wants code vulnerabilities flagged to the developer inside the IDE, before a commit even exists. Which option does that?",
     options: [
       "Amazon Inspector, which scans the container image once it is pushed to ECR",
-      "Amazon Q Developer security scans in the IDE",
+      "Amazon Q Developer code reviews in the IDE",
       "GuardDuty Runtime Monitoring on the container already deployed to ECS",
       "An AWS Config rule evaluating the repository after each push to the branch",
     ],
     correct: 1,
-    explain: "<b>Amazon Q Developer</b> scans code in the editor itself and raises the finding as it is written, which is the cheapest point in the cycle to fix it. Inspector comes in once an artifact exists in ECR or a Lambda function is published. GuardDuty Runtime Monitoring watches what is already running. And Config evaluates AWS resources, not the contents of a repository. The question is not which service finds the flaw, but <em>when</em>. <a href=\"https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/security-scans.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+    explain: "<b>Amazon Q Developer</b> reviews code in the editor itself and raises the finding as it is written, which is the cheapest point in the cycle to fix it. Inspector comes in once an artifact exists in ECR or a Lambda function is published. GuardDuty Runtime Monitoring watches what is already running. And Config evaluates AWS resources, not the contents of a repository. The question is not which service finds the flaw, but <em>when</em>. <a href=\"https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/code-reviews.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
   {
     tag: "Occasional administrative access",
@@ -561,7 +561,7 @@ var QUIZ_DATA = [
       "An IAM user with a password and MFA who logs in to the operating system",
     ],
     correct: 0,
-    explain: "<b>EC2 Instance Connect</b> pushes a one-time public key to the instance, valid for 60 seconds, and authorizes through IAM: there is no key to store or rotate, and the <code>SendSSHPublicKey</code> call lands in CloudTrail. A shared key is still a shared key, even inside Secrets Manager. A bastion is infrastructure you now have to harden and patch. And IAM does not authenticate against the operating system. <a href=\"https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-using-eic.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+    explain: "<b>EC2 Instance Connect</b> pushes a one-time public key to the instance, valid for 60 seconds, and authorizes through IAM: there is no key to store or rotate, and the <code>SendSSHPublicKey</code> call lands in CloudTrail. A shared key is still a shared key, even inside Secrets Manager. A bastion is infrastructure you now have to harden and patch. And IAM does not authenticate against the operating system. <a href=\"https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-connect-methods.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
   {
     tag: "Proving there is no path from the internet",
@@ -573,7 +573,7 @@ var QUIZ_DATA = [
       "An AWS Config report using the rule for security groups with no open ports",
     ],
     correct: 1,
-    explain: "<b>Network Access Analyzer</b> starts from a <em>Network Access Scope</em> — say, 'from the internet to any resource' — and returns every path that satisfies it, evaluating routes, NACLs, security groups and gateways together. Reachability Analyzer answers per pair of resources: useful for debugging one, not for proving a property of the whole VPC. Inspector looks at network reachability for the instances it assesses. And a Config rule checks a condition, not an end-to-end path. <a href=\"https://docs.aws.amazon.com/vpc/latest/network-access-analyzer/what-is-vaa.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+    explain: "<b>Network Access Analyzer</b> starts from a <em>Network Access Scope</em> — say, 'from the internet to any resource' — and returns every path that satisfies it, evaluating routes, NACLs, security groups and gateways together. Reachability Analyzer answers per pair of resources: useful for debugging one, not for proving a property of the whole VPC. Inspector looks at network reachability for the instances it assesses. And a Config rule checks a condition, not an end-to-end path. <a href=\"https://docs.aws.amazon.com/vpc/latest/network-access-analyzer/what-is-network-access-analyzer.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
   {
     tag: "AWS IoT Core policies",

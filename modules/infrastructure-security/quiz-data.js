@@ -537,19 +537,19 @@ var QUIZ_DATA = [
       "Subredes privadas con una instancia proxy que filtre los dominios permitidos",
     ],
     correct: 1,
-    explain: "Una subred <b>aislada</b> es la que no tiene ruta a un internet gateway ni a un NAT: el tráfico a los servicios de AWS entra por <b>VPC endpoints</b>, que resuelven a direcciones privadas y nunca salen de la red de AWS. Con NAT gateway sí hay salida a internet, aunque el security group la limite. Las subredes públicas son lo contrario de lo pedido. Y un proxy sigue necesitando su propia salida, además de convertirse en el punto que hay que endurecer. <a href=\"https://docs.aws.amazon.com/vpc/latest/userguide/VPC_Subnets.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+    explain: "Una subred <b>aislada</b> es la que no tiene ruta a un internet gateway ni a un NAT: el tráfico a los servicios de AWS entra por <b>VPC endpoints</b>, que resuelven a direcciones privadas y nunca salen de la red de AWS. Con NAT gateway sí hay salida a internet, aunque el security group la limite. Las subredes públicas son lo contrario de lo pedido. Y un proxy sigue necesitando su propia salida, además de convertirse en el punto que hay que endurecer. <a href=\"https://docs.aws.amazon.com/vpc/latest/privatelink/privatelink-access-aws-services.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
   {
     tag: "Vulnerabilidades antes del commit",
     q: "El equipo quiere que las vulnerabilidades del código se señalen al desarrollador dentro del IDE, antes de que llegue a haber un commit. ¿Qué opción lo hace?",
     options: [
       "Amazon Inspector, que analiza la imagen del contenedor una vez publicada en ECR",
-      "Los security scans de Amazon Q Developer en el IDE",
+      "Las revisiones de código de Amazon Q Developer en el IDE",
       "GuardDuty Runtime Monitoring sobre el contenedor ya desplegado en ECS",
       "Una regla de AWS Config que evalúe el repositorio tras cada push a la rama",
     ],
     correct: 1,
-    explain: "<b>Amazon Q Developer</b> analiza el código en el propio editor y marca el hallazgo mientras se escribe, que es el punto más barato del ciclo para arreglarlo. Inspector entra cuando ya existe un artefacto en ECR o una función Lambda publicada. GuardDuty Runtime Monitoring vigila lo que ya está corriendo. Y Config evalúa recursos de AWS, no el contenido de un repositorio. La pregunta no es qué servicio encuentra el fallo, sino <em>cuándo</em>. <a href=\"https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/security-scans.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+    explain: "<b>Amazon Q Developer</b> revisa el código en el propio editor y marca el hallazgo mientras se escribe, que es el punto más barato del ciclo para arreglarlo. Inspector entra cuando ya existe un artefacto en ECR o una función Lambda publicada. GuardDuty Runtime Monitoring vigila lo que ya está corriendo. Y Config evalúa recursos de AWS, no el contenido de un repositorio. La pregunta no es qué servicio encuentra el fallo, sino <em>cuándo</em>. <a href=\"https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/code-reviews.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
   {
     tag: "Acceso administrativo puntual",
@@ -561,7 +561,7 @@ var QUIZ_DATA = [
       "Un usuario IAM con contraseña y MFA que haga login en el sistema operativo",
     ],
     correct: 0,
-    explain: "<b>EC2 Instance Connect</b> empuja una clave pública de un solo uso a la instancia, válida 60 segundos, y autoriza con IAM: no hay clave que guardar ni que rotar, y la llamada <code>SendSSHPublicKey</code> queda en CloudTrail. Una clave compartida sigue siendo una clave compartida, aunque la guarde Secrets Manager. Un bastión propio es infraestructura que hay que endurecer y parchear. Y IAM no autentica contra el sistema operativo. <a href=\"https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-using-eic.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+    explain: "<b>EC2 Instance Connect</b> empuja una clave pública de un solo uso a la instancia, válida 60 segundos, y autoriza con IAM: no hay clave que guardar ni que rotar, y la llamada <code>SendSSHPublicKey</code> queda en CloudTrail. Una clave compartida sigue siendo una clave compartida, aunque la guarde Secrets Manager. Un bastión propio es infraestructura que hay que endurecer y parchear. Y IAM no autentica contra el sistema operativo. <a href=\"https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-connect-methods.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
   {
     tag: "Demostrar que no hay acceso desde internet",
@@ -573,7 +573,7 @@ var QUIZ_DATA = [
       "Un informe de AWS Config con la regla de security groups sin puertos abiertos",
     ],
     correct: 1,
-    explain: "<b>Network Access Analyzer</b> parte de un <em>Network Access Scope</em> —por ejemplo, «desde internet hacia cualquier recurso»— y devuelve todos los caminos que lo satisfacen, evaluando rutas, NACL, security groups y gateways juntos. Reachability Analyzer responde por pares de recursos: sirve para depurar uno, no para demostrar una propiedad de la VPC entera. Inspector mira el alcance de red de sus instancias evaluadas. Y una regla de Config comprueba una condición, no un camino completo. <a href=\"https://docs.aws.amazon.com/vpc/latest/network-access-analyzer/what-is-vaa.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+    explain: "<b>Network Access Analyzer</b> parte de un <em>Network Access Scope</em> —por ejemplo, «desde internet hacia cualquier recurso»— y devuelve todos los caminos que lo satisfacen, evaluando rutas, NACL, security groups y gateways juntos. Reachability Analyzer responde por pares de recursos: sirve para depurar uno, no para demostrar una propiedad de la VPC entera. Inspector mira el alcance de red de sus instancias evaluadas. Y una regla de Config comprueba una condición, no un camino completo. <a href=\"https://docs.aws.amazon.com/vpc/latest/network-access-analyzer/what-is-network-access-analyzer.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
   {
     tag: "Políticas de AWS IoT Core",
