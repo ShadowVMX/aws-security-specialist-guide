@@ -15,7 +15,7 @@
 
 const fs = require("fs");
 const path = require("path");
-const { DOMAINS, GUIDE_EDITION } = require("./exam-guide.js");
+const { DOMAINS, NEW_IN_C03, GUIDE_EDITION } = require("./exam-guide.js");
 
 const REPO = path.join(__dirname, "..");
 const CHECK = process.argv.includes("--check");
@@ -29,6 +29,8 @@ const T = {
       `Las tareas y skills que AWS publica para el dominio ${d.id} en la guía del examen. El ${d.weight}% de las preguntas del examen sale de aquí.`,
     note: "Redacción adaptada al español; la versión normativa es la de la guía oficial de AWS.",
     task: "Tarea",
+    isNew: "nuevo en C03",
+    newTitle: "Contenido que AWS añadió al pasar de SCS-C02 a SCS-C03",
   },
   en: {
     heading: "Official exam content covered",
@@ -36,6 +38,8 @@ const T = {
       `The tasks and skills AWS publishes for domain ${d.id} in the exam guide. ${d.weight}% of the exam's questions come from here.`,
     note: "Wording as published by AWS in the exam guide.",
     task: "Task",
+    isNew: "new in C03",
+    newTitle: "Content AWS added when moving from SCS-C02 to SCS-C03",
   },
 };
 
@@ -48,12 +52,16 @@ function block(domain, lang) {
   const tasks = domain.tasks
     .map((task) => {
       const skills = task.skills
-        .map(
-          (s) =>
-            `        <li><span class="skill-id">${s.id}</span> ${esc(
-              lang === "es" ? s.textEs : s.text
-            )}</li>`
-        )
+        .map((s) => {
+          // Someone who studied with SCS-C02 material has never seen these,
+          // so they are worth pointing at rather than leaving in the list.
+          const badge = NEW_IN_C03.includes(s.id)
+            ? ` <span class="skill-new" title="${t.newTitle}">${t.isNew}</span>`
+            : "";
+          return `        <li><span class="skill-id">${s.id}</span> <span>${esc(
+            lang === "es" ? s.textEs : s.text
+          )}${badge}</span></li>`;
+        })
         .join("\n");
       return (
         `      <h4>${t.task} ${task.id} — ${esc(

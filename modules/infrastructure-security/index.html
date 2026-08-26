@@ -13,7 +13,7 @@
 <meta property="og:locale" content="es_ES">
 <meta name="twitter:card" content="summary">
 <title>Infrastructure Security — AWS Security Specialist (SCS-C03)</title>
-<link rel="stylesheet" href="../../assets/css/style.css?v=7">
+<link rel="stylesheet" href="../../assets/css/style.css?v=8">
 </head>
 <body>
 
@@ -438,28 +438,28 @@ aws ec2 create-network-acl-entry \
     <div class="syllabus">
       <h4>Tarea 3.1 — Diseñar, implementar y depurar los controles de seguridad del perímetro de red</h4>
       <ul class="skills">
-        <li><span class="skill-id">3.1.1</span> Definir y elegir la estrategia de seguridad en el perímetro según las amenazas previstas</li>
-        <li><span class="skill-id">3.1.2</span> Implementar la protección del perímetro (cabeceras de CloudFront, WAF, políticas de IoT, OWASP Top 10, CORS de S3, Shield Advanced)</li>
-        <li><span class="skill-id">3.1.3</span> Diseñar reglas de perímetro según requisitos (geografía, geolocalización, rate limiting, fingerprinting de cliente)</li>
-        <li><span class="skill-id">3.1.4</span> Integrar los servicios de perímetro con terceros (ingesta en formato OCSF, reglas de WAF de terceros)</li>
+        <li><span class="skill-id">3.1.1</span> <span>Definir y elegir la estrategia de seguridad en el perímetro según las amenazas previstas</span></li>
+        <li><span class="skill-id">3.1.2</span> <span>Implementar la protección del perímetro (cabeceras de CloudFront, WAF, políticas de IoT, OWASP Top 10, CORS de S3, Shield Advanced)</span></li>
+        <li><span class="skill-id">3.1.3</span> <span>Diseñar reglas de perímetro según requisitos (geografía, geolocalización, rate limiting, fingerprinting de cliente)</span></li>
+        <li><span class="skill-id">3.1.4</span> <span>Integrar los servicios de perímetro con terceros (ingesta en formato OCSF, reglas de WAF de terceros) <span class="skill-new" title="Contenido que AWS añadió al pasar de SCS-C02 a SCS-C03">nuevo en C03</span></span></li>
       </ul>
       <h4>Tarea 3.2 — Diseñar, implementar y depurar los controles de seguridad de las cargas de cómputo</h4>
       <ul class="skills">
-        <li><span class="skill-id">3.2.1</span> Diseñar AMIs e imágenes de contenedor endurecidas (Systems Manager, EC2 Image Builder)</li>
-        <li><span class="skill-id">3.2.2</span> Aplicar instance profiles, service roles y execution roles para autorizar las cargas de cómputo</li>
-        <li><span class="skill-id">3.2.3</span> Escanear vulnerabilidades conocidas en el cómputo (Inspector sobre imágenes y Lambda, Runtime Monitoring de GuardDuty)</li>
-        <li><span class="skill-id">3.2.4</span> Desplegar parches en la flota y validarlo de forma continua (Patch Manager, Amazon Inspector)</li>
-        <li><span class="skill-id">3.2.5</span> Configurar acceso administrativo seguro al cómputo (Session Manager, EC2 Instance Connect)</li>
-        <li><span class="skill-id">3.2.6</span> Configurar herramientas que descubran y remedien vulnerabilidades dentro del pipeline (Amazon Q Developer, CodeGuru Security)</li>
-        <li><span class="skill-id">3.2.7</span> Implementar protecciones y guardrails para aplicaciones de IA generativa (OWASP Top 10 para aplicaciones LLM)</li>
+        <li><span class="skill-id">3.2.1</span> <span>Diseñar AMIs e imágenes de contenedor endurecidas (Systems Manager, EC2 Image Builder)</span></li>
+        <li><span class="skill-id">3.2.2</span> <span>Aplicar instance profiles, service roles y execution roles para autorizar las cargas de cómputo</span></li>
+        <li><span class="skill-id">3.2.3</span> <span>Escanear vulnerabilidades conocidas en el cómputo (Inspector sobre imágenes y Lambda, Runtime Monitoring de GuardDuty)</span></li>
+        <li><span class="skill-id">3.2.4</span> <span>Desplegar parches en la flota y validarlo de forma continua (Patch Manager, Amazon Inspector)</span></li>
+        <li><span class="skill-id">3.2.5</span> <span>Configurar acceso administrativo seguro al cómputo (Session Manager, EC2 Instance Connect)</span></li>
+        <li><span class="skill-id">3.2.6</span> <span>Configurar herramientas que descubran y remedien vulnerabilidades dentro del pipeline (Amazon Q Developer, CodeGuru Security)</span></li>
+        <li><span class="skill-id">3.2.7</span> <span>Implementar protecciones y guardrails para aplicaciones de IA generativa (OWASP Top 10 para aplicaciones LLM) <span class="skill-new" title="Contenido que AWS añadió al pasar de SCS-C02 a SCS-C03">nuevo en C03</span></span></li>
       </ul>
       <h4>Tarea 3.3 — Diseñar y depurar los controles de seguridad de red</h4>
       <ul class="skills">
-        <li><span class="skill-id">3.3.1</span> Diseñar y depurar los controles que permiten o bloquean tráfico (security groups, network ACLs, Network Firewall)</li>
-        <li><span class="skill-id">3.3.2</span> Diseñar conectividad segura híbrida y multi-nube (Site-to-Site VPN, Direct Connect, MACsec)</li>
-        <li><span class="skill-id">3.3.3</span> Determinar los requisitos de comunicación entre el entorno híbrido y AWS (Verified Access)</li>
-        <li><span class="skill-id">3.3.4</span> Diseñar la segmentación de red (tráfico norte-sur y este-oeste, subredes aisladas)</li>
-        <li><span class="skill-id">3.3.5</span> Identificar accesos de red innecesarios (Verified Access, Network Access Analyzer, findings de alcanzabilidad de Inspector)</li>
+        <li><span class="skill-id">3.3.1</span> <span>Diseñar y depurar los controles que permiten o bloquean tráfico (security groups, network ACLs, Network Firewall)</span></li>
+        <li><span class="skill-id">3.3.2</span> <span>Diseñar conectividad segura híbrida y multi-nube (Site-to-Site VPN, Direct Connect, MACsec)</span></li>
+        <li><span class="skill-id">3.3.3</span> <span>Determinar los requisitos de comunicación entre el entorno híbrido y AWS (Verified Access)</span></li>
+        <li><span class="skill-id">3.3.4</span> <span>Diseñar la segmentación de red (tráfico norte-sur y este-oeste, subredes aisladas)</span></li>
+        <li><span class="skill-id">3.3.5</span> <span>Identificar accesos de red innecesarios (Verified Access, Network Access Analyzer, findings de alcanzabilidad de Inspector)</span></li>
       </ul>
       <p class="syllabus-note">Redacción adaptada al español; la versión normativa es la de la guía oficial de AWS. SCS-C03 (guía oficial, edición 2026).</p>
     </div>
@@ -477,7 +477,7 @@ aws ec2 create-network-acl-entry \
 </footer>
 
 <script src="quiz-data.js"></script>
-<script src="../../assets/js/quiz.js?v=7"></script>
-<script src="../../assets/js/app.js?v=7"></script>
+<script src="../../assets/js/quiz.js?v=8"></script>
+<script src="../../assets/js/app.js?v=8"></script>
 </body>
 </html>
