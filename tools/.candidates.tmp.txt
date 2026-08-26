@@ -1,0 +1,12 @@
+https://docs.aws.amazon.com/vpc/latest/userguide/how-it-works.html
+https://docs.aws.amazon.com/vpc/latest/privatelink/privatelink-access-aws-services.html
+https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/security-scans-code.html
+https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/code-reviews.html
+https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/what-is.html
+https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/software-dev.html
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/connect-linux-inst-eic.html
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-connect-methods.html
+https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-connect-set-up.html
+https://docs.aws.amazon.com/vpc/latest/network-access-analyzer/what-is-network-access-analyzer.html
+https://docs.aws.amazon.com/vpc/latest/network-access-analyzer/getting-started-na-console.html
+https://docs.aws.amazon.com/vpc/latest/network-access-analyzer/network-access-analyzer-concepts.html
