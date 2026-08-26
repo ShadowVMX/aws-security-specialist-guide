@@ -5,7 +5,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/examen-SCS--C03-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white" alt="SCS-C03">
   <img src="https://img.shields.io/badge/dominios-6%2F6-3ECF8E?style=for-the-badge" alt="6 de 6 dominios">
-  <img src="https://img.shields.io/badge/preguntas-262-B892FF?style=for-the-badge" alt="262 preguntas">
+  <img src="https://img.shields.io/badge/preguntas-286-B892FF?style=for-the-badge" alt="286 preguntas">
   <img src="https://img.shields.io/badge/simulacro-65%20preguntas%20%C2%B7%20170%20min-4FA8FF?style=for-the-badge" alt="Simulacro de 65 preguntas en 170 minutos">
   <img src="https://img.shields.io/badge/idiomas-ES%20%7C%20EN-0b1220?style=for-the-badge" alt="Español e inglés">
 </p>
@@ -60,18 +60,28 @@ También puede abrirse `index.html` directamente desde el disco: no hay build st
 
 ## Dominios del examen
 
+Los seis dominios, sus pesos y sus *task statements* provienen de la guía oficial
+**AWS Certified Security – Specialty (SCS-C03)**, edición 2026. Cada página de módulo
+imprime las tareas y skills que le corresponden, con su numeración oficial, y cada
+encabezado de teoría lleva el número de skill que cubre.
+
 | # | Dominio | Peso | Preguntas |
 |---|---|---|---|
-| 1 | Detection | 16 % | 40 |
-| 2 | Incident Response | 14 % | 41 |
-| 3 | Infrastructure Security | 18 % | 42 |
-| 4 | Identity and Access Management | 20 % | 53 |
-| 5 | Data Protection | 18 % | 46 |
-| 6 | Security Foundations & Governance | 14 % | 40 |
+| 1 | Detection | 16 % | 48 |
+| 2 | Incident Response | 14 % | 44 |
+| 3 | Infrastructure Security | 18 % | 49 |
+| 4 | Identity and Access Management | 20 % | 54 |
+| 5 | Data Protection | 18 % | 50 |
+| 6 | Security Foundations & Governance | 14 % | 41 |
+
+El simulacro reparte sus 65 preguntas con esos mismos pesos: 10 de Detection, 9 de
+Incident Response, 12 de Infrastructure Security, 13 de IAM, 12 de Data Protection y
+9 de Governance.
 
 Cada módulo incluye:
 
-- Teoría organizada por los *task statements* oficiales del exam guide
+- Teoría organizada por los *task statements* oficiales del exam guide, con su numeración
+- El temario oficial del dominio impreso al final, para ir tachando contra la guía
 - Diagramas SVG interactivos, navegables también con teclado
 - Ejemplos de AWS CLI y de políticas JSON listos para leer y adaptar
 - Comparativas con Azure donde el mapeo es fiable, o ejemplos en lenguaje llano donde forzarlo induciría a error
@@ -83,7 +93,7 @@ Cada módulo incluye:
 
 ### Quiz por dominio
 
-262 preguntas, 25 de ellas de **respuesta múltiple** (`choose TWO`), puntuadas todo-o-nada igual que en el examen real.
+286 preguntas, 26 de ellas de **respuesta múltiple** (`choose TWO`), puntuadas todo-o-nada igual que en el examen real.
 
 | Función | Para qué sirve |
 |---|---|

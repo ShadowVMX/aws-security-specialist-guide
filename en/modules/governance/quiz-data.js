@@ -479,6 +479,18 @@ var QUIZ_DATA = [
     correct: [1, 2],
     explain: "The basics are <strong>MFA and no access keys</strong> on root, and <strong>centralized root access management</strong> lets you remove those credentials from member accounts entirely, leaving root-only tasks to scoped sessions via <code>sts:AssumeRoot</code>. Creating root access keys is the exact opposite of the guidance. And the fact that SCPs don't restrict the management account's root is a reason <strong>not</strong> to use it daily, not a reason to use it. <a href=\"https://docs.aws.amazon.com/IAM/latest/UserGuide/root-user-best-practices.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
+  {
+    tag: "Delegated administrator per service",
+    q: "You are moving administration of GuardDuty, Security Hub and Macie out of the organization's management account. What is true of the delegated administrator?",
+    options: [
+      "It must be the management account itself in order to see all member accounts",
+      "It is designated per service, and can be a different account for each one",
+      "Only one delegated account can be designated for the whole organization",
+      "It automatically inherits administrator permissions over the other accounts",
+    ],
+    correct: 1,
+    explain: "Delegation is <b>per service</b>: you register one account as delegated administrator for GuardDuty, another — or the same one — for Security Hub, and so on for every service integrated with Organizations. Concentrating them in a security account is the common choice, but it is a choice, not a requirement. The management account is precisely the one worth keeping out, to limit what a compromise of it would reach. And being delegated administrator of a security service grants no permission over member account resources. <a href=\"https://docs.aws.amazon.com/organizations/latest/userguide/orgs_integrate_services.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+  },
 ];
 
 // Registrado para el simulacro de examen, que carga los seis bancos a la vez.

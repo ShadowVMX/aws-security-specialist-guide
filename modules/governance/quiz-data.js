@@ -479,6 +479,18 @@ var QUIZ_DATA = [
     correct: [1, 2],
     explain: "Lo básico es <strong>MFA y cero access keys</strong> en el root, y la <strong>gestión centralizada de acceso root</strong> permite retirar por completo esas credenciales de las cuentas miembro, dejando las tareas que exigen root para sesiones acotadas vía <code>sts:AssumeRoot</code>. Crear access keys de root es justo lo contrario de la recomendación. Y que las SCP no limiten al root de la management account es un motivo para <strong>no</strong> usarlo a diario, no para usarlo. <a href=\"https://docs.aws.amazon.com/IAM/latest/UserGuide/root-user-best-practices.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
+  {
+    tag: "Administrador delegado por servicio",
+    q: "Vas a sacar la administración de GuardDuty, Security Hub y Macie fuera de la cuenta de gestión de la organización. ¿Qué es cierto del administrador delegado?",
+    options: [
+      "Debe ser la propia cuenta de gestión para poder ver todas las cuentas miembro",
+      "Se designa por servicio, y puede ser una cuenta distinta para cada uno",
+      "Solo puede designarse una única cuenta delegada para toda la organización",
+      "Hereda de forma automática permisos de administrador sobre las demás cuentas",
+    ],
+    correct: 1,
+    explain: "La delegación es <b>por servicio</b>: se registra una cuenta como administrador delegado de GuardDuty, otra —o la misma— de Security Hub, y así con cada servicio integrado con Organizations. Lo habitual es concentrarlos en una cuenta de seguridad, pero es una decisión, no una obligación. La cuenta de gestión es justo la que conviene dejar fuera, para reducir lo que puede pasar si se compromete. Y ser administrador delegado de un servicio de seguridad no otorga ningún permiso sobre los recursos de las cuentas miembro. <a href=\"https://docs.aws.amazon.com/organizations/latest/userguide/orgs_integrate_services.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+  },
 ];
 
 // Registrado para el simulacro de examen, que carga los seis bancos a la vez.

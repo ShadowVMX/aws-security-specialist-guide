@@ -479,6 +479,102 @@ var QUIZ_DATA = [
     correct: [1, 2],
     explain: "Security Hub necesita <b>delegated administrator</b> para la vista multi-cuenta y <b>cross-Region aggregation</b> para la vista multi-Región; son dos ejes distintos y hacen falta los dos. La replicación con Lambda es reinventar una función nativa. Y desactivar Security Hub en las otras Regiones eliminaría precisamente los findings que se quieren ver: los controles se evalúan donde están los recursos. <a href=\"https://docs.aws.amazon.com/securityhub/latest/userguide/finding-aggregation-enable.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
+  {
+    tag: "Elegir la fuente de log",
+    q: "Necesitas saber quién modificó la política de un bucket S3 y desde qué dirección IP lo hizo. ¿Qué fuente de log responde a esa pregunta?",
+    options: [
+      "Los VPC Flow Logs de la subred donde vive la aplicación que usa el bucket",
+      "Los S3 server access logs del bucket, que registran cada petición recibida",
+      "El evento de CloudTrail de la llamada PutBucketPolicy, con su sourceIPAddress",
+      "Las métricas de CloudWatch del bucket durante la ventana del cambio",
+    ],
+    correct: 2,
+    explain: "Cambiar una política de bucket es una llamada al <b>plano de control</b>, y eso vive en CloudTrail: el evento <code>PutBucketPolicy</code> trae identidad, hora y <code>sourceIPAddress</code>. Los server access logs y los data events de S3 registran acceso a <b>objetos</b>, no cambios de configuración. Los Flow Logs ven paquetes, no llamadas a la API, y las métricas cuentan pero no dicen quién. Saber qué pregunta responde cada fuente es la mitad del dominio de detección. <a href=\"https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-concepts.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+  },
+  {
+    tag: "Requisitos de retención",
+    q: "Una carga de trabajo nueva procesa datos de tarjetas y está sujeta a PCI DSS. ¿Qué determina cuánto tiempo hay que conservar sus logs de seguridad?",
+    options: [
+      "El coste de almacenamiento en CloudWatch Logs, que crece con el volumen ingerido",
+      "Los requisitos de cumplimiento de la carga y su ventana de investigación",
+      "El periodo por defecto de CloudTrail, que conserva 90 días de eventos de gestión",
+      "El tiempo que tarda GuardDuty en generar findings sobre los eventos ingeridos",
+    ],
+    correct: 1,
+    explain: "La retención se deriva del <b>requisito</b>, no de la herramienta: el marco de cumplimiento fija un mínimo y la ventana de investigación realista suele pedir más. El coste es una consecuencia a optimizar después, no la entrada del diseño. Los 90 días del historial de eventos de CloudTrail son la vista de consola, no un límite del trail. Y GuardDuty analiza en continuo: su latencia no tiene relación con cuánto guardas. <a href=\"https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Working-with-log-groups-and-streams.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+  },
+  {
+    tag: "Alerta sobre un cambio de configuración",
+    q: "Quieres que salte un aviso en cuanto alguien desactive el cifrado por defecto de un bucket, sin depender de que un humano mire un panel. ¿Cómo lo montas?",
+    options: [
+      "Una alarma de CloudWatch sobre la métrica de peticiones PUT del bucket",
+      "Un panel de CloudWatch con un widget que muestre la configuración del bucket",
+      "Una consulta programada de Athena sobre los logs de acceso al servidor de S3",
+      "Una regla de EventBridge sobre el evento de CloudTrail que publica en SNS",
+    ],
+    correct: 3,
+    explain: "El patrón de detección casi reflejo en AWS es <b>CloudTrail → EventBridge → destino</b>: la regla casa el evento concreto y lo entrega a SNS, Lambda o Systems Manager en segundos. Una alarma sobre peticiones PUT mide volumen, no configuración. Un panel exige que alguien lo mire, que es justo lo que se quiere evitar. Y una consulta programada de Athena introduce el retardo de su propio horario, además de mirar la fuente equivocada. <a href=\"https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-events.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+  },
+  {
+    tag: "Estado deseado en la flota",
+    q: "Debes garantizar que el agente de CloudWatch está instalado y con la misma configuración en todas las instancias EC2, incluidas las que se lancen la semana que viene. ¿Qué encaja mejor?",
+    options: [
+      "Systems Manager State Manager, que reaplica el estado deseado periódicamente",
+      "Una regla de AWS Config que marque como no conformes las instancias sin el agente",
+      "Un script de user data en la plantilla de lanzamiento del Auto Scaling group",
+      "Systems Manager Run Command lanzado a mano al detectar instancias nuevas",
+    ],
+    correct: 0,
+    explain: "<b>State Manager</b> declara un estado y lo <b>reaplica</b> según su horario, así que corrige tanto la instancia nueva como la que alguien tocó ayer. Una regla de Config detecta la desviación pero no la arregla por sí sola. El user data se ejecuta una única vez al arrancar y no repara nada después. Y Run Command a mano depende de que alguien se acuerde, que es la definición de control que no escala. <a href=\"https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-state.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+  },
+  {
+    tag: "Logs de flujo en Transit Gateway",
+    q: "Dos VPC se comunican a través de un Transit Gateway y necesitas ver el tráfico que el propio gateway descarta por sus tablas de rutas, no lo que ocurre dentro de cada VPC. ¿Qué activas?",
+    options: [
+      "VPC Flow Logs en las dos VPC, que ya cubren todo lo que atraviesa el gateway",
+      "Transit gateway flow logs, que registran el tráfico en sus attachments",
+      "Route 53 Resolver query logs sobre las dos VPC conectadas al gateway",
+      "Los logs de acceso del Network Load Balancer situado delante del gateway",
+    ],
+    correct: 1,
+    explain: "Los <b>transit gateway flow logs</b> son una fuente propia del gateway: registran cada flujo por attachment y tabla de rutas, incluido lo que se descarta porque no hay ruta. Los VPC Flow Logs solo ven las ENI dentro de la VPC, así que un paquete rechazado en el gateway nunca aparece ahí. Los logs de Resolver responden preguntas de DNS. Y el balanceador ni siquiera está en ese camino. <a href=\"https://docs.aws.amazon.com/vpc/latest/tgw/tgw-flow-logs.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+  },
+  {
+    tag: "Consultas históricas de CloudTrail",
+    q: "Seguridad necesita consultar con SQL siete años de eventos de CloudTrail sin montar ni mantener infraestructura de consulta propia. ¿Qué encaja?",
+    options: [
+      "Un trail que entregue a S3 y una tabla de Athena creada sobre ese prefijo",
+      "CloudWatch Logs Insights sobre el grupo de logs al que entrega el trail",
+      "Amazon OpenSearch Service con los eventos ingeridos por una función Lambda",
+      "CloudTrail Lake, un almacén de datos de eventos consultable con SQL",
+    ],
+    correct: 3,
+    explain: "<b>CloudTrail Lake</b> guarda los eventos en un event data store gestionado, con retención de hasta siete años y consultas SQL desde la propia consola: no hay bucket, ni catálogo, ni clúster que mantener. Athena sobre S3 resuelve lo mismo pero exige crear y particionar la tabla. Logs Insights no usa SQL y su retención se gestiona aparte. Y OpenSearch es precisamente la infraestructura que el enunciado descarta. <a href=\"https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-lake.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+  },
+  {
+    tag: "Panel unificado de seguridad",
+    q: "Quieres un panel único que combine métricas de CloudWatch, datos de OpenSearch y de Prometheus para el equipo de seguridad, con inicio de sesión federado desde IAM Identity Center. ¿Qué servicio?",
+    options: [
+      "Amazon Managed Grafana, que federa varias fuentes y usa Identity Center",
+      "Un panel de CloudWatch, que ya muestra métricas y logs en la misma pantalla",
+      "Security Hub, cuyo resumen agrega los findings de los servicios de seguridad",
+      "Amazon Athena con una vista que una las tres fuentes en una sola consulta",
+    ],
+    correct: 0,
+    explain: "<b>Amazon Managed Grafana</b> existe justo para eso: conecta varios orígenes —CloudWatch, OpenSearch, Prometheus, y de terceros— en un mismo panel y delega la autenticación en IAM Identity Center. Los paneles de CloudWatch se quedan en las fuentes de CloudWatch. Security Hub agrega findings de seguridad, no series temporales arbitrarias. Y Athena consulta datos en S3, no métricas de Prometheus. <a href=\"https://docs.aws.amazon.com/grafana/latest/userguide/what-is-Amazon-Managed-Service-Grafana.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+  },
+  {
+    tag: "Entrega de notificaciones",
+    q: "La organización quiere que los avisos importantes de sus cuentas lleguen a un centro de notificaciones común en la consola y además al móvil del equipo de guardia, sin escribir código. ¿Qué servicio lo centraliza?",
+    options: [
+      "Un tema de SNS con suscripción SMS creado a mano en cada cuenta miembro",
+      "AWS User Notifications, que centraliza los avisos de la consola",
+      "Una función Lambda suscrita a EventBridge que llame a la API de mensajería",
+      "Amazon EventBridge Scheduler, que reparte los eventos según su calendario",
+    ],
+    correct: 1,
+    explain: "<b>AWS User Notifications</b> es la capa de entrega: se configuran reglas sobre eventos de EventBridge y se eligen destinos —el Notifications Center de la consola, correo, chat o móvil—, con vista consolidada para toda la organización y sin código. Un tema de SNS por cuenta funciona, pero hay que crearlo y mantenerlo en cada una. Lambda es escribir el código que el enunciado descarta. Y Scheduler dispara por horario, no por evento. <a href=\"https://docs.aws.amazon.com/notifications/latest/userguide/what-is-service.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+  },
 ];
 
 // Registrado para el simulacro de examen, que carga los seis bancos a la vez.

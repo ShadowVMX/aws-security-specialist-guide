@@ -635,6 +635,18 @@ var QUIZ_DATA = [
     correct: [2, 3],
     explain: "<b>Identity Center</b> con <b>permission sets</b> asignados a grupos es el patrón recomendado a escala, y la federación entrega siempre <b>credenciales temporales de STS</b>. Crear 3.000 usuarios en 60 cuentas es exactamente el problema que la federación elimina (180.000 identidades que mantener). Y compartir una clave entre personas destruye la atribución: nunca es la respuesta. <a href=\"https://docs.aws.amazon.com/singlesignon/latest/userguide/permissionsetsconcept.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
+  {
+    tag: "Active Directory y acceso a AWS",
+    q: "Una empresa con Active Directory on-premises quiere que sus empleados entren en AWS con las credenciales corporativas y, además, que sus aplicaciones Windows en EC2 se unan a un dominio gestionado dentro de AWS. ¿Qué combinación encaja?",
+    options: [
+      "Crear un usuario IAM por empleado y sincronizarlo con un script contra el AD",
+      "AWS Managed Microsoft AD como directorio, federado en IAM Identity Center",
+      "Amazon Cognito con un grupo de usuarios que replique las cuentas del dominio",
+      "AD Connector como directorio y un rol IAM por cada grupo del dominio local",
+    ],
+    correct: 1,
+    explain: "Los dos requisitos tiran en direcciones distintas y solo uno los cubre a la vez. Para la consola bastaría <b>AD Connector</b>, que reenvía la autenticación al AD local sin guardar nada en AWS; pero <em>unir instancias a un dominio</em> exige un directorio real en AWS, y eso es <b>AWS Managed Microsoft AD</b>, que además se conecta a IAM Identity Center como origen de identidad y puede establecer una relación de confianza con el dominio corporativo. Los usuarios IAM sincronizados a mano son credenciales duplicadas. Y Cognito está pensado para las identidades de tu aplicación, no para los empleados. <a href=\"https://docs.aws.amazon.com/directoryservice/latest/admin-guide/directory_microsoft_ad.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
+  },
 ];
 
 // Registrado para el simulacro de examen, que carga los seis bancos a la vez.

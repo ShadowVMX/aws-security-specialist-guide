@@ -4,16 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light dark">
-<meta name="description" content="Guía interactiva y gratuita para el examen AWS Certified Security — Specialty (SCS-C03): teoría por dominios, diagramas interactivos, 262 preguntas de práctica y simulacro cronometrado.">
+<meta name="description" content="Guía interactiva y gratuita para el examen AWS Certified Security — Specialty (SCS-C03): teoría por dominios, diagramas interactivos, 286 preguntas de práctica y simulacro cronometrado.">
 <link rel="icon" href="../../assets/img/favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Detection — AWS Security Specialist (SCS-C03)">
-<meta property="og:description" content="Guía interactiva y gratuita para el examen AWS Certified Security — Specialty (SCS-C03): teoría por dominios, diagramas interactivos, 262 preguntas de práctica y simulacro cronometrado.">
+<meta property="og:description" content="Guía interactiva y gratuita para el examen AWS Certified Security — Specialty (SCS-C03): teoría por dominios, diagramas interactivos, 286 preguntas de práctica y simulacro cronometrado.">
 <meta property="og:url" content="https://shadowvmx.github.io/aws-security-specialist-guide/modules/detection/">
 <meta property="og:locale" content="es_ES">
 <meta name="twitter:card" content="summary">
 <title>Detection — AWS Security Specialist (SCS-C03)</title>
-<link rel="stylesheet" href="../../assets/css/style.css?v=6">
+<link rel="stylesheet" href="../../assets/css/style.css?v=7">
 </head>
 <body>
 
@@ -40,6 +40,7 @@
 
   <aside class="sidebar">
     <h4>1.1 Monitoring &amp; alerting</h4>
+    <a href="#requisitos">Requisitos y alertas</a>
     <a href="#pipeline">Pipeline de detección centralizado</a>
     <a href="#which-service">GuardDuty vs Macie vs Config vs Security Hub</a>
     <a href="#automations">Automatizar evaluaciones</a>
@@ -52,13 +53,41 @@
     <a href="#troubleshoot">Diagnosticar logging roto</a>
     <a href="#fuentes">Fuentes oficiales</a>
     <a href="#trampas">Trampas típicas</a>
+    <a href="#temario">Temario oficial</a>
     <h4>Práctica</h4>
-    <a href="#quiz">Quiz (40 preguntas)</a>
+    <a href="#quiz">Quiz (48 preguntas)</a>
   </aside>
 
   <main class="content">
 
-    <h2 id="pipeline">Pipeline de detección centralizado</h2>
+    <h2 id="requisitos">De los requisitos a las alertas (1.1.1 / 1.1.2)</h2>
+    <p>
+      Antes de activar nada conviene responder tres preguntas sobre la carga de trabajo, porque de ellas salen
+      las <strong>fuentes de log</strong>, las <strong>métricas</strong> y el <strong>umbral</strong> de cada alerta.
+      El examen plantea a menudo el escenario al revés —te da la alerta y pregunta qué falta— y el hilo del que
+      hay que tirar es siempre este.
+    </p>
+    <table role="table">
+      <tr><th>Pregunta</th><th>Qué determina</th></tr>
+      <tr><td>¿Qué activos hay y cuáles son sensibles?</td><td>Qué recursos se monitorizan y con qué prioridad: no todo merece una alerta que despierte a alguien.</td></tr>
+      <tr><td>¿Qué eventos importan y qué marco de cumplimiento aplica?</td><td>Qué fuentes se ingieren y cuánto se conservan. La retención sale del requisito, no del coste.</td></tr>
+      <tr><td>¿Quién responde y en cuánto tiempo?</td><td>Si el destino es un panel, un correo o una remediación automática, y qué severidad justifica cada uno.</td></tr>
+    </table>
+    <p>
+      Con eso ya se puede elegir el mecanismo. Para <strong>estado del recurso</strong> —una instancia que no responde, un
+      endpoint caído— la herramienta son los <strong>health checks</strong> y las <strong>alarmas de CloudWatch</strong> sobre
+      una métrica, con su periodo y sus puntos de datos. Para <strong>cambios de configuración o de comportamiento</strong> —alguien
+      abre un security group, GuardDuty ve tráfico a un dominio conocido— el camino es
+      <strong>EventBridge</strong> sobre el evento, que dispara en segundos y no depende de que una métrica cruce un umbral.
+    </p>
+    <div class="callout exam">
+      <b>Métrica o evento</b>
+      Una alarma de CloudWatch necesita una <strong>serie temporal</strong>; si lo que quieres vigilar ocurre una sola vez y
+      no produce métrica —un <code>PutBucketPolicy</code>, un <code>DeleteTrail</code>— la respuesta es una regla de
+      EventBridge, o un metric filter sobre el grupo de logs si de verdad necesitas contar apariciones.
+    </div>
+
+    <h2 id="pipeline">Pipeline de detección centralizado (1.1.3)</h2>
     <p class="lede">Así encajan las piezas del dominio en una arquitectura real multi-cuenta. Haz clic en cada paso.</p>
 
     <div class="diagram">
@@ -117,7 +146,7 @@
       </table>
     </div>
 
-    <h2 id="which-service">GuardDuty vs Macie vs Config vs Security Hub</h2>
+    <h2 id="which-service">GuardDuty vs Macie vs Config vs Security Hub (1.1.4)</h2>
     <p class="lede">Cuatro servicios que el examen confunde a propósito en las respuestas incorrectas. Cada uno responde una pregunta distinta.</p>
 
     <table role="table">
@@ -329,8 +358,38 @@ aws cloudtrail get-trail-status --name org-security-trail
     </div>
 
 
+    <!-- temario:inicio -->
+    <h2 id="temario">Temario oficial cubierto</h2>
+    <p class="lede">Las tareas y skills que AWS publica para el dominio 1 en la guía del examen. El 16% de las preguntas del examen sale de aquí.</p>
+    <div class="syllabus">
+      <h4>Tarea 1.1 — Diseñar e implementar la monitorización y las alertas de una cuenta u organización</h4>
+      <ul class="skills">
+        <li><span class="skill-id">1.1.1</span> Analizar las cargas de trabajo para determinar qué hay que monitorizar</li>
+        <li><span class="skill-id">1.1.2</span> Diseñar e implementar estrategias de monitorización (por ejemplo, health checks de recursos)</li>
+        <li><span class="skill-id">1.1.3</span> Agregar eventos de seguridad y de monitorización</li>
+        <li><span class="skill-id">1.1.4</span> Crear métricas, alertas y paneles que detecten datos y eventos anómalos (GuardDuty, Security Lake, Security Hub, Macie)</li>
+        <li><span class="skill-id">1.1.5</span> Crear y mantener automatizaciones de evaluación e investigación periódicas (conformance packs de Config, Security Hub, State Manager)</li>
+      </ul>
+      <h4>Tarea 1.2 — Diseñar e implementar soluciones de logging</h4>
+      <ul class="skills">
+        <li><span class="skill-id">1.2.1</span> Identificar las fuentes de log a ingerir y almacenar según los requisitos</li>
+        <li><span class="skill-id">1.2.2</span> Configurar el logging de servicios y aplicaciones (trail de organización, cuenta dedicada de logs, agente de CloudWatch Logs)</li>
+        <li><span class="skill-id">1.2.3</span> Implementar almacenamiento y lagos de datos de logs (Security Lake) e integrarlos con herramientas de terceros</li>
+        <li><span class="skill-id">1.2.4</span> Analizar logs con servicios de AWS (CloudWatch Logs Insights, Athena, findings de Security Hub)</li>
+        <li><span class="skill-id">1.2.5</span> Normalizar, parsear y correlacionar logs (OpenSearch Service, Lambda, Managed Grafana)</li>
+        <li><span class="skill-id">1.2.6</span> Elegir las fuentes de log según el diseño de red y las amenazas (VPC Flow Logs, transit gateway flow logs, logs de Route 53 Resolver)</li>
+      </ul>
+      <h4>Tarea 1.3 — Diagnosticar problemas de monitorización, logging y alertas de seguridad</h4>
+      <ul class="skills">
+        <li><span class="skill-id">1.3.1</span> Analizar funcionalidad, permisos y configuración de los recursos (logging de Lambda, de API Gateway, health checks, logs de CloudFront)</li>
+        <li><span class="skill-id">1.3.2</span> Corregir configuraciones erróneas (agente de CloudWatch, logs que no llegan)</li>
+      </ul>
+      <p class="syllabus-note">Redacción adaptada al español; la versión normativa es la de la guía oficial de AWS. SCS-C03 (guía oficial, edición 2026).</p>
+    </div>
+<!-- temario:fin -->
+
     <h2 id="quiz">Quiz de práctica — Detection</h2>
-    <p class="lede">40 preguntas estilo examen. Elige una opción para ver si es correcta y por qué.</p>
+    <p class="lede">48 preguntas estilo examen. Elige una opción para ver si es correcta y por qué.</p>
     <div id="quiz-root"></div>
 
   </main>
@@ -341,7 +400,7 @@ aws cloudtrail get-trail-status --name org-security-trail
 </footer>
 
 <script src="quiz-data.js"></script>
-<script src="../../assets/js/quiz.js?v=6"></script>
-<script src="../../assets/js/app.js?v=6"></script>
+<script src="../../assets/js/quiz.js?v=7"></script>
+<script src="../../assets/js/app.js?v=7"></script>
 </body>
 </html>

@@ -491,6 +491,42 @@ var QUIZ_DATA = [
     correct: [1, 2],
     explain: "<strong>Isolation in a forensics account</strong> with audited access and <strong>integrity hashes</strong> are what let you prove the evidence wasn't altered. Working on the original volumes modifies them and ruins the chain of custody: always analyze copies. Email provides neither access control nor proof of integrity. <a href=\"https://docs.aws.amazon.com/wellarchitected/latest/security-pillar/sec_incident_response_prepare_forensic.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
+  {
+    tag: "Validating a finding before acting",
+    q: "GuardDuty raises a cryptocurrency mining finding on a production EC2 instance. Before isolating it, which step establishes the real scope and impact of the event?",
+    options: [
+      "Archive the finding so that it stops appearing in the GuardDuty console",
+      "Correlate the finding with the VPC Flow Logs and CloudTrail for that instance",
+      "Raise the finding's severity in Security Hub so that it escalates to the on-call team",
+      "Suppress that finding type with a rule, since it is usually a false positive",
+    ],
+    correct: 1,
+    explain: "A finding is a <b>hypothesis</b>, not a verdict: it says what the service saw, not how much has happened. Validating it means crossing it with other sources — Flow Logs show which destinations the instance talked to and for how long, CloudTrail shows what its role did — and the scope falls out of that. Archiving or suppressing closes the case without looking at it, and raising severity escalates a conclusion nobody has checked yet. <a href=\"https://docs.aws.amazon.com/guardduty/latest/ug/guardduty_findings.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+  },
+  {
+    tag: "Continuous recovery assessment",
+    q: "Beyond tabletop exercises, you want continuous assessment of whether the architecture meets the recovery objectives (RTO and RPO) you declared for the application. Which service?",
+    options: [
+      "AWS Fault Injection Service, which injects controlled failures into the workload",
+      "AWS Resilience Hub, which assesses the application against the stated RTO and RPO",
+      "AWS Backup, whose plans define the frequency and retention of the copies",
+      "Amazon CloudWatch Synthetics, which runs canaries against the public endpoint",
+    ],
+    correct: 1,
+    explain: "<b>Resilience Hub</b> does what none of the others do: you declare RTO and RPO, it analyses the architecture and tells you whether it meets them, with recommendations and a score tracked over time. FIS <em>causes</em> the failure but passes no judgement on the recovery policy. AWS Backup runs the copies Resilience Hub assesses. And Synthetics checks availability, which is not the same as ability to recover. <a href=\"https://docs.aws.amazon.com/resilience-hub/latest/userguide/what-is.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+  },
+  {
+    tag: "Shifting traffic after containment",
+    q: "After containing an incident affecting one Region, you need to shift traffic to the secondary Region with an explicit, audited action, without leaving the decision to health checks. What do you use?",
+    options: [
+      "Editing the Route 53 records in the public hosted zone by hand",
+      "Amazon Application Recovery Controller and its routing controls",
+      "A CodeDeploy blue/green deployment into the secondary Region",
+      "Lowering the TTL on the DNS records so the change propagates sooner",
+    ],
+    correct: 1,
+    explain: "Application Recovery Controller's <b>routing controls</b> are failover switches backed by a highly available data plane: you flip them on purpose, the action is recorded, and safety rules stop you turning both Regions off at once. Editing Route 53 by hand works right up until the console is the thing that is degraded. CodeDeploy ships versions, it does not steer traffic between Regions. And lowering the TTL helps propagation but is not the decision mechanism. <a href=\"https://docs.aws.amazon.com/r53recovery/latest/dg/what-is-route53-recovery.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+  },
 ];
 
 // Registrado para el simulacro de examen, que carga los seis bancos a la vez.

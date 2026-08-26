@@ -4,16 +4,16 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light dark">
-<meta name="description" content="Free interactive study guide for the AWS Certified Security — Specialty (SCS-C03) exam: theory by domain, interactive diagrams, 262 practice questions and a timed simulation.">
+<meta name="description" content="Free interactive study guide for the AWS Certified Security — Specialty (SCS-C03) exam: theory by domain, interactive diagrams, 286 practice questions and a timed simulation.">
 <link rel="icon" href="../../../assets/img/favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Detection — AWS Security Specialist (SCS-C03)">
-<meta property="og:description" content="Free interactive study guide for the AWS Certified Security — Specialty (SCS-C03) exam: theory by domain, interactive diagrams, 262 practice questions and a timed simulation.">
+<meta property="og:description" content="Free interactive study guide for the AWS Certified Security — Specialty (SCS-C03) exam: theory by domain, interactive diagrams, 286 practice questions and a timed simulation.">
 <meta property="og:url" content="https://shadowvmx.github.io/aws-security-specialist-guide/en/modules/detection/">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary">
 <title>Detection — AWS Security Specialist (SCS-C03)</title>
-<link rel="stylesheet" href="../../../assets/css/style.css?v=6">
+<link rel="stylesheet" href="../../../assets/css/style.css?v=7">
 </head>
 <body>
 
@@ -40,6 +40,7 @@
 
   <aside class="sidebar">
     <h4>1.1 Monitoring &amp; alerting</h4>
+    <a href="#requisitos">Requirements and alerts</a>
     <a href="#pipeline">Centralized detection pipeline</a>
     <a href="#which-service">GuardDuty vs Macie vs Config vs Security Hub</a>
     <a href="#automations">Automating evaluations</a>
@@ -52,13 +53,41 @@
     <a href="#troubleshoot">Diagnosing broken logging</a>
     <a href="#fuentes">Official sources</a>
     <a href="#trampas">Classic traps</a>
+    <a href="#temario">Official exam content</a>
     <h4>Practice</h4>
-    <a href="#quiz">Quiz (40 questions)</a>
+    <a href="#quiz">Quiz (48 questions)</a>
   </aside>
 
   <main class="content">
 
-    <h2 id="pipeline">Centralized detection pipeline</h2>
+    <h2 id="requisitos">From requirements to alerts (1.1.1 / 1.1.2)</h2>
+    <p>
+      Before turning anything on, answer three questions about the workload, because the
+      <strong>log sources</strong>, the <strong>metrics</strong> and each alert's <strong>threshold</strong> all fall out of them.
+      The exam often poses the scenario backwards — it hands you the alert and asks what is missing — and this is
+      always the thread to pull.
+    </p>
+    <table role="table">
+      <tr><th>Question</th><th>What it determines</th></tr>
+      <tr><td>Which assets exist, and which are sensitive?</td><td>What gets monitored and at what priority: not everything deserves an alert that wakes somebody up.</td></tr>
+      <tr><td>Which events matter, and which compliance framework applies?</td><td>Which sources are ingested and how long they are kept. Retention comes from the requirement, not from cost.</td></tr>
+      <tr><td>Who responds, and how fast?</td><td>Whether the destination is a dashboard, an email or automatic remediation, and which severity justifies each.</td></tr>
+    </table>
+    <p>
+      With that settled you can pick the mechanism. For <strong>resource health</strong> — an instance that stops responding, an
+      endpoint that is down — the tools are <strong>health checks</strong> and <strong>CloudWatch alarms</strong> over a metric,
+      with their period and datapoints. For <strong>configuration or behaviour changes</strong> — somebody opens a security
+      group, GuardDuty sees traffic to a known-bad domain — the path is <strong>EventBridge</strong> on the event, which fires
+      in seconds and does not wait for a metric to cross a threshold.
+    </p>
+    <div class="callout exam">
+      <b>Metric or event</b>
+      A CloudWatch alarm needs a <strong>time series</strong>; if what you want to watch happens once and produces no metric —
+      a <code>PutBucketPolicy</code>, a <code>DeleteTrail</code> — the answer is an EventBridge rule, or a metric filter over
+      the log group if you genuinely need to count occurrences.
+    </div>
+
+    <h2 id="pipeline">Centralized detection pipeline (1.1.3)</h2>
     <p class="lede">Here's how the pieces of this domain fit together in a real multi-account architecture. Click each step.</p>
 
     <div class="diagram">
@@ -117,7 +146,7 @@
       </table>
     </div>
 
-    <h2 id="which-service">GuardDuty vs Macie vs Config vs Security Hub</h2>
+    <h2 id="which-service">GuardDuty vs Macie vs Config vs Security Hub (1.1.4)</h2>
     <p class="lede">Four services the exam deliberately conflates in wrong answers. Each one answers a different question.</p>
 
     <table role="table">
@@ -329,6 +358,36 @@ aws cloudtrail get-trail-status --name org-security-trail
     </div>
 
 
+    <!-- temario:inicio -->
+    <h2 id="temario">Official exam content covered</h2>
+    <p class="lede">The tasks and skills AWS publishes for domain 1 in the exam guide. 16% of the exam's questions come from here.</p>
+    <div class="syllabus">
+      <h4>Task 1.1 — Design and implement monitoring and alerting solutions for an AWS account or organization</h4>
+      <ul class="skills">
+        <li><span class="skill-id">1.1.1</span> Analyze workloads to determine monitoring requirements</li>
+        <li><span class="skill-id">1.1.2</span> Design and implement workload monitoring strategies (resource health checks)</li>
+        <li><span class="skill-id">1.1.3</span> Aggregate security and monitoring events</li>
+        <li><span class="skill-id">1.1.4</span> Create metrics, alerts, and dashboards (GuardDuty, Security Lake, Security Hub, Macie)</li>
+        <li><span class="skill-id">1.1.5</span> Automations for regular assessments (Config conformance packs, Security Hub, Systems Manager State Manager)</li>
+      </ul>
+      <h4>Task 1.2 — Design and implement logging solutions</h4>
+      <ul class="skills">
+        <li><span class="skill-id">1.2.1</span> Identify sources for log ingestion and storage based on requirements</li>
+        <li><span class="skill-id">1.2.2</span> Configure logging for AWS services and applications (organization trail, dedicated logging account, CloudWatch Logs agent)</li>
+        <li><span class="skill-id">1.2.3</span> Implement log storage and log data lakes (Security Lake) and integrate with third-party tools</li>
+        <li><span class="skill-id">1.2.4</span> Use AWS services to analyze logs (CloudWatch Logs Insights, Athena, Security Hub findings)</li>
+        <li><span class="skill-id">1.2.5</span> Normalize, parse, and correlate logs (OpenSearch Service, Lambda, Managed Grafana)</li>
+        <li><span class="skill-id">1.2.6</span> Determine log sources based on network design (VPC Flow Logs, transit gateway flow logs, Route 53 Resolver logs)</li>
+      </ul>
+      <h4>Task 1.3 — Troubleshoot security monitoring, logging, and alerting solutions</h4>
+      <ul class="skills">
+        <li><span class="skill-id">1.3.1</span> Analyze functionality, permissions and configuration of resources (Lambda logging, API Gateway logging, health checks, CloudFront logging)</li>
+        <li><span class="skill-id">1.3.2</span> Remediate misconfiguration of resources (CloudWatch Agent, missing logs)</li>
+      </ul>
+      <p class="syllabus-note">Wording as published by AWS in the exam guide. SCS-C03 (guía oficial, edición 2026).</p>
+    </div>
+<!-- temario:fin -->
+
     <h2 id="quiz">Practice quiz — Detection</h2>
     <p class="lede">40 exam-style questions. Choose an option to see if it's correct and why.</p>
     <div id="quiz-root"></div>
@@ -341,7 +400,7 @@ aws cloudtrail get-trail-status --name org-security-trail
 </footer>
 
 <script src="quiz-data.js"></script>
-<script src="../../../assets/js/quiz.js?v=6"></script>
-<script src="../../../assets/js/app.js?v=6"></script>
+<script src="../../../assets/js/quiz.js?v=7"></script>
+<script src="../../../assets/js/app.js?v=7"></script>
 </body>
 </html>

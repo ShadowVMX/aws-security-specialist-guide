@@ -5,7 +5,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/exam-SCS--C03-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white" alt="SCS-C03">
   <img src="https://img.shields.io/badge/domains-6%2F6-3ECF8E?style=for-the-badge" alt="6 of 6 domains">
-  <img src="https://img.shields.io/badge/questions-262-B892FF?style=for-the-badge" alt="262 questions">
+  <img src="https://img.shields.io/badge/questions-286-B892FF?style=for-the-badge" alt="286 questions">
   <img src="https://img.shields.io/badge/simulation-65%20questions%20%C2%B7%20170%20min-4FA8FF?style=for-the-badge" alt="65-question, 170-minute simulation">
   <img src="https://img.shields.io/badge/languages-ES%20%7C%20EN-0b1220?style=for-the-badge" alt="Spanish and English">
 </p>
@@ -60,18 +60,27 @@ You can also open `index.html` straight from disk: there is no build step and no
 
 ## Exam domains
 
+The six domains, their weights and their task statements come from the official
+**AWS Certified Security – Specialty (SCS-C03)** exam guide, 2026 edition. Every module
+page prints the tasks and skills it covers, with their official numbering, and every
+theory heading carries the skill number it addresses.
+
 | # | Domain | Weight | Questions |
 |---|---|---|---|
-| 1 | Detection | 16% | 40 |
-| 2 | Incident Response | 14% | 41 |
-| 3 | Infrastructure Security | 18% | 42 |
-| 4 | Identity and Access Management | 20% | 53 |
-| 5 | Data Protection | 18% | 46 |
-| 6 | Security Foundations & Governance | 14% | 40 |
+| 1 | Detection | 16% | 48 |
+| 2 | Incident Response | 14% | 44 |
+| 3 | Infrastructure Security | 18% | 49 |
+| 4 | Identity and Access Management | 20% | 54 |
+| 5 | Data Protection | 18% | 50 |
+| 6 | Security Foundations & Governance | 14% | 41 |
+
+The simulation draws its 65 questions with those same weights: 10 Detection, 9 Incident
+Response, 12 Infrastructure Security, 13 IAM, 12 Data Protection and 9 Governance.
 
 Every module includes:
 
-- Theory organized around the exam guide's official task statements
+- Theory organized around the exam guide's official task statements, with their numbering
+- The domain's official content outline printed at the end, to tick off against the guide
 - Interactive SVG diagrams, navigable by keyboard as well
 - AWS CLI and JSON policy examples ready to read and adapt
 - Azure comparisons where the mapping is reliable, or plain-language examples where forcing it would mislead
@@ -83,7 +92,7 @@ Every module includes:
 
 ### Per-domain quiz
 
-262 questions, 25 of them **multiple response** (`choose TWO`), scored all-or-nothing exactly as in the real exam.
+286 questions, 26 of them **multiple response** (`choose TWO`), scored all-or-nothing exactly as in the real exam.
 
 | Feature | What it's for |
 |---|---|

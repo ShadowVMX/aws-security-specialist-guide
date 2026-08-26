@@ -479,6 +479,102 @@ var QUIZ_DATA = [
     correct: [1, 2],
     explain: "Security Hub needs a <b>delegated administrator</b> for the multi-account view and <b>cross-Region aggregation</b> for the multi-Region view; they are two separate axes and both are required. Replicating with Lambda reinvents a native feature. Disabling Security Hub in the other Regions would remove the very findings you want to see: controls are evaluated where the resources live. <a href=\"https://docs.aws.amazon.com/securityhub/latest/userguide/finding-aggregation-enable.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
+  {
+    tag: "Choosing the log source",
+    q: "You need to know who changed an S3 bucket policy and from which IP address. Which log source answers that question?",
+    options: [
+      "The VPC Flow Logs of the subnet where the application using the bucket runs",
+      "The bucket's S3 server access logs, which record every request received",
+      "The CloudTrail event for the PutBucketPolicy call, with its sourceIPAddress",
+      "The bucket's CloudWatch metrics during the window in which it changed",
+    ],
+    correct: 2,
+    explain: "Changing a bucket policy is a <b>control plane</b> call, and that lives in CloudTrail: the <code>PutBucketPolicy</code> event carries identity, time and <code>sourceIPAddress</code>. S3 server access logs and S3 data events record access to <b>objects</b>, not configuration changes. Flow Logs see packets, not API calls, and metrics count requests without saying who made them. Knowing which question each source answers is half of the detection domain. <a href=\"https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-concepts.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+  },
+  {
+    tag: "Retention requirements",
+    q: "A new workload processes cardholder data and falls under PCI DSS. What determines how long its security logs must be kept?",
+    options: [
+      "The storage cost in CloudWatch Logs, which grows with the volume ingested",
+      "The compliance requirements for the workload and its investigation window",
+      "The CloudTrail default period, which keeps 90 days of management events",
+      "How long GuardDuty takes to raise findings on the events already ingested",
+    ],
+    correct: 1,
+    explain: "Retention follows the <b>requirement</b>, not the tool: the compliance framework sets a floor and a realistic investigation window usually asks for more. Cost is something to optimise afterwards, not the input to the design. CloudTrail's 90 days are the console event history, not a limit on the trail. And GuardDuty analyses continuously: its latency has nothing to do with how long you keep data. <a href=\"https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/Working-with-log-groups-and-streams.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+  },
+  {
+    tag: "Alerting on a configuration change",
+    q: "You want an alert the moment someone turns off default encryption on a bucket, without relying on a human watching a dashboard. How do you build it?",
+    options: [
+      "A CloudWatch alarm on the bucket's PUT request metric",
+      "A CloudWatch dashboard with a widget showing the bucket's configuration",
+      "A scheduled Athena query over the S3 server access logs for the bucket",
+      "An EventBridge rule on the CloudTrail event that publishes to SNS",
+    ],
+    correct: 3,
+    explain: "The near-reflex detection pattern on AWS is <b>CloudTrail → EventBridge → target</b>: the rule matches the specific event and delivers it to SNS, Lambda or Systems Manager within seconds. An alarm on PUT requests measures volume, not configuration. A dashboard needs someone to look at it, which is exactly what you are trying to avoid. And a scheduled query adds the delay of its own schedule, on top of reading the wrong source. <a href=\"https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-events.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+  },
+  {
+    tag: "Desired state across the fleet",
+    q: "You must guarantee that the CloudWatch agent is installed with the same configuration on every EC2 instance, including those launched next week. What fits best?",
+    options: [
+      "Systems Manager State Manager, which reapplies the desired state on a schedule",
+      "An AWS Config rule that flags instances without the agent as noncompliant",
+      "A user data script in the Auto Scaling group's launch template",
+      "Systems Manager Run Command, run by hand whenever new instances appear",
+    ],
+    correct: 0,
+    explain: "<b>State Manager</b> declares a state and <b>reapplies</b> it on its schedule, so it fixes both the new instance and the one somebody changed yesterday. A Config rule detects the drift but does not correct it on its own. User data runs once at boot and repairs nothing afterwards. And Run Command by hand depends on somebody remembering, which is the definition of a control that does not scale. <a href=\"https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-state.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+  },
+  {
+    tag: "Transit Gateway flow logs",
+    q: "Two VPCs talk through a Transit Gateway and you need to see traffic the gateway itself drops because of its route tables, not what happens inside each VPC. What do you enable?",
+    options: [
+      "VPC Flow Logs in both VPCs, which already cover everything crossing the gateway",
+      "Transit gateway flow logs, which record traffic on its attachments",
+      "Route 53 Resolver query logs on the two VPCs attached to the gateway",
+      "The access logs of the Network Load Balancer placed in front of the gateway",
+    ],
+    correct: 1,
+    explain: "<b>Transit gateway flow logs</b> are a source of the gateway itself: they record each flow per attachment and route table, including traffic dropped because no route matched. VPC Flow Logs only see ENIs inside the VPC, so a packet rejected at the gateway never shows up there. Resolver logs answer DNS questions. And the load balancer is not even on that path. <a href=\"https://docs.aws.amazon.com/vpc/latest/tgw/tgw-flow-logs.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+  },
+  {
+    tag: "Historical CloudTrail queries",
+    q: "Security needs to query seven years of CloudTrail events with SQL without building or maintaining query infrastructure of its own. What fits?",
+    options: [
+      "A trail delivering to S3 and an Athena table created over that prefix",
+      "CloudWatch Logs Insights over the log group the trail delivers to",
+      "Amazon OpenSearch Service with the events ingested by a Lambda function",
+      "CloudTrail Lake, an event data store you query with SQL",
+    ],
+    correct: 3,
+    explain: "<b>CloudTrail Lake</b> stores events in a managed event data store, with retention of up to seven years and SQL queries from the console itself: no bucket, no catalog, no cluster to maintain. Athena over S3 solves the same problem but requires creating and partitioning the table. Logs Insights does not use SQL and its retention is managed separately. And OpenSearch is precisely the infrastructure the question rules out. <a href=\"https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-lake.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+  },
+  {
+    tag: "Unified security dashboard",
+    q: "You want a single dashboard combining CloudWatch metrics, OpenSearch data and Prometheus data for the security team, with federated sign-in from IAM Identity Center. Which service?",
+    options: [
+      "Amazon Managed Grafana, which federates several sources and uses Identity Center",
+      "A CloudWatch dashboard, which already shows metrics and logs on one screen",
+      "Security Hub, whose summary aggregates findings from the security services",
+      "Amazon Athena with a view joining the three sources into a single query",
+    ],
+    correct: 0,
+    explain: "<b>Amazon Managed Grafana</b> exists for exactly this: it connects several data sources — CloudWatch, OpenSearch, Prometheus and third parties — on one dashboard and delegates authentication to IAM Identity Center. CloudWatch dashboards stay within CloudWatch sources. Security Hub aggregates security findings, not arbitrary time series. And Athena queries data in S3, not Prometheus metrics. <a href=\"https://docs.aws.amazon.com/grafana/latest/userguide/what-is-Amazon-Managed-Service-Grafana.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+  },
+  {
+    tag: "Notification delivery",
+    q: "The organization wants important account notices to reach a common notification center in the console and the on-call team's phone, with no code written. Which service centralizes that?",
+    options: [
+      "An SNS topic with an SMS subscription, created by hand in each member account",
+      "AWS User Notifications, which centralizes console notices",
+      "A Lambda function subscribed to EventBridge that calls the messaging API",
+      "Amazon EventBridge Scheduler, which dispatches events on its calendar",
+    ],
+    correct: 1,
+    explain: "<b>AWS User Notifications</b> is the delivery layer: you configure rules over EventBridge events and pick destinations — the console Notifications Center, email, chat or mobile push — with a consolidated view across the organization and no code. An SNS topic per account works, but has to be created and maintained in every one. Lambda is the code the question rules out. And Scheduler fires on a timetable, not on an event. <a href=\"https://docs.aws.amazon.com/notifications/latest/userguide/what-is-service.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
+  },
 ];
 
 // Registrado para el simulacro de examen, que carga los seis bancos a la vez.
