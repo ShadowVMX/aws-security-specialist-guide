@@ -156,7 +156,7 @@ var QUIZ_DATA = [
       "Create a service user with a long password and exclude it from conditional access policies",
     ],
     correct: 0,
-    explain: "An agent acting on its own is a principal, and as such it needs an <b>identity of its own</b>. <b>Entra Agent ID</b> provides one with a lifecycle, an owner and an audit trail, and because it is a first-class identity, <b>conditional access</b> policies apply to it, which is what bounds where it can reach and under what conditions. Inheriting the user's identity hands it all of their permissions and makes it impossible to tell in the log who acted. A shared secret is a credential nobody rotates. And excluding it from conditional access removes the very control being asked for. <a href=\"https://learn.microsoft.com/en-us/entra/identity/monitoring-health/concept-agent-id\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "An agent acting on its own is a principal, and as such it needs an <b>identity of its own</b>. <b>Entra Agent ID</b> provides one with a lifecycle, an owner and an audit trail, and because it is a first-class identity, <b>conditional access</b> policies apply to it, which is what bounds where it can reach and under what conditions. Inheriting the user's identity hands it all of their permissions and makes it impossible to tell in the log who acted. A shared secret is a credential nobody rotates. And excluding it from conditional access removes the very control being asked for. <a href=\"https://learn.microsoft.com/en-us/entra/agent-id/what-is-microsoft-entra-agent-id\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "An agent's blast radius",
@@ -180,7 +180,7 @@ var QUIZ_DATA = [
       "Reviewing the application audit logs monthly to work out which agent accessed which piece of data",
     ],
     correct: 1,
-    explain: "All three questions — who is accountable, what it accesses, whether it is still needed — are exactly what <b>identity governance</b> answers, and that is why the agent has to be a directory identity rather than a row in a sheet. With <b>Entra Agent ID</b> it inherits an owner, an access record and <b>access reviews</b>. The sheet and the resource tags enforce nothing. And inferring it from logs is forensics, not governance. <a href=\"https://learn.microsoft.com/en-us/entra/identity/monitoring-health/concept-agent-id\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "All three questions — who is accountable, what it accesses, whether it is still needed — are exactly what <b>identity governance</b> answers, and that is why the agent has to be a directory identity rather than a row in a sheet. With <b>Entra Agent ID</b> it inherits an owner, an access record and <b>access reviews</b>. The sheet and the resource tags enforce nothing. And inferring it from logs is forensics, not governance. <a href=\"https://learn.microsoft.com/en-us/entra/id-governance/agent-id-governance-overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "An agent's permissions",

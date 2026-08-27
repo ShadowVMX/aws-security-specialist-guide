@@ -156,7 +156,7 @@ var QUIZ_DATA = [
       "Crear un usuario de servicio con contraseña larga y excluirlo de las políticas de acceso condicional",
     ],
     correct: 0,
-    explain: "Un agente que actúa solo es un principal, y como tal necesita <b>identidad propia</b>. <b>Entra Agent ID</b> se la da con ciclo de vida, propietario y rastro de auditoría, y al ser una identidad de primera clase le aplican las políticas de <b>acceso condicional</b>, que es lo que acota a qué llega y bajo qué condiciones. Heredar la identidad del usuario le regala todos sus permisos y hace imposible distinguir en el log quién actuó. Un secreto compartido es una credencial que nadie rota. Y excluir del acceso condicional es quitar justo el control que se pide. <a href=\"https://learn.microsoft.com/en-us/entra/identity/monitoring-health/concept-agent-id\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Un agente que actúa solo es un principal, y como tal necesita <b>identidad propia</b>. <b>Entra Agent ID</b> se la da con ciclo de vida, propietario y rastro de auditoría, y al ser una identidad de primera clase le aplican las políticas de <b>acceso condicional</b>, que es lo que acota a qué llega y bajo qué condiciones. Heredar la identidad del usuario le regala todos sus permisos y hace imposible distinguir en el log quién actuó. Un secreto compartido es una credencial que nadie rota. Y excluir del acceso condicional es quitar justo el control que se pide. <a href=\"https://learn.microsoft.com/en-us/entra/agent-id/what-is-microsoft-entra-agent-id\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Radio de impacto de un agente",
@@ -180,7 +180,7 @@ var QUIZ_DATA = [
       "Revisar mensualmente los registros de auditoría de las aplicaciones para deducir qué agente ha accedido a qué dato",
     ],
     correct: 1,
-    explain: "Las tres preguntas —quién responde, a qué accede, si sigue haciendo falta— son exactamente las que resuelve el <b>gobierno de identidades</b>, y por eso el agente tiene que ser una identidad de directorio y no una entrada en una hoja. Con <b>Entra Agent ID</b> hereda propietario, registro de acceso y <b>access reviews</b>. La hoja y las etiquetas de recurso no se aplican a nada. Y deducirlo de los logs es forense, no gobierno. <a href=\"https://learn.microsoft.com/en-us/entra/identity/monitoring-health/concept-agent-id\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Las tres preguntas —quién responde, a qué accede, si sigue haciendo falta— son exactamente las que resuelve el <b>gobierno de identidades</b>, y por eso el agente tiene que ser una identidad de directorio y no una entrada en una hoja. Con <b>Entra Agent ID</b> hereda propietario, registro de acceso y <b>access reviews</b>. La hoja y las etiquetas de recurso no se aplican a nada. Y deducirlo de los logs es forense, no gobierno. <a href=\"https://learn.microsoft.com/en-us/entra/id-governance/agent-id-governance-overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Permisos de un agente",
