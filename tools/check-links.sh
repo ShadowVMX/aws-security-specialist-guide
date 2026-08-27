@@ -17,11 +17,13 @@ cd "$(dirname "$0")/.." || exit 1
 # an explanation is exactly the one a student would click to check a claim.
 # In the .js banks the HTML lives inside a JS string, so the quotes arrive
 # backslash-escaped — match either form.
+# Cada certificación vive en su propia carpeta; el índice de la raíz enlaza a
+# todas. Se recorre el sitio entero en vez de listar rutas a mano, para que una
+# certificación nueva quede cubierta sin tocar este script.
 mapfile -t urls < <(
   grep -rhoE 'href=\\?"https://[^"\\]+' \
-    index.html en/index.html examen/index.html en/exam/index.html \
-    modules/*/index.html en/modules/*/index.html \
-    modules/*/quiz-data.js en/modules/*/quiz-data.js 2>/dev/null |
+    --include='*.html' --include='quiz-data.js' \
+    . 2>/dev/null |
   sed -E 's/^href=\\?"//' |
   sort -u
 )

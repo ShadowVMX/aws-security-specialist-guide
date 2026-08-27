@@ -15,13 +15,13 @@
 </p>
 
 <h3 align="center">
-  <a href="https://shadowvmx.github.io/aws-security-specialist-guide/">Abrir la guía →</a>
+  <a href="https://shadowvmx.github.io/aws-scs-c03/">Abrir la guía →</a>
 </h3>
 
 <p align="center">
-  <a href="https://shadowvmx.github.io/aws-security-specialist-guide/examen/">Simulacro de examen</a>
+  <a href="https://shadowvmx.github.io/aws-scs-c03/examen/">Simulacro de examen</a>
   &nbsp;·&nbsp;
-  <a href="https://shadowvmx.github.io/aws-security-specialist-guide/en/">English version</a>
+  <a href="https://shadowvmx.github.io/aws-scs-c03/en/">English version</a>
 </p>
 
 ---
@@ -42,7 +42,7 @@ Funciona en el navegador, sin instalación y sin cuentas: **el progreso se guard
 
 No requiere instalación:
 
-### [shadowvmx.github.io/aws-security-specialist-guide](https://shadowvmx.github.io/aws-security-specialist-guide/)
+### [shadowvmx.github.io/aws-security-specialist-guide](https://shadowvmx.github.io/aws-scs-c03/)
 
 <details>
 <summary>Ejecutarla en local</summary>

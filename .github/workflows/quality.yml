@@ -19,17 +19,23 @@ jobs:
         with:
           node-version: '20'
 
+      # Recorre el árbol en vez de listar rutas: cada certificación vive en su
+      # propia carpeta y no debería haber que tocar el workflow para añadir una.
       - name: Syntax of every quiz bank
         run: |
-          for f in modules/*/quiz-data.js en/modules/*/quiz-data.js; do
-            node -c "$f" || { echo "::error file=$f::syntax error"; exit 1; }
-          done
+          fail=0
+          while IFS= read -r f; do
+            node -c "$f" || { echo "::error file=$f::syntax error"; fail=1; }
+          done < <(find . -name quiz-data.js -not -path './.git/*')
+          exit $fail
 
       - name: Syntax of every script
         run: |
-          for f in assets/js/*.js tools/*.js; do
-            node -c "$f" || { echo "::error file=$f::syntax error"; exit 1; }
+          fail=0
+          for f in assets/js/*.js tools/*.js tools/guides/*.js; do
+            node -c "$f" || { echo "::error file=$f::syntax error"; fail=1; }
           done
+          exit $fail
 
       # Structure, ES/EN parity and the answer-position bias that lets someone
       # pass the quiz without reading the questions.
@@ -56,16 +62,24 @@ jobs:
 
       # Every Spanish page must have its English twin and vice versa, or the
       # language switch sends people to a 404.
+      # Cada módulo en español necesita su gemelo en inglés y al revés, en
+      # todas las certificaciones: sin eso el selector de idioma lleva a un 404.
       - name: ES/EN page parity
         run: |
           fail=0
-          for f in modules/*/index.html; do
-            twin="en/$f"
-            [ -f "$twin" ] || { echo "::error file=$f::missing $twin"; fail=1; }
-          done
-          for f in en/modules/*/index.html; do
-            twin="${f#en/}"
-            [ -f "$twin" ] || { echo "::error file=$f::missing $twin"; fail=1; }
+          for cert in */modules; do
+            [ -d "$cert" ] || continue
+            root="${cert%/modules}"
+            for f in "$root"/modules/*/index.html; do
+              [ -e "$f" ] || continue
+              twin="$root/en/modules/$(basename "$(dirname "$f")")/index.html"
+              [ -f "$twin" ] || { echo "::error file=$f::falta $twin"; fail=1; }
+            done
+            for f in "$root"/en/modules/*/index.html; do
+              [ -e "$f" ] || continue
+              twin="$root/modules/$(basename "$(dirname "$f")")/index.html"
+              [ -f "$twin" ] || { echo "::error file=$f::falta $twin"; fail=1; }
+            done
           done
           exit $fail
 
@@ -76,11 +90,10 @@ jobs:
       - name: Every page declares a viewport and a color scheme
         run: |
           fail=0
-          for f in index.html en/index.html examen/index.html en/exam/index.html \
-                   modules/*/index.html en/modules/*/index.html; do
-            grep -q 'name="viewport"' "$f" || { echo "::error file=$f::no viewport"; fail=1; }
-            grep -q 'name="color-scheme"' "$f" || { echo "::error file=$f::no color-scheme"; fail=1; }
-          done
+          while IFS= read -r f; do
+            grep -q 'name="viewport"' "$f" || { echo "::error file=$f::sin viewport"; fail=1; }
+            grep -q 'name="color-scheme"' "$f" || { echo "::error file=$f::sin color-scheme"; fail=1; }
+          done < <(find . -name '*.html' -not -path './.git/*')
           exit $fail
 
   links:

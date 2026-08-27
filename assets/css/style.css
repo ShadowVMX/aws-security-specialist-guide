@@ -233,6 +233,7 @@ a:hover { text-decoration: underline; }
 }
 .status.ready { background: var(--green-soft); color: var(--green); }
 .status.soon { background: var(--border); color: var(--text-faint); }
+.status.wip { background: var(--accent-soft); color: var(--accent); }
 .card-link { position: absolute; inset: 0; }
 
 /* ---- module page layout ---- */
