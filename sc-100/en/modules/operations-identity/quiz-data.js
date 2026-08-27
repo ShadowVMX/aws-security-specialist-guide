@@ -12,7 +12,7 @@ var QUIZ_DATA = [
       "Deploy Sentinel alongside Defender XDR and work incidents in both portals",
     ],
     correct: 1,
-    explain: "Defender XDR <b>already</b> correlates identity, endpoint, email and Microsoft cloud apps into assembled incidents, with nothing to connect and no ingestion cost. Adding Sentinel here means paying to rebuild by hand what comes finished. A SIEM earns its place when a foreign source appears — a third-party firewall, another cloud, a line-of-business application — or when long retention is required; none of that is in the scenario. And working in two portals is exactly what the unified portal removes. <a href=\"https://learn.microsoft.com/en-us/unified-secops-platform/overview-unified-security\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Defender XDR <b>already</b> correlates identity, endpoint, email and Microsoft cloud apps into assembled incidents, with nothing to connect and no ingestion cost. Adding Sentinel here means paying to rebuild by hand what comes finished. A SIEM earns its place when a foreign source appears — a third-party firewall, another cloud, a line-of-business application — or when long retention is required; none of that is in the scenario. And working in two portals is exactly what the unified portal removes. <a href=\"https://learn.microsoft.com/en-us/unified-secops/overview-unified-security\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "When the SIEM earns its place",
@@ -72,7 +72,7 @@ var QUIZ_DATA = [
       "Replicate the critical workloads into Azure so Defender for Cloud can assess them",
     ],
     correct: 0,
-    explain: "The <b>multicloud connectors</b> in Defender for Cloud authenticate against AWS and GCP and assess their configuration from outside, with no agent on the workloads, which is precisely the constraint. Deploying agents contradicts it. Sentinel correlates events; it does not produce posture recommendations. And replicating workloads so you can look at them is not an architectural answer. <a href=\"https://learn.microsoft.com/en-us/azure/defender-for-cloud/multicloud\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "The <b>multicloud connectors</b> in Defender for Cloud authenticate against AWS and GCP and assess their configuration from outside, with no agent on the workloads, which is precisely the constraint. Deploying agents contradicts it. Sentinel correlates events; it does not produce posture recommendations. And replicating workloads so you can look at them is not an architectural answer. <a href=\"https://learn.microsoft.com/en-us/azure/defender-for-cloud/plan-multicloud-security-get-started\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Automation rule or playbook",
@@ -96,7 +96,7 @@ var QUIZ_DATA = [
       "An ITSM data connector in Sentinel",
     ],
     correct: 2,
-    explain: "When the action leaves <b>Sentinel</b>, you need a <b>playbook</b>: a Logic App with hundreds of connectors, usually triggered from an automation rule that filters on severity. Rules on their own act within the incident. An export moves data but does not create the ticket. And a data connector brings information from the ITSM into Sentinel, which is the opposite direction. <a href=\"https://learn.microsoft.com/en-us/azure/sentinel/automate-responses-with-playbooks\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "When the action leaves <b>Sentinel</b>, you need a <b>playbook</b>: a Logic App with hundreds of connectors, usually triggered from an automation rule that filters on severity. Rules on their own act within the incident. An export moves data but does not create the ticket. And a data connector brings information from the ITSM into Sentinel, which is the opposite direction. <a href=\"https://learn.microsoft.com/en-us/azure/sentinel/automation/automate-responses-with-playbooks\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Hunting versus detection",
@@ -432,7 +432,7 @@ var QUIZ_DATA = [
       "Pass-the-hash; fixed by enabling Credential Guard on every workstation",
     ],
     correct: 2,
-    explain: "Any authenticated user can request a service ticket for an account with an SPN and crack its password offline: that is <b>kerberoasting</b>, and what closes it at the root is the password no longer being human, using <b>group managed service accounts</b>, which generate it long and rotate it themselves. DCSync abuses replication permissions. Golden Ticket starts from a krbtgt compromise. And pass-the-hash replays credentials held in memory. <a href=\"https://learn.microsoft.com/en-us/windows-server/security/group-managed-service-accounts/group-managed-service-accounts-overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Any authenticated user can request a service ticket for an account with an SPN and crack its password offline: that is <b>kerberoasting</b>, and what closes it at the root is the password no longer being human, using <b>group managed service accounts</b>, which generate it long and rotate it themselves. DCSync abuses replication permissions. Golden Ticket starts from a krbtgt compromise. And pass-the-hash replays credentials held in memory. <a href=\"https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/group-managed-service-accounts/group-managed-service-accounts/group-managed-service-accounts-overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Detecting the attack inside the domain",
@@ -451,24 +451,24 @@ var QUIZ_DATA = [
     q: "An organisation with workloads in Azure, AWS and GCP wants to identify which identities hold permissions they never use, and trim them down to actual usage. What do you recommend?",
     options: [
       "The regulatory compliance dashboard in Microsoft Defender for Cloud",
-      "Entra ID access reviews over the groups belonging to each cloud",
-      "Microsoft Entra Permissions Management",
-      "Azure Policy with initiatives assigned to every subscription and project",
+      "Entra ID access reviews over the groups that grant access to each of the three clouds",
+      "The CIEM capabilities of the Defender CSPM plan in Defender for Cloud",
+      "Azure Policy with initiatives assigned to every Azure subscription and every GCP project",
     ],
     correct: 2,
-    explain: "This is cloud infrastructure entitlement management, and the Microsoft piece is <b>Permissions Management</b>: it compares <em>granted</em> against <em>used</em> permissions across the three clouds, computes the excess and lets you trim to real usage. Defender for Cloud gives you posture over <em>resources</em>, not over permissions. Access reviews recertify membership without knowing what is used. And Azure Policy governs configuration. <a href=\"https://learn.microsoft.com/en-us/entra/permissions-management/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "This is <b>cloud infrastructure entitlement management</b> (CIEM), and it now lives inside <b>Defender for Cloud</b>, in the <b>Defender CSPM</b> plan: it analyses identity configuration and actual usage across Azure, AWS and GCP and returns recommendations on inactive identities and excessive permissions. Watch out for the older product: <em>Microsoft Entra Permissions Management</em> did exactly this, but Microsoft retired it on 1 November 2025 and pointed customers at Defender CSPM. The compliance dashboard evidences conformance with a standard. Access reviews recertify membership without knowing what is used. And Azure Policy governs resource configuration, not identity permissions. <a href=\"https://learn.microsoft.com/en-us/azure/defender-for-cloud/permissions-management\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Trimming the granted permission",
-    q: "Permissions Management shows that an AWS role used by a data team has a very high permission creep index. The team is afraid trimming it will break their nightly processes. How do you plan the trim?",
+    q: "The CIEM recommendations in Defender for Cloud flag an AWS role, used by a data team, holding permissions far beyond what it uses. The team is afraid trimming it will break their nightly processes. How do you plan the trim?",
     options: [
       "Remove the role and grant it back only when somebody complains that something stopped working",
       "Leave it as it is and offset it with an alert every time the role performs a privileged action",
-      "Generate the role right-sized to observed historical usage and apply it after the observation period",
+      "Right-size the role to observed usage, with an observation window covering a full nightly cycle",
       "Replace the role with long-lived credentials specific to each of the nightly processes",
     ],
     correct: 2,
-    explain: "The value of <b>Permissions Management</b> is not the number: it is that it knows <em>what has actually been used</em> and can propose a role right-sized to that usage. The team's fear is answered with an observation window long enough for the nightly processes to run, not by giving up on the trim. Removing and waiting for complaints is manufacturing the incident. The alert detects after the fact. And long-lived credentials make the problem worse rather than solving it. <a href=\"https://learn.microsoft.com/en-us/entra/permissions-management/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "The value of CIEM is not the risk label: it is that it knows <em>what has actually been used</em>, and from that you can write a role right-sized to that usage. The team's fear is answered by extending the <b>observation window</b> until the nightly processes have run, not by giving up on the trim. Removing and waiting for complaints is manufacturing the incident. The alert detects after the fact. And long-lived credentials swap an excessive permission for a permanent secret: they make it worse. <a href=\"https://learn.microsoft.com/en-us/azure/defender-for-cloud/permissions-management\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Administering the tenant",

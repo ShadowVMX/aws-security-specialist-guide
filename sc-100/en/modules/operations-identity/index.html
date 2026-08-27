@@ -88,7 +88,7 @@
       <tr><td>"the security team must not hold standing permissions"</td><td>PIM, <em>just-in-time</em> access, access reviews.</td></tr>
       <tr><td>"there is an on-premises AD DS that is not going away"</td><td>That the solution has to be hybrid, not cloud only.</td></tr>
       <tr><td>"must comply with <em>standard X</em>" followed by "with minimal operational effort"</td><td>That a template or initiative already exists and does not need writing.</td></tr>
-      <tr><td>"multiple clouds" / "AWS and GCP too"</td><td>Azure Arc, Defender for Cloud multicloud connectors, Permissions Management.</td></tr>
+      <tr><td>"multiple clouds" / "AWS and GCP too"</td><td>Azure Arc, Defender for Cloud multicloud connectors, and its CIEM capabilities.</td></tr>
     </table>
     <div class="callout exam">
       <b>The reflex worth training</b>
@@ -373,16 +373,26 @@
 
     <h2 id="ciem">CIEM: cloud infrastructure entitlements (2.3.5)</h2>
     <p>
-      The problem it solves: in any cloud, 90% of granted permissions are never used, and every one of them
-      is attack surface. <strong>Microsoft Entra Permissions Management</strong> is Microsoft's answer: it
-      discovers granted versus actually used permissions across Azure, AWS and GCP, computes a permission
-      creep index and lets you trim down to real usage.
+      The problem it solves: in any cloud, most granted permissions are never used, and every one of them is
+      attack surface. Microsoft's answer is the <strong>CIEM</strong> capabilities of the
+      <strong>Defender CSPM</strong> plan in Defender for Cloud: they analyse identity configuration and
+      actual usage across <strong>Azure, AWS and GCP</strong> and return concrete recommendations on
+      inactive identities, over-provisioned permissions and insecure identity settings, so you can trim to
+      real usage.
     </p>
+    <div class="callout warn">
+      <b>Careful with the older product</b>
+      Until recently this was <strong>Microsoft Entra Permissions Management</strong>, a separate product
+      with its "permission creep index". Microsoft <strong>retired it on 1 November 2025</strong> and
+      pointed customers at Defender CSPM. It still shows up in older study material, so it is worth
+      recognising the name and knowing the current answer is Defender for Cloud.
+    </div>
     <div class="callout exam">
       <b>How they word it</b>
       "We need to see, across all three clouds, which identities hold permissions they do not use." That is
-      CIEM. Defender for Cloud gives posture over <em>resources</em>; Permissions Management gives posture
-      over <em>permissions</em>.
+      CIEM. The distinction they are after outlives the product change: <em>resource</em> posture looks at
+      how the storage account or the machine is configured; <em>permission</em> posture looks at what each
+      identity can do and what it actually does.
     </div>
 
     <h2 id="paw">Privileged access workstations (2.3.7)</h2>

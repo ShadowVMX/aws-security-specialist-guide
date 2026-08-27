@@ -12,7 +12,7 @@ var QUIZ_DATA = [
       "Desplegar Sentinel y además Defender XDR, y trabajar los incidentes en los dos portales",
     ],
     correct: 1,
-    explain: "Defender XDR <b>ya</b> correlaciona identidad, endpoint, correo y aplicaciones de Microsoft en incidentes montados, sin conectar nada y sin coste de ingesta. Meter Sentinel aquí es pagar por reconstruir a mano lo que viene hecho. El SIEM se justifica cuando entra un origen ajeno —un firewall de terceros, otra nube, una aplicación propia— o cuando hace falta retención larga; nada de eso aparece en el enunciado. Y trabajar en dos portales a la vez es justo lo que resuelve el portal unificado. <a href=\"https://learn.microsoft.com/en-us/unified-secops-platform/overview-unified-security\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Defender XDR <b>ya</b> correlaciona identidad, endpoint, correo y aplicaciones de Microsoft en incidentes montados, sin conectar nada y sin coste de ingesta. Meter Sentinel aquí es pagar por reconstruir a mano lo que viene hecho. El SIEM se justifica cuando entra un origen ajeno —un firewall de terceros, otra nube, una aplicación propia— o cuando hace falta retención larga; nada de eso aparece en el enunciado. Y trabajar en dos portales a la vez es justo lo que resuelve el portal unificado. <a href=\"https://learn.microsoft.com/en-us/unified-secops/overview-unified-security\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Cuándo entra el SIEM",
@@ -72,7 +72,7 @@ var QUIZ_DATA = [
       "Replicar las cargas críticas en Azure para poder evaluarlas con Defender for Cloud",
     ],
     correct: 0,
-    explain: "Los <b>conectores multinube</b> de Defender for Cloud se autentican contra AWS y GCP y evalúan su configuración desde fuera, sin agente en las cargas, que es exactamente la restricción del enunciado. Desplegar agentes la contradice. Sentinel correlaciona eventos, no produce recomendaciones de postura. Y replicar cargas para poder mirarlas no es una respuesta de arquitectura. <a href=\"https://learn.microsoft.com/en-us/azure/defender-for-cloud/multicloud\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Los <b>conectores multinube</b> de Defender for Cloud se autentican contra AWS y GCP y evalúan su configuración desde fuera, sin agente en las cargas, que es exactamente la restricción del enunciado. Desplegar agentes la contradice. Sentinel correlaciona eventos, no produce recomendaciones de postura. Y replicar cargas para poder mirarlas no es una respuesta de arquitectura. <a href=\"https://learn.microsoft.com/en-us/azure/defender-for-cloud/plan-multicloud-security-get-started\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Reglas de automatización o playbook",
@@ -96,7 +96,7 @@ var QUIZ_DATA = [
       "Un conector de datos del ITSM en Sentinel",
     ],
     correct: 2,
-    explain: "Cuando la acción sale <b>fuera</b> de Sentinel hace falta un <b>playbook</b>: es una Logic App con cientos de conectores, y lo habitual es dispararlo desde una regla de automatización que filtre por severidad. Las reglas por sí solas actúan dentro del incidente. Una exportación mueve datos pero no crea el ticket. Y un conector de datos trae información del ITSM hacia Sentinel, que es la dirección contraria. <a href=\"https://learn.microsoft.com/en-us/azure/sentinel/automate-responses-with-playbooks\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Cuando la acción sale <b>fuera</b> de Sentinel hace falta un <b>playbook</b>: es una Logic App con cientos de conectores, y lo habitual es dispararlo desde una regla de automatización que filtre por severidad. Las reglas por sí solas actúan dentro del incidente. Una exportación mueve datos pero no crea el ticket. Y un conector de datos trae información del ITSM hacia Sentinel, que es la dirección contraria. <a href=\"https://learn.microsoft.com/en-us/azure/sentinel/automation/automate-responses-with-playbooks\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Caza frente a detección",
@@ -432,7 +432,7 @@ var QUIZ_DATA = [
       "Pass-the-hash; se corrige habilitando Credential Guard en todas las estaciones",
     ],
     correct: 2,
-    explain: "Cualquier usuario autenticado puede pedir un ticket de servicio para una cuenta con SPN y romper su contraseña sin conexión: eso es <b>kerberoasting</b>, y lo que lo cierra de raíz es que la contraseña deje de ser humana, con <b>cuentas de servicio administradas de grupo</b>, que la generan larga y la rotan solas. DCSync explota permisos de replicación. Golden Ticket parte del compromiso de krbtgt. Y pass-the-hash reutiliza credenciales en memoria. <a href=\"https://learn.microsoft.com/en-us/windows-server/security/group-managed-service-accounts/group-managed-service-accounts-overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Cualquier usuario autenticado puede pedir un ticket de servicio para una cuenta con SPN y romper su contraseña sin conexión: eso es <b>kerberoasting</b>, y lo que lo cierra de raíz es que la contraseña deje de ser humana, con <b>cuentas de servicio administradas de grupo</b>, que la generan larga y la rotan solas. DCSync explota permisos de replicación. Golden Ticket parte del compromiso de krbtgt. Y pass-the-hash reutiliza credenciales en memoria. <a href=\"https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/manage/group-managed-service-accounts/group-managed-service-accounts/group-managed-service-accounts-overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Detectar el ataque en el dominio",
@@ -451,24 +451,24 @@ var QUIZ_DATA = [
     q: "Una organización con cargas en Azure, AWS y GCP quiere identificar qué identidades tienen permisos concedidos que no utilizan, y recortarlos al uso real. ¿Qué recomiendas?",
     options: [
       "El panel de cumplimiento normativo de Microsoft Defender for Cloud",
-      "Access reviews de Entra ID sobre los grupos de cada una de las nubes",
-      "Microsoft Entra Permissions Management",
-      "Azure Policy con iniciativas asignadas a cada suscripción y proyecto",
+      "Access reviews de Entra ID sobre los grupos que dan acceso a cada una de las tres nubes",
+      "Las capacidades CIEM del plan Defender CSPM en Defender for Cloud",
+      "Azure Policy con iniciativas asignadas a cada suscripción de Azure y a cada proyecto de GCP",
     ],
     correct: 2,
-    explain: "Esto es gestión de permisos de infraestructura en la nube, y la pieza de Microsoft es <b>Permissions Management</b>: compara permisos <em>concedidos</em> contra permisos <em>usados</em> en las tres nubes, calcula el exceso y permite recortar al uso real. Defender for Cloud da postura de <em>recursos</em>, no de permisos. Las access reviews recertifican pertenencia, sin saber qué se usa. Y Azure Policy gobierna configuración. <a href=\"https://learn.microsoft.com/en-us/entra/permissions-management/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Esto es <b>gestión de permisos de infraestructura en la nube</b> (CIEM), y hoy vive dentro de <b>Defender for Cloud</b>, en el plan <b>Defender CSPM</b>: analiza la configuración y el uso real de las identidades en Azure, AWS y GCP y devuelve recomendaciones sobre identidades inactivas y permisos excesivos. Ojo con el producto anterior: <em>Microsoft Entra Permissions Management</em> hacía justo esto, pero Microsoft lo retiró el 1 de noviembre de 2025 y dirigió a los clientes a Defender CSPM. El panel de cumplimiento evidencia conformidad con una norma. Las access reviews recertifican pertenencia, sin saber qué se usa. Y Azure Policy gobierna configuración de recursos, no permisos de identidades. <a href=\"https://learn.microsoft.com/en-us/azure/defender-for-cloud/permissions-management\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Recortar el permiso concedido",
-    q: "Permissions Management muestra que un rol de AWS usado por un equipo de datos tiene un índice de exceso de permiso muy alto. El equipo teme que recortarlo rompa sus procesos nocturnos. ¿Cómo se plantea el recorte?",
+    q: "Las recomendaciones CIEM de Defender for Cloud señalan un rol de AWS, usado por un equipo de datos, con permisos muy por encima de lo que utiliza. El equipo teme que recortarlo rompa sus procesos nocturnos. ¿Cómo se plantea el recorte?",
     options: [
       "Retirar el rol y volver a concederlo solo cuando alguien reclame que algo ha dejado de funcionar",
       "Dejarlo como está y compensarlo con una alerta cada vez que el rol ejecute una acción privilegiada",
-      "Generar el rol ajustado al uso observado en el histórico y aplicarlo tras el periodo de observación",
+      "Ajustar el rol al uso observado, con un periodo de observación que cubra el ciclo nocturno completo",
       "Sustituir el rol por credenciales de larga duración específicas para cada uno de los procesos nocturnos",
     ],
     correct: 2,
-    explain: "El valor de <b>Permissions Management</b> no es el número: es que sabe <em>qué se ha usado realmente</em> y puede proponer un rol ajustado a ese uso. El miedo del equipo se responde con un periodo de observación suficiente para que entren los procesos nocturnos, no renunciando al recorte. Retirar y esperar quejas es provocar la incidencia. La alerta detecta después de que ocurra. Y las credenciales de larga duración empeoran el problema en vez de resolverlo. <a href=\"https://learn.microsoft.com/en-us/entra/permissions-management/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "El valor de CIEM no es la etiqueta de riesgo: es que sabe <em>qué se ha usado realmente</em>, y con eso se puede escribir un rol ajustado a ese uso. El miedo del equipo se responde alargando la <b>ventana de observación</b> hasta que hayan entrado los procesos nocturnos, no renunciando al recorte. Retirar y esperar quejas es provocar la incidencia. La alerta detecta después de que ocurra. Y las credenciales de larga duración cambian un permiso excesivo por un secreto permanente: empeoran el problema. <a href=\"https://learn.microsoft.com/en-us/azure/defender-for-cloud/permissions-management\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Administración del tenant",

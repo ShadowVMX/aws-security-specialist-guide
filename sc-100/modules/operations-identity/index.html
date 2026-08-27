@@ -88,7 +88,7 @@
       <tr><td>«el equipo de seguridad no puede tener permisos permanentes»</td><td>PIM, acceso <em>just-in-time</em>, revisiones de acceso.</td></tr>
       <tr><td>«hay un AD DS on-premises que no se va a retirar»</td><td>Que la solución tiene que ser híbrida, no solo cloud.</td></tr>
       <tr><td>«debe cumplir <em>norma X</em>» y luego «con el mínimo esfuerzo operativo»</td><td>Que hay una plantilla o iniciativa que ya existe y no hay que escribirla.</td></tr>
-      <tr><td>«varias nubes» / «AWS y GCP también»</td><td>Azure Arc, conectores multinube de Defender for Cloud, Permissions Management.</td></tr>
+      <tr><td>«varias nubes» / «AWS y GCP también»</td><td>Azure Arc, conectores multinube de Defender for Cloud, y sus capacidades CIEM.</td></tr>
     </table>
     <div class="callout exam">
       <b>El reflejo que hay que entrenar</b>
@@ -372,16 +372,26 @@
 
     <h2 id="ciem">CIEM: permisos de infraestructura en la nube (2.3.5)</h2>
     <p>
-      El problema que resuelve: en cualquier nube el 90% de los permisos concedidos no se usa nunca, y cada
-      uno es superficie de ataque. <strong>Microsoft Entra Permissions Management</strong> es la respuesta
-      de Microsoft: descubre los permisos concedidos frente a los realmente usados en Azure, AWS y GCP,
-      calcula un índice de exceso de permiso y permite recortar al uso real.
+      El problema que resuelve: en cualquier nube la mayoría de los permisos concedidos no se usa nunca, y
+      cada uno es superficie de ataque. La respuesta de Microsoft son las capacidades <strong>CIEM</strong>
+      del plan <strong>Defender CSPM</strong> en Defender for Cloud: analizan la configuración y el uso real
+      de las identidades en <strong>Azure, AWS y GCP</strong> y devuelven recomendaciones concretas sobre
+      identidades inactivas, permisos excesivos y configuraciones de identidad inseguras, para poder
+      recortar al uso real.
     </p>
+    <div class="callout warn">
+      <b>Cuidado con el producto anterior</b>
+      Hasta hace poco esto era <strong>Microsoft Entra Permissions Management</strong>, un producto aparte
+      con su «índice de exceso de permiso». Microsoft lo <strong>retiró el 1 de noviembre de 2025</strong> y
+      dirigió a sus clientes a Defender CSPM. Sigue apareciendo en material de estudio antiguo, así que
+      conviene reconocer el nombre y saber que la respuesta actual es Defender for Cloud.
+    </div>
     <div class="callout exam">
       <b>Cómo lo enuncian</b>
       «Necesitamos ver, en las tres nubes, qué identidades tienen permisos que no utilizan.» Eso es CIEM.
-      Defender for Cloud da postura de <em>recursos</em>; Permissions Management da postura de
-      <em>permisos</em>.
+      La distinción que buscan sigue viva aunque el producto haya cambiado: la postura de
+      <em>recursos</em> mira cómo está configurado el almacenamiento o la máquina; la de
+      <em>permisos</em> mira qué puede hacer cada identidad y qué hace de verdad.
     </div>
 
     <h2 id="paw">Estaciones de trabajo para acceso privilegiado (2.3.7)</h2>
