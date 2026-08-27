@@ -384,7 +384,10 @@ const OUT_OF_SCOPE = [
 // likely to be under-represented in material written for the previous exam.
 const NEW_IN_C03 = ["2.2.3", "3.1.4", "3.2.7", "5.1.3", "5.3.3", "5.3.4", "5.3.5"];
 
-const GUIDE_EDITION = "SCS-C03 (guía oficial, edición 2026)";
+const GUIDE_EDITION = {
+  es: "SCS-C03 (guía oficial, edición 2026)",
+  en: "SCS-C03 (official exam guide, 2026 edition)",
+};
 
 function allSkills() {
   const out = [];

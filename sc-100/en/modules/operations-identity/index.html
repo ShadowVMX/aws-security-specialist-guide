@@ -1,0 +1,533 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="SC-100 domain 2: designing security operations, identity, privileged access and compliance. Decision criteria, exam traps and scenario questions.">
+<link rel="icon" href="../../../../assets/img/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Security Operations, Identity &amp; Compliance — Microsoft Cybersecurity Architect (SC-100)">
+<meta property="og:description" content="SC-100 domain 2: designing security operations, identity, privileged access and compliance. Decision criteria, exam traps and scenario questions.">
+<meta property="og:url" content="https://shadowvmx.github.io/sc-100/en/modules/operations-identity/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+<title>Security Operations, Identity &amp; Compliance — Microsoft Cybersecurity Architect (SC-100)</title>
+<link rel="stylesheet" href="../../../../assets/css/style.css?v=9">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="dot">●</span> Microsoft SC-100</div>
+    <nav class="topnav">
+      <a href="../../index.html">← Domains</a>
+      <span class="lang-switch"><a href="../../../modules/operations-identity/index.html">ES</a><span class="current">EN</span></span>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero" style="padding-top:40px;">
+    <span class="badge">SC-100 · Domain 2 · 25-30% of the exam</span>
+    <h1>Security operations, identity and compliance</h1>
+    <p>The heaviest domain on the exam alongside infrastructure. Its four tasks share one underlying question: <strong>which capability is needed</strong> to satisfy a requirement, not which button turns it on. Nobody asks you to configure Sentinel here: you are asked to decide whether the problem is solved with Sentinel, with Defender XDR, with both, or with neither.</p>
+    <p class="module-reviewed">Written against the official skills outline, with the skills measured as of 28 July 2026.</p>
+  </section>
+</div>
+
+<div class="wrap module-layout">
+
+  <aside class="sidebar">
+    <h4>How to read this exam</h4>
+    <a href="#como-preguntan">Design, Evaluate, Specify</a>
+    <h4>2.1 Security operations</h4>
+    <a href="#xdr-siem">XDR and SIEM: who does what</a>
+    <a href="#logging">Centralised logging and auditing</a>
+    <a href="#hibrido">Hybrid and multicloud monitoring</a>
+    <a href="#soar">SOAR: rules versus playbooks</a>
+    <a href="#flujos">IR, hunting and management flows</a>
+    <a href="#mitre">Coverage with MITRE ATT&amp;CK</a>
+    <h4>2.2 Identity and access</h4>
+    <a href="#agent-id">Agent identities (Entra Agent ID)</a>
+    <a href="#acceso-recursos">Access to SaaS, PaaS, IaaS and hybrid</a>
+    <a href="#entra-hibrido">Hybrid and multicloud Entra ID</a>
+    <a href="#externas">External identities and B2B</a>
+    <a href="#ca-moderna">Conditional Access, CAE and risk</a>
+    <a href="#adds-hardening">Hardening AD DS</a>
+    <a href="#secretos">Secrets, keys and certificates</a>
+    <h4>2.3 Privileged access</h4>
+    <a href="#enterprise-access">Enterprise access model</a>
+    <a href="#pim">PIM, entitlement and access reviews</a>
+    <a href="#adds-gobierno">AD DS: governance and resilience</a>
+    <a href="#tenants">Tenant administration</a>
+    <a href="#ciem">CIEM: permissions across clouds</a>
+    <a href="#paw">Privileged access workstations</a>
+    <h4>2.4 Compliance</h4>
+    <a href="#requisito-control">From requirement to control</a>
+    <a href="#purview">Purview for compliance</a>
+    <a href="#azure-policy">Azure Policy</a>
+    <a href="#defender-compliance">Defender for Cloud: regulatory</a>
+    <a href="#trampas">Common traps</a>
+    <a href="#temario">Official syllabus</a>
+    <h4>Practice</h4>
+    <a href="#quiz">Quiz (48 questions)</a>
+  </aside>
+
+  <main class="content">
+
+    <h2 id="como-preguntan">Design, Evaluate, Specify: how this exam asks</h2>
+    <p>
+      All fourteen SC-100 tasks begin with one of those three verbs. Not one of them says <em>Configure</em>.
+      The practical consequence is that almost every option in a question is <strong>technically
+      possible</strong>: what separates them is whether they satisfy <em>every</em> constraint in the stem.
+    </p>
+    <table role="table">
+      <tr><th>What the stem says</th><th>What it is measuring</th></tr>
+      <tr><td>"without deploying agents", "with no infrastructure to maintain"</td><td>Whether you know the <em>agentless</em> or managed variant of the control.</td></tr>
+      <tr><td>"the security team must not hold standing permissions"</td><td>PIM, <em>just-in-time</em> access, access reviews.</td></tr>
+      <tr><td>"there is an on-premises AD DS that is not going away"</td><td>That the solution has to be hybrid, not cloud only.</td></tr>
+      <tr><td>"must comply with <em>standard X</em>" followed by "with minimal operational effort"</td><td>That a template or initiative already exists and does not need writing.</td></tr>
+      <tr><td>"multiple clouds" / "AWS and GCP too"</td><td>Azure Arc, Defender for Cloud multicloud connectors, Permissions Management.</td></tr>
+    </table>
+    <div class="callout exam">
+      <b>The reflex worth training</b>
+      Read the <strong>last sentence</strong> of the stem first. That is usually where the constraint that
+      eliminates two of the four options lives — cost, operational effort, no agents, or the requirement
+      that it also work outside Azure. Read the options afterwards, with that constraint already in mind.
+    </div>
+
+    <h2 id="xdr-siem">XDR and SIEM: who does what, and when you need both (2.1.1)</h2>
+    <p>
+      This is the most profitable confusion in the domain to clear up, because the exam mines it again and again.
+    </p>
+    <table role="table">
+      <tr><th></th><th>Microsoft Defender XDR</th><th>Microsoft Sentinel</th></tr>
+      <tr><td>What it is</td><td>Detection and response <strong>over the Microsoft estate</strong>: identities, endpoints, email, cloud apps, servers.</td><td>SIEM and SOAR <strong>over any source</strong>, including what is not Microsoft.</td></tr>
+      <tr><td>Where the signal comes from</td><td>Its own sensors. Nothing to connect: you turn it on.</td><td>Connectors. Anything you do not connect does not exist for it.</td></tr>
+      <tr><td>Correlation</td><td>Automatic across its workloads, into already-assembled incidents.</td><td>Whatever you write: analytics rules in KQL.</td></tr>
+      <tr><td>Retention</td><td>Fixed per product.</td><td>Whatever you pay for, up to years, across different cost tiers.</td></tr>
+      <tr><td>What only it can do</td><td>Automatic response on the endpoint, the identity and the mailbox.</td><td>Ingest a third-party firewall, a mainframe or a custom application log.</td></tr>
+    </table>
+    <p>
+      That yields the criterion: <strong>XDR covers the Microsoft estate out of the box</strong>; the moment
+      the requirement names a foreign source — network appliances, another cloud, a line-of-business
+      application, multi-year retention — <strong>Sentinel</strong> comes in. And the most common answer in
+      a large-enterprise scenario is <em>both</em>, with Defender XDR connected into Sentinel and the SOC
+      working in the unified Defender portal.
+    </p>
+    <div class="callout warn">
+      <b>The trap</b>
+      "We need to correlate endpoint, identity and email alerts" does <strong>not</strong> on its own justify
+      a SIEM: Defender XDR already does that with nothing connected. What justifies the SIEM is a source
+      appearing from <em>outside</em> that family. If you pick Sentinel where XDR was enough, you have added
+      ingestion cost and rule-writing work to get what already came finished.
+    </div>
+
+    <h2 id="logging">Centralised logging and auditing (2.1.2)</h2>
+    <p>
+      Three pieces the exam mixes deliberately, because they answer different questions:
+    </p>
+    <ul>
+      <li><strong>Microsoft Purview Audit</strong> — the record of <em>user and admin activity</em> in
+        Microsoft 365 and Entra: who read a mailbox, who exported, who changed a role. It answers
+        "what did this person do?". Its Premium tier extends retention and adds high-value events.</li>
+      <li><strong>Sentinel</strong> — the analytics store. This is where you ingest what has to be
+        <em>correlated</em> and what has to raise an <em>alert</em>.</li>
+      <li><strong>Azure Monitor / Log Analytics</strong> — the platform underneath. The design decision is
+        rarely "which product" but <strong>how many workspaces</strong> and with which table tiers, because
+        that is where the cost comes from.</li>
+    </ul>
+    <p>
+      The classic design mistake: ingesting everything into the analytics tier. High-volume, low-analytic-value
+      logs — raw network flows, verbose proxy logs — belong in a cheaper tier or long-term storage, and you
+      promote only what feeds a rule.
+    </p>
+
+    <h2 id="hibrido">Monitoring hybrid and multicloud environments (2.1.3)</h2>
+    <p>
+      The question is almost always "we have servers outside Azure and/or workloads in AWS or GCP". The pattern:
+    </p>
+    <table role="table">
+      <tr><th>What has to be reached</th><th>What reaches it</th></tr>
+      <tr><td>On-premises or other-cloud servers, as if they were Azure resources</td><td><strong>Azure Arc</strong>: projects them into the Azure control plane and enables Policy, Defender for Servers and Machine Configuration over them.</td></tr>
+      <tr><td>Posture and recommendations for AWS and GCP accounts</td><td>The <strong>Defender for Cloud multicloud connectors</strong>, which read the other cloud's configuration agentlessly.</td></tr>
+      <tr><td>The logs from those environments, for correlation</td><td><strong>Sentinel</strong> connectors.</td></tr>
+    </table>
+    <div class="callout exam">
+      <b>Arc is not a log agent</b>
+      Azure Arc exists to <em>govern</em> the resource from Azure. Getting its events into the SIEM is a
+      separate decision. In a scenario with both needs, the answer carries both pieces.
+    </div>
+
+    <h2 id="soar">SOAR: automation rules versus playbooks (2.1.4)</h2>
+    <p>
+      Sentinel has two mechanisms and the exam distinguishes which one applies:
+    </p>
+    <table role="table">
+      <tr><th></th><th>Automation rule</th><th>Playbook (Logic App)</th></tr>
+      <tr><td>What for</td><td>Governing the incident inside Sentinel: assign, tag, change severity, close, chain.</td><td>Acting <strong>outside</strong>: open a ticket, isolate a machine, notify in Teams, call an API.</td></tr>
+      <tr><td>Cost and latency</td><td>Native, immediate.</td><td>Logic Apps execution, with its own billing.</td></tr>
+      <tr><td>When it is preferred</td><td>Whenever the action stays inside the incident.</td><td>When another system has to be touched.</td></tr>
+    </table>
+    <p>
+      Rule of thumb: if the stem says "automatically close known false positives" or "assign by incident
+      type", that is an <strong>automation rule</strong>. If it says "create a ticket in ServiceNow" or
+      "disable the account", that is a <strong>playbook</strong> — and if the action is on the endpoint or
+      the identity, often you do not even need one: <strong>Defender XDR</strong> automatic response already
+      ships it.
+    </p>
+
+    <h2 id="flujos">Designing the flows: response, hunting and incident management (2.1.5)</h2>
+    <p>
+      Three activities that are not done the same way, and that the exam keeps apart:
+    </p>
+    <ul>
+      <li><strong>Incident response</strong> — reactive, triggered by an alert. Designed in phases (prepare,
+        detect, contain, eradicate, recover, lessons learned) and with who decides at each one.</li>
+      <li><strong>Threat hunting</strong> — <em>proactive</em>, with no prior alert: it starts from a hypothesis
+        ("if an attacker were doing this, what trace would they leave?") and runs as queries over data that is
+        already there. It needs sufficient retention, and that is its link to the earlier cost decision.</li>
+      <li><strong>Incident management</strong> — the process: severity, owner, escalation, communication and
+        closure.</li>
+    </ul>
+    <div class="callout warn">
+      <b>The confusion they are fishing for</b>
+      A stem asking to "proactively look for suspicious activity that no rule has detected" describes
+      <strong>hunting</strong>, not detection. Adding more analytics rules does not solve it: what it needs
+      is access to historical data and queries, not another alert.
+    </div>
+
+    <h2 id="mitre">Evaluating detection coverage with MITRE ATT&amp;CK (2.1.6)</h2>
+    <p>
+      ATT&amp;CK is the map you use to answer "what would we <em>not</em> find out about?". You cross active
+      rules against the matrix techniques, and whatever stays blank is the gap. The exam expects you to know
+      there are <strong>three matrices</strong> and that they are not interchangeable:
+    </p>
+    <table role="table">
+      <tr><th>Matrix</th><th>When it is the right one</th></tr>
+      <tr><td><strong>Enterprise</strong></td><td>Windows, Linux, macOS, containers, identity and SaaS. The default.</td></tr>
+      <tr><td><strong>Mobile</strong></td><td>Threats against iOS and Android.</td></tr>
+      <tr><td><strong>ICS</strong></td><td>Industrial control systems. The one that goes with <strong>Defender for IoT</strong> in a plant or OT scenario.</td></tr>
+    </table>
+
+    <h2 id="agent-id">Agent identities: Microsoft Entra Agent ID (2.2.1)</h2>
+    <p>
+      New content and highly askable, because it solves a problem that until now was solved badly. An AI
+      agent acting on its own needs an identity: without one, it either gets the user's — inheriting
+      everything they have — or a shared application credential nobody reviews.
+    </p>
+    <p>
+      <strong>Entra Agent ID</strong> gives the agent its own directory identity, with a lifecycle, an owner
+      and an audit trail. And the part that matters for the exam: because it is a first-class identity,
+      <strong>Conditional Access policies apply to it</strong> exactly as they do to a person, so the agent
+      stays bounded by the resources, conditions and risk you decide.
+    </p>
+    <div class="callout exam">
+      <b>The principle underneath</b>
+      "Give the agent its own identity and treat it like any other principal." If an option proposes that the
+      agent use the invoking user's credentials, or a shared secret in code, it is the wrong one even though
+      it would work.
+    </div>
+
+    <h2 id="acceso-recursos">Access to SaaS, PaaS, IaaS, hybrid and multicloud (2.2.2)</h2>
+    <p>
+      The answer is almost never a single product but a combination across three layers, and the stem usually
+      asks for all three without saying so:
+    </p>
+    <ul>
+      <li><strong>Identity</strong> — who they are and under what conditions they get in: Entra ID as the
+        single provider, Conditional Access, phishing-resistant MFA.</li>
+      <li><strong>Network</strong> — how the request arrives: Entra Private Access for internal, Entra
+        Internet Access for egress, private endpoints for PaaS.</li>
+      <li><strong>Application</strong> — what they can do inside: <strong>Defender for Cloud Apps</strong>
+        for SaaS, with session policies that block downloads on an unmanaged device.</li>
+    </ul>
+
+    <h2 id="entra-hibrido">Entra ID in hybrid and multicloud environments (2.2.3)</h2>
+    <table role="table">
+      <tr><th>Method</th><th>Where the password is validated</th><th>When the stems pick it</th></tr>
+      <tr><td><strong>Password hash sync</strong></td><td>In the cloud, against a hash of the hash.</td><td>The default. Survives an on-premises outage and enables leaked-credential detection.</td></tr>
+      <tr><td><strong>Pass-through authentication</strong></td><td>Against on-premises AD DS, through agents.</td><td>When policy requires validation to happen on-premises.</td></tr>
+      <tr><td><strong>Federation (AD FS)</strong></td><td>In your own federation infrastructure.</td><td>Requirements only AD FS covers. These days the exam usually points the other way: <em>away</em> from AD FS.</td></tr>
+    </table>
+    <div class="callout warn">
+      <b>Resilience</b>
+      With PTA or federation, if the on-premises environment goes down nobody signs in <em>to the cloud
+      either</em>. A stem asking that "users keep authenticating even if the data centre is unavailable" is
+      asking for <strong>password hash sync</strong>, even if only as a fallback.
+    </div>
+
+    <h2 id="externas">External identities: B2B and decentralised (2.2.4)</h2>
+    <ul>
+      <li><strong>B2B collaboration</strong> — the partner comes in as a guest in your tenant, with their own
+        identity. Your Conditional Access policies apply to them.</li>
+      <li><strong>B2B direct connect</strong> — mutual trust between tenants without creating guests; it is
+        what backs Teams shared channels.</li>
+      <li><strong>Cross-tenant access settings</strong> — the governance piece: which tenants, which users
+        and with what assurances (for example, accepting the MFA the user already performed in their home
+        tenant).</li>
+      <li><strong>Decentralised identity / Verified ID</strong> — verifiable credentials the person holds
+        themselves. It shows up when the stem wants to <em>prove an attribute</em> — that someone is an
+        employee of a given company, that they hold a given qualification — without storing their data or
+        depending on the other party's directory.</li>
+    </ul>
+
+    <h2 id="ca-moderna">Conditional Access, continuous evaluation and risk (2.2.5 / 2.2.6)</h2>
+    <p>
+      Conditional Access is the Zero Trust decision engine: every request is evaluated against signals —
+      user, device, location, application, risk — and is granted, strengthened or blocked.
+    </p>
+    <table role="table">
+      <tr><th>Piece</th><th>What problem it solves</th></tr>
+      <tr><td><strong>Continuous access evaluation (CAE)</strong></td><td>A token staying valid after the user has been disabled or their risk has risen. With CAE, revocation applies almost immediately, without waiting for expiry.</td></tr>
+      <tr><td><strong>User risk / sign-in risk</strong></td><td>Telling "this account looks compromised" apart from "this particular sign-in is odd". The first calls for a secure password change; the second, for MFA.</td></tr>
+      <tr><td><strong>Protected actions</strong></td><td>Requiring recent, strong authentication for specific high-impact operations — modifying the Conditional Access policies themselves, for instance — even if the session was already open.</td></tr>
+      <tr><td><strong>Authentication strength</strong></td><td>Requiring a specific method, not "MFA" in the abstract: for administrators, phishing-resistant (FIDO2, Windows Hello for Business, certificate).</td></tr>
+      <tr><td><strong>Report-only mode and What If</strong></td><td>Publishing a policy without enforcing it: it is evaluated on every real sign-in and the outcome is logged, so you see who it would block before blocking anyone. <em>What If</em> does the same for one specific case, even before you publish it.</td></tr>
+    </table>
+    <div class="callout warn">
+      <b>Validating against Zero Trust (2.2.6)</b>
+      A Conditional Access policy that only looks at user and application is <strong>not</strong> Zero Trust.
+      The <em>device</em> signals (compliance, Entra join) and the <em>risk</em> signals are missing. And so
+      is what almost nobody remembers: an <strong>excluded emergency access account</strong>, because one
+      badly written rule can lock out every administrator at once.
+    </div>
+
+    <h2 id="adds-hardening">Specifying AD DS hardening (2.2.7)</h2>
+    <p>
+      AD DS still sits underneath almost every enterprise, and the exam treats it as what it is: the
+      attacker's real objective. What you are expected to be able to specify:
+    </p>
+    <ul>
+      <li><strong>Tiered model</strong> (tier 0/1/2): domain administration credentials are never used on
+        lower-tier machines. That is what cuts lateral movement.</li>
+      <li><strong>Privileged accounts and groups</strong> reduced to a minimum, with time-bound membership.</li>
+      <li><strong>Windows LAPS</strong> so the local administrator password is unique and rotated on every
+        machine — without it, one compromised machine opens all the others.</li>
+      <li><strong>Defender for Identity</strong> on the domain controllers, which is what detects DCSync,
+        Golden Ticket, kerberoasting and reconnaissance enumeration.</li>
+    </ul>
+
+    <h2 id="secretos">Managing secrets, keys and certificates (2.2.8)</h2>
+    <table role="table">
+      <tr><th>Need</th><th>Service</th></tr>
+      <tr><td>Application secrets, keys and certificates, with rotation and Azure integration</td><td><strong>Azure Key Vault</strong> (Standard, or Premium with HSM backing)</td></tr>
+      <tr><td>Exclusive control of the module, single tenant, FIPS 140-3 Level 3</td><td><strong>Azure Key Vault Managed HSM</strong></td></tr>
+      <tr><td>The application holding no credential at all</td><td><strong>Managed identities</strong>: there is no secret to rotate because there is no secret</td></tr>
+      <tr><td>Issuing and renewing internal certificates</td><td>Key Vault integrated with the CA, with automatic renewal</td></tr>
+    </table>
+    <div class="callout exam">
+      <b>The order of preference</b>
+      Managed identity &gt; secret in Key Vault &gt; secret in the application configuration. If an option
+      removes the secret instead of guarding it better, it is usually the right one.
+    </div>
+
+    <h2 id="enterprise-access">The enterprise access model (2.3.1)</h2>
+    <p>
+      It is the successor to the classic tier model and the reference Microsoft expects you to design
+      privilege delegation against. The idea to retain: <strong>the planes are separated</strong> — control,
+      management and data/workload — and an identity from a higher plane is never exposed on a lower one.
+      Applied to the cloud, that means whoever administers Entra ID does not use that same account to
+      administer a subscription, nor that one to sign in to a machine.
+    </p>
+
+    <h2 id="pim">PIM, entitlement management and access reviews (2.3.2 / 2.3.6)</h2>
+    <table role="table">
+      <tr><th>Piece</th><th>What it eliminates</th></tr>
+      <tr><td><strong>Privileged Identity Management</strong></td><td>Standing permission. The role is activated for a limited time, with justification, approval and MFA, and it is logged.</td></tr>
+      <tr><td><strong>Entitlement management</strong></td><td>Manual onboarding: access packages with request, approval and <strong>expiry</strong> policy, which also serve external users.</td></tr>
+      <tr><td><strong>Access reviews</strong></td><td>The permission that outlives the reason it was granted: someone recertifies periodically and whatever is not confirmed is removed.</td></tr>
+    </table>
+    <div class="callout warn">
+      <b>The distinction they ask about</b>
+      PIM solves <em>how long a role is active</em>. Access reviews solve <em>whether that person should
+      still have it</em>. They do not substitute for each other: a PIM-eligible role nobody has reviewed in
+      two years is still a governance problem.
+    </div>
+
+    <h2 id="adds-gobierno">Evaluating AD DS governance and resilience (2.3.3)</h2>
+    <p>
+      Here the exam wants you to recognise the attacks by name and know what stops them:
+    </p>
+    <table role="table">
+      <tr><th>Attack</th><th>What it abuses</th><th>What cuts it</th></tr>
+      <tr><td><strong>Pass-the-hash / pass-the-ticket</strong></td><td>Credentials left in memory on a lower-tier machine.</td><td>Tiered model, Credential Guard, dedicated workstations.</td></tr>
+      <tr><td><strong>DCSync</strong></td><td>Replication permissions granted too widely.</td><td>Auditing who holds those permissions; detection with Defender for Identity.</td></tr>
+      <tr><td><strong>Golden Ticket</strong></td><td>Compromise of the <code>krbtgt</code> account.</td><td>Double rotation of <code>krbtgt</code> and a tested forest recovery plan.</td></tr>
+      <tr><td><strong>Kerberoasting</strong></td><td>Service accounts with weak passwords and an SPN.</td><td>Group managed service accounts (gMSA).</td></tr>
+    </table>
+
+    <h2 id="tenants">Secure administration of cloud tenants (2.3.4)</h2>
+    <p>
+      An Entra ID tenant is the root of trust for everything else, and what you are asked to design is how it
+      is administered without becoming the single point of failure: administrators in PIM and not permanent,
+      dedicated workstations, <strong>emergency access accounts</strong> excluded from Conditional Access and
+      watched with an alert if they are used, and separation between whoever administers identity and
+      whoever administers the workloads. In SaaS and multicloud scenarios, the same discipline extends to
+      each provider's console.
+    </p>
+
+    <h2 id="ciem">CIEM: cloud infrastructure entitlements (2.3.5)</h2>
+    <p>
+      The problem it solves: in any cloud, 90% of granted permissions are never used, and every one of them
+      is attack surface. <strong>Microsoft Entra Permissions Management</strong> is Microsoft's answer: it
+      discovers granted versus actually used permissions across Azure, AWS and GCP, computes a permission
+      creep index and lets you trim down to real usage.
+    </p>
+    <div class="callout exam">
+      <b>How they word it</b>
+      "We need to see, across all three clouds, which identities hold permissions they do not use." That is
+      CIEM. Defender for Cloud gives posture over <em>resources</em>; Permissions Management gives posture
+      over <em>permissions</em>.
+    </div>
+
+    <h2 id="paw">Privileged access workstations (2.3.7)</h2>
+    <p>
+      A PAW is a dedicated, hardened machine you administer from, stripped of everything that introduces
+      risk: email, general browsing, arbitrary software. The reasoning the exam expects: <strong>there is no
+      point protecting the account if the machine it is used from is exposed</strong>, because the attacker
+      does not need the password — the machine where it is typed is enough. For remote access into those
+      environments, the modern variant is a service like <strong>Azure Bastion</strong> with Entra ID and
+      Conditional Access in front, instead of published RDP.
+    </p>
+
+    <h2 id="requisito-control">Translating a regulatory requirement into controls (2.4.1)</h2>
+    <p>
+      This is the most "architect" task in the domain and the one most often failed, because the right answer
+      is rarely a product. The sequence the exam expects:
+    </p>
+    <ol>
+      <li>Identify the specific <strong>obligation</strong> in the framework, not the whole framework.</li>
+      <li>Translate it into a verifiable technical or organisational <strong>control</strong>.</li>
+      <li>Choose the <strong>mechanism</strong> that implements it and, above all, the one that
+        <strong>evidences</strong> it.</li>
+      <li>Define how it is <strong>demonstrated</strong> to an auditor repeatably.</li>
+    </ol>
+    <div class="callout exam">
+      <b>Enforcing and demonstrating are not the same</b>
+      Azure Policy <em>enforces</em> and prevents drift. Defender for Cloud and Purview <em>evidence</em>
+      compliance against a framework. A stem asking to "demonstrate to the auditor" is not solved with a
+      policy: it is solved with the report.
+    </div>
+
+    <h2 id="purview">Microsoft Purview for compliance requirements (2.4.2)</h2>
+    <ul>
+      <li><strong>Classification and sensitivity labels</strong> — discover where the regulated data lives and
+        mark it, with protection that travels with the file.</li>
+      <li><strong>Data loss prevention</strong> — stop it leaving through email, endpoint or SaaS.</li>
+      <li><strong>Data lifecycle management and retention</strong> — keep what the regulation requires kept
+        and delete what it requires deleted.</li>
+      <li><strong>Insider risk management and information barriers</strong> — the insider threat and
+        separation-of-duties angle.</li>
+      <li><strong>Purview Audit</strong> — the evidence of who did what.</li>
+    </ul>
+
+    <h2 id="azure-policy">Azure Policy for security and compliance (2.4.3)</h2>
+    <table role="table">
+      <tr><th>Effect</th><th>What it is designed for</th></tr>
+      <tr><td><code>Deny</code></td><td>Preventing the non-compliant resource from existing at all. The preventive control.</td></tr>
+      <tr><td><code>Audit</code></td><td>Seeing the size of the problem without breaking anything. The realistic first step in an environment with resources already deployed.</td></tr>
+      <tr><td><code>DeployIfNotExists</code> / <code>Modify</code></td><td>Remediating: deploy the missing configuration or add the setting. Needs a managed identity.</td></tr>
+      <tr><td><strong>Initiatives</strong></td><td>Grouping dozens of policies under a regulatory framework and assigning them to a whole scope.</td></tr>
+    </table>
+    <div class="callout warn">
+      <b>The order matters</b>
+      Putting <code>Deny</code> in up front on a subscription with existing resources does not fix them — it
+      only blocks new ones — and it usually breaks deployments. The pattern the exam is after is
+      <em>Audit first to measure, remediation for what exists, Deny afterwards so it does not come back</em>.
+    </div>
+
+    <h2 id="defender-compliance">Defender for Cloud to validate regulatory compliance (2.4.4)</h2>
+    <p>
+      The Defender for Cloud <strong>regulatory compliance</strong> dashboard maps your resources against
+      standards — MCSB by default, plus whatever you add: ISO 27001, PCI DSS, NIST, CIS — and shows, control
+      by control, what is met and what is not, in Azure and also in connected AWS and GCP accounts. It is the
+      tool the continuous evidence comes from; <strong>Secure Score</strong>, by contrast, is a relative
+      improvement metric, not a compliance report.
+    </p>
+
+    <h2 id="trampas">Common traps in this domain</h2>
+    <div class="callout warn">
+      <b>Sentinel where Defender XDR was enough</b>
+      Correlating endpoint, identity, email and Microsoft cloud app signals is already what XDR does. The SIEM comes in when a foreign source or long retention appears.
+    </div>
+    <div class="callout warn">
+      <b>Secure Score as a compliance report</b>
+      Secure Score measures improvement; the regulatory compliance dashboard measures conformance against a standard. They are not interchangeable.
+    </div>
+    <div class="callout warn">
+      <b>PIM instead of access reviews</b>
+      Shortening the activation window does not answer whether that person should still be eligible. Many scenarios need both.
+    </div>
+    <div class="callout warn">
+      <b>Forgetting the emergency access account</b>
+      Any Conditional Access design that does not exclude break-glass accounts is a total lockout waiting to happen.
+    </div>
+    <div class="callout warn">
+      <b>Azure Arc treated as a log connector</b>
+      Arc governs the resource from Azure; getting its events into the SIEM is a separate decision.
+    </div>
+
+    <!-- temario:inicio -->
+    <h2 id="temario">Official exam content covered</h2>
+    <p class="lede">The tasks and skills Microsoft publishes for domain 2 in the exam guide. 25-30% of the exam's questions come from here.</p>
+    <div class="syllabus">
+      <h4>Task 2.1 — Design solutions for security operations</h4>
+      <ul class="skills">
+        <li><span class="skill-id">2.1.1</span> <span>Design a solution for detection and response that includes extended detection and response (XDR) and security information and event management (SIEM)</span></li>
+        <li><span class="skill-id">2.1.2</span> <span>Design a solution for centralized logging and auditing, including Microsoft Purview Audit</span></li>
+        <li><span class="skill-id">2.1.3</span> <span>Design monitoring to support hybrid and multicloud environments</span></li>
+        <li><span class="skill-id">2.1.4</span> <span>Design a solution for security orchestration and automated response (SOAR), including Microsoft Sentinel and Microsoft Defender XDR</span></li>
+        <li><span class="skill-id">2.1.5</span> <span>Design and evaluate security workflows, including incident response, threat hunting, and incident management</span></li>
+        <li><span class="skill-id">2.1.6</span> <span>Design and evaluate threat detection coverage by using MITRE ATT&amp;CK matrices, including Enterprise, Mobile, and industrial control systems (ICS)</span></li>
+      </ul>
+      <h4>Task 2.2 — Design solutions for identity and access management</h4>
+      <ul class="skills">
+        <li><span class="skill-id">2.2.1</span> <span>Design a solution for agent identities using Microsoft Entra Agent ID and conditional access policies <span class="skill-new" title="Content Microsoft added in the 28 July 2026 revision">new in 2026</span></span></li>
+        <li><span class="skill-id">2.2.2</span> <span>Design a solution for access to SaaS, PaaS, IaaS, hybrid/on-premises, and multicloud resources, including identity, networking, and application controls</span></li>
+        <li><span class="skill-id">2.2.3</span> <span>Design a solution for Microsoft Entra ID, including hybrid and multi-cloud environments</span></li>
+        <li><span class="skill-id">2.2.4</span> <span>Design a solution for external identities, including business-to-business (B2B) and decentralized identity</span></li>
+        <li><span class="skill-id">2.2.5</span> <span>Design a modern authentication and authorization strategy, including Conditional Access, continuous access evaluation, risk scoring, and protected actions</span></li>
+        <li><span class="skill-id">2.2.6</span> <span>Validate the alignment of Conditional Access policies with a Zero Trust strategy</span></li>
+        <li><span class="skill-id">2.2.7</span> <span>Specify requirements to harden Active Directory Domain Services (AD DS)</span></li>
+        <li><span class="skill-id">2.2.8</span> <span>Design a solution to manage secrets, keys, and certificates</span></li>
+      </ul>
+      <h4>Task 2.3 — Design solutions for securing privileged access</h4>
+      <ul class="skills">
+        <li><span class="skill-id">2.3.1</span> <span>Design a solution for assigning and delegating privileged roles by using the enterprise access model</span></li>
+        <li><span class="skill-id">2.3.2</span> <span>Evaluate the security and governance of Microsoft Entra ID, including Privileged Identity Management (PIM), entitlement management, and access reviews</span></li>
+        <li><span class="skill-id">2.3.3</span> <span>Evaluate the security and governance of Active Directory Domain Services (AD DS), including resilience to common attacks</span></li>
+        <li><span class="skill-id">2.3.4</span> <span>Design a solution for securing the administration of cloud tenants, including SaaS and multicloud infrastructure and platforms</span></li>
+        <li><span class="skill-id">2.3.5</span> <span>Design a solution for cloud infrastructure entitlement management</span></li>
+        <li><span class="skill-id">2.3.6</span> <span>Evaluate an access review management solution</span></li>
+        <li><span class="skill-id">2.3.7</span> <span>Design a solution for secure workstations for privileged access, including remote access</span></li>
+      </ul>
+      <h4>Task 2.4 — Design solutions for regulatory compliance</h4>
+      <ul class="skills">
+        <li><span class="skill-id">2.4.1</span> <span>Translate compliance requirements into security controls</span></li>
+        <li><span class="skill-id">2.4.2</span> <span>Design a solution to address compliance requirements by using Microsoft Purview</span></li>
+        <li><span class="skill-id">2.4.3</span> <span>Design Azure Policy solutions to address security and compliance requirements</span></li>
+        <li><span class="skill-id">2.4.4</span> <span>Evaluate and validate alignment with regulatory standards and benchmarks by using Microsoft Defender for Cloud</span></li>
+      </ul>
+      <p class="syllabus-note">Wording as published by Microsoft in the exam guide. SC-100 (official skills outline, skills measured as of 28 Jul 2026).</p>
+    </div>
+<!-- temario:fin -->
+
+    <h2 id="quiz">Practice quiz — Security operations, identity and compliance</h2>
+    <p class="lede">48 scenario questions. Pick an option to see whether it is right and why.</p>
+    <div id="quiz-root"></div>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">Independent study guide, not affiliated with Microsoft. Reviewed as of August 2026.</div>
+</footer>
+
+<script src="quiz-data.js"></script>
+<script src="../../../../assets/js/quiz.js?v=9"></script>
+<script src="../../../../assets/js/app.js?v=9"></script>
+
+</body>
+</html>

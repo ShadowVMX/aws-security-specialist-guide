@@ -1,0 +1,528 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Dominio 2 de SC-100: diseño de operaciones de seguridad, identidad, acceso privilegiado y cumplimiento. Criterios de decisión, trampas de examen y preguntas de escenario.">
+<link rel="icon" href="../../../assets/img/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Operaciones, identidad y cumplimiento — Microsoft Cybersecurity Architect (SC-100)">
+<meta property="og:description" content="Dominio 2 de SC-100: diseño de operaciones de seguridad, identidad, acceso privilegiado y cumplimiento. Criterios de decisión, trampas de examen y preguntas de escenario.">
+<meta property="og:url" content="https://shadowvmx.github.io/sc-100/modules/operations-identity/">
+<meta property="og:locale" content="es_ES">
+<meta name="twitter:card" content="summary">
+<title>Operaciones, identidad y cumplimiento — Microsoft Cybersecurity Architect (SC-100)</title>
+<link rel="stylesheet" href="../../../assets/css/style.css?v=9">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="dot">●</span> Microsoft SC-100</div>
+    <nav class="topnav">
+      <a href="../../index.html">← Dominios</a>
+      <span class="lang-switch"><span class="current">ES</span><a href="../../en/modules/operations-identity/index.html">EN</a></span>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero" style="padding-top:40px;">
+    <span class="badge">SC-100 · Dominio 2 · 25-30% del examen</span>
+    <h1>Operaciones de seguridad, identidad y cumplimiento</h1>
+    <p>El dominio más pesado del examen junto al de infraestructura. Las cuatro tareas comparten una misma pregunta de fondo: <strong>qué capacidad hace falta</strong> para cubrir un requisito, no qué botón la enciende. Aquí no se pide configurar Sentinel: se pide decidir si el problema se resuelve con Sentinel, con Defender XDR, con los dos, o con ninguno.</p>
+    <p class="module-reviewed">Escrito contra el <em>skills outline</em> oficial con los skills medidos a 28 de julio de 2026.</p>
+  </section>
+</div>
+
+<div class="wrap module-layout">
+
+  <aside class="sidebar">
+    <h4>Cómo leer este examen</h4>
+    <a href="#como-preguntan">Design, Evaluate, Specify</a>
+    <h4>2.1 Operaciones de seguridad</h4>
+    <a href="#xdr-siem">XDR y SIEM: quién hace qué</a>
+    <a href="#logging">Registro y auditoría centralizados</a>
+    <a href="#hibrido">Monitorización híbrida y multinube</a>
+    <a href="#soar">SOAR: reglas frente a playbooks</a>
+    <a href="#flujos">Flujos de IR, hunting y gestión</a>
+    <a href="#mitre">Cobertura con MITRE ATT&amp;CK</a>
+    <h4>2.2 Identidad y acceso</h4>
+    <a href="#agent-id">Identidades de agente (Entra Agent ID)</a>
+    <a href="#acceso-recursos">Acceso a SaaS, PaaS, IaaS e híbrido</a>
+    <a href="#entra-hibrido">Entra ID híbrido y multinube</a>
+    <a href="#externas">Identidades externas y B2B</a>
+    <a href="#ca-moderna">Acceso condicional, CAE y riesgo</a>
+    <a href="#adds-hardening">Endurecer AD DS</a>
+    <a href="#secretos">Secretos, claves y certificados</a>
+    <h4>2.3 Acceso privilegiado</h4>
+    <a href="#enterprise-access">Enterprise access model</a>
+    <a href="#pim">PIM, entitlement y access reviews</a>
+    <a href="#adds-gobierno">AD DS: gobierno y resistencia</a>
+    <a href="#tenants">Administración de tenants</a>
+    <a href="#ciem">CIEM: permisos en multinube</a>
+    <a href="#paw">Estaciones de acceso privilegiado</a>
+    <h4>2.4 Cumplimiento</h4>
+    <a href="#requisito-control">Del requisito al control</a>
+    <a href="#purview">Purview para cumplimiento</a>
+    <a href="#azure-policy">Azure Policy</a>
+    <a href="#defender-compliance">Defender for Cloud: normativa</a>
+    <a href="#trampas">Trampas típicas</a>
+    <a href="#temario">Temario oficial</a>
+    <h4>Práctica</h4>
+    <a href="#quiz">Quiz (48 preguntas)</a>
+  </aside>
+
+  <main class="content">
+
+    <h2 id="como-preguntan">Design, Evaluate, Specify: cómo pregunta este examen</h2>
+    <p>
+      Las catorce tareas de SC-100 empiezan por uno de esos tres verbos. Ninguna dice <em>Configure</em>.
+      La consecuencia práctica es que casi todas las opciones de una pregunta son <strong>técnicamente
+      posibles</strong>: lo que las separa es si cumplen <em>todas</em> las restricciones del enunciado.
+    </p>
+    <table role="table">
+      <tr><th>Lo que dice el enunciado</th><th>Lo que está midiendo</th></tr>
+      <tr><td>«sin desplegar agentes», «sin infraestructura que mantener»</td><td>Si conoces la variante <em>agentless</em> o gestionada del control.</td></tr>
+      <tr><td>«el equipo de seguridad no puede tener permisos permanentes»</td><td>PIM, acceso <em>just-in-time</em>, revisiones de acceso.</td></tr>
+      <tr><td>«hay un AD DS on-premises que no se va a retirar»</td><td>Que la solución tiene que ser híbrida, no solo cloud.</td></tr>
+      <tr><td>«debe cumplir <em>norma X</em>» y luego «con el mínimo esfuerzo operativo»</td><td>Que hay una plantilla o iniciativa que ya existe y no hay que escribirla.</td></tr>
+      <tr><td>«varias nubes» / «AWS y GCP también»</td><td>Azure Arc, conectores multinube de Defender for Cloud, Permissions Management.</td></tr>
+    </table>
+    <div class="callout exam">
+      <b>El reflejo que hay que entrenar</b>
+      Lee primero la <strong>última frase</strong> del enunciado. Es donde suele estar la restricción que
+      descarta a dos de las cuatro opciones —el coste, el esfuerzo operativo, la ausencia de agentes, la
+      obligación de que funcione también fuera de Azure—. Las opciones se leen después, con esa restricción
+      ya en la cabeza.
+    </div>
+
+    <h2 id="xdr-siem">XDR y SIEM: quién hace qué, y cuándo hacen falta los dos (2.1.1)</h2>
+    <p>
+      Es la confusión más rentable de aclarar del dominio, porque el examen la explota una y otra vez.
+    </p>
+    <table role="table">
+      <tr><th></th><th>Microsoft Defender XDR</th><th>Microsoft Sentinel</th></tr>
+      <tr><td>Qué es</td><td>Detección y respuesta <strong>sobre el estado de Microsoft</strong>: identidades, endpoints, correo, aplicaciones cloud, servidores.</td><td>SIEM y SOAR <strong>sobre cualquier origen</strong>, incluido lo que no es Microsoft.</td></tr>
+      <tr><td>De dónde saca la señal</td><td>De sus propios sensores. No hay que conectar nada: se activa.</td><td>De conectores. Todo lo que no conectes, no existe para él.</td></tr>
+      <tr><td>Correlación</td><td>Automática entre sus cargas, en incidentes ya montados.</td><td>La que escribas: reglas de análisis en KQL.</td></tr>
+      <tr><td>Retención</td><td>Fija por producto.</td><td>La que pagues, hasta años, con niveles de coste distintos.</td></tr>
+      <tr><td>Lo que solo hace él</td><td>Respuesta automática en el endpoint, la identidad y el buzón.</td><td>Ingerir un firewall de terceros, un mainframe o un log de aplicación propia.</td></tr>
+    </table>
+    <p>
+      De ahí sale el criterio: <strong>XDR cubre el estado de Microsoft de fábrica</strong>; en cuanto el
+      requisito nombra un origen ajeno —appliances de red, otra nube, una aplicación de negocio, retención
+      de años— entra <strong>Sentinel</strong>. Y la respuesta más habitual en un escenario de empresa
+      grande es <em>los dos</em>, con Defender XDR conectado a Sentinel y el SOC trabajando en el portal
+      unificado de Defender.
+    </p>
+    <div class="callout warn">
+      <b>La trampa</b>
+      «Necesitamos correlacionar alertas de endpoint, identidad y correo» <strong>no</strong> justifica por sí
+      solo un SIEM: eso ya lo hace Defender XDR sin conectar nada. Lo que justifica el SIEM es que aparezca
+      un origen <em>fuera</em> de esa familia. Si eliges Sentinel cuando bastaba XDR, has añadido coste de
+      ingesta y trabajo de reglas para obtener lo que ya venía hecho.
+    </div>
+
+    <h2 id="logging">Registro y auditoría centralizados (2.1.2)</h2>
+    <p>
+      Tres piezas que el examen mezcla a propósito porque responden a preguntas distintas:
+    </p>
+    <ul>
+      <li><strong>Microsoft Purview Audit</strong> — el registro de <em>actividad de usuario y administrador</em>
+        en Microsoft 365 y Entra: quién leyó un buzón, quién exportó, quién cambió un rol. Es el que responde
+        «¿qué hizo esta persona?». Su nivel Premium alarga la retención y añade eventos de alto valor.</li>
+      <li><strong>Sentinel</strong> — el almacén de análisis. Aquí se ingiere lo que hay que
+        <em>correlacionar</em> y sobre lo que hay que <em>alertar</em>.</li>
+      <li><strong>Azure Monitor / Log Analytics</strong> — la plataforma que hay debajo. La decisión de
+        diseño no suele ser «qué producto», sino <strong>en cuántos workspaces</strong> y con qué niveles de
+        tabla, porque de ahí sale el coste.</li>
+    </ul>
+    <p>
+      El error de diseño clásico: ingerir todo en el nivel de análisis. Los logs voluminosos y de bajo valor
+      analítico —flujos de red crudos, verbosos de proxy— van a un nivel más barato o a almacenamiento a
+      largo plazo, y solo se promociona lo que alimenta una regla.
+    </p>
+
+    <h2 id="hibrido">Monitorización de entornos híbridos y multinube (2.1.3)</h2>
+    <p>
+      La pregunta casi siempre es «tenemos servidores fuera de Azure y/o cargas en AWS o GCP». El patrón:
+    </p>
+    <table role="table">
+      <tr><th>Qué hay que alcanzar</th><th>Con qué se alcanza</th></tr>
+      <tr><td>Servidores on-premises o en otra nube, como si fueran recursos de Azure</td><td><strong>Azure Arc</strong>: los proyecta al plano de control de Azure y habilita Policy, Defender for Servers y Machine Configuration sobre ellos.</td></tr>
+      <tr><td>Postura y recomendaciones de las suscripciones de AWS y GCP</td><td>Los <strong>conectores multinube de Defender for Cloud</strong>, que leen la configuración de la otra nube sin agentes.</td></tr>
+      <tr><td>Los logs de esos entornos, para correlacionar</td><td>Conectores de <strong>Sentinel</strong>.</td></tr>
+    </table>
+    <div class="callout exam">
+      <b>Arc no es un agente de log</b>
+      Azure Arc sirve para <em>gobernar</em> el recurso desde Azure. Que los eventos lleguen al SIEM es una
+      decisión aparte. En un escenario con las dos necesidades, la respuesta lleva las dos piezas.
+    </div>
+
+    <h2 id="soar">SOAR: reglas de automatización frente a playbooks (2.1.4)</h2>
+    <p>
+      Sentinel tiene dos mecanismos y el examen distingue cuál toca:
+    </p>
+    <table role="table">
+      <tr><th></th><th>Regla de automatización</th><th>Playbook (Logic App)</th></tr>
+      <tr><td>Para qué</td><td>Gobernar el incidente dentro de Sentinel: asignar, etiquetar, cambiar severidad, cerrar, encadenar.</td><td>Actuar <strong>fuera</strong>: abrir un ticket, aislar un equipo, avisar en Teams, llamar a una API.</td></tr>
+      <tr><td>Coste y latencia</td><td>Nativas, inmediatas.</td><td>Ejecución de Logic Apps, con su facturación.</td></tr>
+      <tr><td>Cuándo se prefiere</td><td>Siempre que la acción se quede dentro del incidente.</td><td>Cuando hace falta tocar otro sistema.</td></tr>
+    </table>
+    <p>
+      Regla práctica: si el enunciado dice «cerrar automáticamente los falsos positivos conocidos» o
+      «asignar por tipo de incidente», es una <strong>regla de automatización</strong>. Si dice «crear un
+      ticket en ServiceNow» o «deshabilitar la cuenta», es un <strong>playbook</strong> — y si la acción
+      es sobre el endpoint o la identidad, muchas veces ni siquiera hace falta: la respuesta automática de
+      <strong>Defender XDR</strong> ya la trae.
+    </p>
+
+    <h2 id="flujos">Diseñar los flujos: respuesta, caza y gestión del incidente (2.1.5)</h2>
+    <p>
+      Tres actividades que no se hacen igual y que el examen separa:
+    </p>
+    <ul>
+      <li><strong>Respuesta a incidentes</strong> — reactiva, con una alerta como disparador. Se diseña con
+        fases (preparar, detectar, contener, erradicar, recuperar, lecciones) y con quién decide en cada una.</li>
+      <li><strong>Caza de amenazas</strong> — <em>proactiva</em> y sin alerta previa: parte de una hipótesis
+        («si hubiera un atacante haciendo esto, ¿qué rastro dejaría?») y se ejecuta en consultas sobre datos
+        que ya están. Requiere retención suficiente, y ese es su vínculo con la decisión de coste anterior.</li>
+      <li><strong>Gestión del incidente</strong> — el proceso: severidad, propietario, escalado, comunicación
+        y cierre.</li>
+    </ul>
+    <div class="callout warn">
+      <b>La confusión que buscan</b>
+      Un enunciado que pide «buscar de forma proactiva actividad sospechosa que ninguna regla ha detectado»
+      describe <strong>caza</strong>, no detección. Añadir más reglas de análisis no lo resuelve: lo que
+      necesita es acceso a los datos históricos y consultas, no otra alerta.
+    </div>
+
+    <h2 id="mitre">Evaluar la cobertura de detección con MITRE ATT&amp;CK (2.1.6)</h2>
+    <p>
+      ATT&amp;CK es el mapa con el que se responde «¿de qué <em>no</em> nos enteraríamos?». Se cruzan las
+      reglas activas contra las técnicas de la matriz y lo que queda en blanco es la brecha. El examen
+      espera que sepas que hay <strong>tres matrices</strong> y que no son intercambiables:
+    </p>
+    <table role="table">
+      <tr><th>Matriz</th><th>Cuándo es la que toca</th></tr>
+      <tr><td><strong>Enterprise</strong></td><td>Windows, Linux, macOS, contenedores, identidad y SaaS. La de por defecto.</td></tr>
+      <tr><td><strong>Mobile</strong></td><td>Amenazas sobre iOS y Android.</td></tr>
+      <tr><td><strong>ICS</strong></td><td>Sistemas de control industrial. Es la que va con <strong>Defender for IoT</strong> en un escenario de planta u OT.</td></tr>
+    </table>
+
+    <h2 id="agent-id">Identidades de agente: Microsoft Entra Agent ID (2.2.1)</h2>
+    <p>
+      Contenido nuevo y muy preguntable, porque resuelve un problema que hasta ahora se resolvía mal. Un
+      agente de IA que actúa por su cuenta necesita una identidad: sin ella, o se le da la del usuario
+      —y hereda todo lo suyo— o una credencial de aplicación compartida que nadie revisa.
+    </p>
+    <p>
+      <strong>Entra Agent ID</strong> le da al agente una identidad propia en el directorio, con su ciclo de
+      vida, su propietario y su rastro de auditoría. Y lo importante para el examen: al ser una identidad de
+      primera clase, <strong>le aplican las políticas de acceso condicional</strong> igual que a una persona,
+      de modo que el agente queda acotado a los recursos, las condiciones y el riesgo que decidas.
+    </p>
+    <div class="callout exam">
+      <b>El principio detrás</b>
+      «Dale al agente su propia identidad y trátalo como a cualquier otro principal.» Si una opción propone
+      que el agente use las credenciales del usuario que lo invoca, o un secreto compartido en el código,
+      es la incorrecta aunque funcione.
+    </div>
+
+    <h2 id="acceso-recursos">Acceso a SaaS, PaaS, IaaS, híbrido y multinube (2.2.2)</h2>
+    <p>
+      La respuesta casi nunca es un único producto, sino una combinación en tres capas, y el enunciado
+      suele pedir las tres sin decirlo:
+    </p>
+    <ul>
+      <li><strong>Identidad</strong> — quién es y bajo qué condiciones entra: Entra ID como proveedor único,
+        acceso condicional, MFA resistente a phishing.</li>
+      <li><strong>Red</strong> — por dónde llega: Entra Private Access para lo interno, Entra Internet Access
+        para la salida, endpoints privados para PaaS.</li>
+      <li><strong>Aplicación</strong> — qué puede hacer dentro: <strong>Defender for Cloud Apps</strong> para
+        SaaS, con políticas de sesión que bloquean la descarga en un equipo no gestionado.</li>
+    </ul>
+
+    <h2 id="entra-hibrido">Entra ID en entornos híbridos y multinube (2.2.3)</h2>
+    <table role="table">
+      <tr><th>Método</th><th>Dónde se valida la contraseña</th><th>Cuándo lo eligen los enunciados</th></tr>
+      <tr><td><strong>Password hash sync</strong></td><td>En la nube, sobre un hash del hash.</td><td>Por defecto. Sobrevive a una caída del entorno local y habilita la detección de credenciales filtradas.</td></tr>
+      <tr><td><strong>Pass-through authentication</strong></td><td>Contra el AD DS local, mediante agentes.</td><td>Cuando la política exige que la validación ocurra on-premises.</td></tr>
+      <tr><td><strong>Federación (AD FS)</strong></td><td>En la infraestructura de federación propia.</td><td>Requisitos que solo cubre AD FS. Hoy el examen suele ir en dirección contraria: <em>salir</em> de AD FS.</td></tr>
+    </table>
+    <div class="callout warn">
+      <b>Resiliencia</b>
+      Con PTA o federación, si cae el entorno local nadie entra <em>tampoco en la nube</em>. Un enunciado que
+      pida «que los usuarios sigan autenticándose aunque el centro de datos no esté disponible» está pidiendo
+      <strong>password hash sync</strong>, aunque sea solo como respaldo.
+    </div>
+
+    <h2 id="externas">Identidades externas: B2B y descentralizada (2.2.4)</h2>
+    <ul>
+      <li><strong>B2B colaboración</strong> — el socio entra como invitado en tu tenant, con su propia
+        identidad. Le aplican tus políticas de acceso condicional.</li>
+      <li><strong>B2B direct connect</strong> — confianza mutua entre tenants sin crear invitados; es lo que
+        sostiene los canales compartidos de Teams.</li>
+      <li><strong>Cross-tenant access settings</strong> — la pieza de gobierno: qué tenants, qué usuarios y
+        con qué garantías (por ejemplo, aceptar la MFA que ya hizo el usuario en su tenant de origen).</li>
+      <li><strong>Identidad descentralizada / Verified ID</strong> — credenciales verificables que la persona
+        custodia. Aparece cuando el enunciado quiere <em>probar un atributo</em> —que es empleado de tal
+        empresa, que tiene tal titulación— sin almacenar sus datos ni depender del directorio del otro.</li>
+    </ul>
+
+    <h2 id="ca-moderna">Acceso condicional, evaluación continua y riesgo (2.2.5 / 2.2.6)</h2>
+    <p>
+      El acceso condicional es el motor de decisión de Zero Trust: cada petición se evalúa contra señales
+      —usuario, dispositivo, ubicación, aplicación, riesgo— y se concede, se refuerza o se bloquea.
+    </p>
+    <table role="table">
+      <tr><th>Pieza</th><th>Qué problema resuelve</th></tr>
+      <tr><td><strong>Continuous access evaluation (CAE)</strong></td><td>Que un token siga siendo válido después de que el usuario haya sido deshabilitado o su riesgo haya subido. Con CAE la revocación se aplica casi al momento, sin esperar a que caduque.</td></tr>
+      <tr><td><strong>Riesgo de usuario / de inicio de sesión</strong></td><td>Distinguir «esta cuenta parece comprometida» de «este inicio de sesión concreto es raro». El primero pide cambio de contraseña seguro; el segundo, MFA.</td></tr>
+      <tr><td><strong>Protected actions</strong></td><td>Exigir una autenticación reciente y fuerte para operaciones concretas de alto impacto —por ejemplo, modificar las propias políticas de acceso condicional— aunque la sesión ya estuviera abierta.</td></tr>
+      <tr><td><strong>Fuerza de autenticación</strong></td><td>Exigir un método concreto, no «MFA» a secas: para los administradores, resistente a phishing (FIDO2, Windows Hello for Business, certificado).</td></tr>
+      <tr><td><strong>Modo solo informe y What If</strong></td><td>Publicar una política sin aplicarla: se evalúa en cada inicio de sesión real y se registra el resultado, de modo que se ve a quién bloquearía antes de bloquear a nadie. <em>What If</em> hace lo mismo para un caso concreto, incluso antes de publicarla.</td></tr>
+    </table>
+    <div class="callout warn">
+      <b>Validar contra Zero Trust (2.2.6)</b>
+      Una política de acceso condicional que solo mira usuario y aplicación <strong>no</strong> es Zero Trust.
+      Faltan las señales de <em>dispositivo</em> (cumplimiento, unión a Entra) y de <em>riesgo</em>. Y falta
+      lo que casi nadie recuerda: una <strong>cuenta de emergencia excluida</strong> de las políticas, porque
+      una regla mal escrita puede dejar fuera a todos los administradores a la vez.
+    </div>
+
+    <h2 id="adds-hardening">Especificar el endurecimiento de AD DS (2.2.7)</h2>
+    <p>
+      AD DS sigue estando debajo de casi toda empresa, y el examen lo trata como lo que es: el objetivo real
+      del atacante. Lo que se espera que sepas especificar:
+    </p>
+    <ul>
+      <li><strong>Modelo por niveles</strong> (tier 0/1/2): las credenciales de administración de dominio no
+        se usan nunca en equipos de menor nivel. Es lo que corta el movimiento lateral.</li>
+      <li><strong>Cuentas y grupos privilegiados</strong> reducidos al mínimo, con pertenencia temporal.</li>
+      <li><strong>Windows LAPS</strong> para que la contraseña de administrador local sea distinta y rotada
+        en cada equipo — sin eso, un equipo comprometido abre todos los demás.</li>
+      <li><strong>Defender for Identity</strong> sobre los controladores de dominio, que es lo que detecta
+        DCSync, Golden Ticket, kerberoasting y enumeración con reconocimiento.</li>
+    </ul>
+
+    <h2 id="secretos">Gestionar secretos, claves y certificados (2.2.8)</h2>
+    <table role="table">
+      <tr><th>Necesidad</th><th>Servicio</th></tr>
+      <tr><td>Secretos, claves y certificados de aplicación, con rotación e integración con Azure</td><td><strong>Azure Key Vault</strong> (Standard o Premium con respaldo HSM)</td></tr>
+      <tr><td>Control exclusivo del módulo, un solo inquilino, FIPS 140-3 nivel 3</td><td><strong>Azure Key Vault Managed HSM</strong></td></tr>
+      <tr><td>Que la aplicación no guarde ninguna credencial</td><td><strong>Identidades administradas</strong>: no hay secreto que rotar porque no hay secreto</td></tr>
+      <tr><td>Emitir y renovar certificados internos</td><td>Key Vault integrado con la CA, con renovación automática</td></tr>
+    </table>
+    <div class="callout exam">
+      <b>El orden de preferencia</b>
+      Identidad administrada &gt; secreto en Key Vault &gt; secreto en la configuración de la aplicación. Si una
+      opción elimina el secreto en vez de custodiarlo mejor, suele ser la buena.
+    </div>
+
+    <h2 id="enterprise-access">El enterprise access model (2.3.1)</h2>
+    <p>
+      Es el sucesor del modelo de niveles clásico y la referencia con la que Microsoft espera que diseñes la
+      delegación de privilegio. La idea que hay que retener: <strong>los planos de control se separan</strong>
+      —control, gestión y datos/carga de trabajo— y una identidad de un plano superior nunca se expone en uno
+      inferior. Aplicado a la nube, significa que quien administra Entra ID no usa esa misma cuenta para
+      administrar una suscripción, ni esa para entrar en una máquina.
+    </p>
+
+    <h2 id="pim">PIM, entitlement management y access reviews (2.3.2 / 2.3.6)</h2>
+    <table role="table">
+      <tr><th>Pieza</th><th>Qué elimina</th></tr>
+      <tr><td><strong>Privileged Identity Management</strong></td><td>El permiso permanente. El rol se activa por tiempo limitado, con justificación, aprobación y MFA, y queda registrado.</td></tr>
+      <tr><td><strong>Entitlement management</strong></td><td>El alta manual: paquetes de acceso con política de solicitud, aprobación y <strong>caducidad</strong>, que sirven también para externos.</td></tr>
+      <tr><td><strong>Access reviews</strong></td><td>El permiso que sobrevive al motivo por el que se concedió: alguien recertifica periódicamente y lo que no se confirma, se quita.</td></tr>
+    </table>
+    <div class="callout warn">
+      <b>La distinción que preguntan</b>
+      PIM resuelve <em>cuánto tiempo está activo</em> un rol. Las access reviews resuelven <em>si esa persona
+      debería seguir teniéndolo</em>. No se sustituyen: un rol elegible en PIM que nadie revisa en dos años
+      sigue siendo un problema de gobierno.
+    </div>
+
+    <h2 id="adds-gobierno">Evaluar el gobierno y la resistencia de AD DS (2.3.3)</h2>
+    <p>
+      Aquí el examen quiere que reconozcas los ataques por su nombre y sepas qué los frena:
+    </p>
+    <table role="table">
+      <tr><th>Ataque</th><th>Qué explota</th><th>Qué lo corta</th></tr>
+      <tr><td><strong>Pass-the-hash / pass-the-ticket</strong></td><td>Credenciales que quedan en memoria de un equipo de menor nivel.</td><td>Modelo por niveles, Credential Guard, estaciones dedicadas.</td></tr>
+      <tr><td><strong>DCSync</strong></td><td>Permisos de replicación concedidos de más.</td><td>Auditar quién tiene esos permisos; detección con Defender for Identity.</td></tr>
+      <tr><td><strong>Golden Ticket</strong></td><td>El compromiso de la cuenta <code>krbtgt</code>.</td><td>Rotación doble de <code>krbtgt</code> y un plan de recuperación de bosque probado.</td></tr>
+      <tr><td><strong>Kerberoasting</strong></td><td>Cuentas de servicio con contraseña débil y SPN.</td><td>Cuentas de servicio administradas de grupo (gMSA).</td></tr>
+    </table>
+
+    <h2 id="tenants">Administración segura de tenants en la nube (2.3.4)</h2>
+    <p>
+      Un tenant de Entra ID es la raíz de confianza de todo lo demás, y lo que se pide diseñar es cómo se
+      administra sin convertirlo en el punto único de fallo: administradores en PIM y no permanentes,
+      estaciones dedicadas, <strong>cuentas de emergencia</strong> excluidas del acceso condicional y
+      vigiladas con alerta si se usan, y separación entre quien administra la identidad y quien administra
+      las cargas. En escenarios SaaS y multinube, la misma disciplina se extiende a la consola de cada
+      proveedor.
+    </p>
+
+    <h2 id="ciem">CIEM: permisos de infraestructura en la nube (2.3.5)</h2>
+    <p>
+      El problema que resuelve: en cualquier nube el 90% de los permisos concedidos no se usa nunca, y cada
+      uno es superficie de ataque. <strong>Microsoft Entra Permissions Management</strong> es la respuesta
+      de Microsoft: descubre los permisos concedidos frente a los realmente usados en Azure, AWS y GCP,
+      calcula un índice de exceso de permiso y permite recortar al uso real.
+    </p>
+    <div class="callout exam">
+      <b>Cómo lo enuncian</b>
+      «Necesitamos ver, en las tres nubes, qué identidades tienen permisos que no utilizan.» Eso es CIEM.
+      Defender for Cloud da postura de <em>recursos</em>; Permissions Management da postura de
+      <em>permisos</em>.
+    </div>
+
+    <h2 id="paw">Estaciones de trabajo para acceso privilegiado (2.3.7)</h2>
+    <p>
+      Una PAW es un equipo dedicado y endurecido desde el que se administra, y del que se ha quitado todo lo
+      que introduce riesgo: correo, navegación general, software arbitrario. El razonamiento que espera el
+      examen: <strong>no tiene sentido proteger la cuenta si el equipo desde el que se usa está expuesto</strong>,
+      porque el atacante no necesita la contraseña, le basta con el equipo donde se teclea. Para el acceso
+      remoto a esos entornos, la variante moderna es un servicio como <strong>Azure Bastion</strong> con
+      Entra ID y acceso condicional delante, en lugar de RDP publicado.
+    </p>
+
+    <h2 id="requisito-control">Traducir un requisito normativo en controles (2.4.1)</h2>
+    <p>
+      Es la tarea más «de arquitecto» del dominio y la que más se falla, porque la respuesta correcta rara
+      vez es un producto. La secuencia que espera el examen:
+    </p>
+    <ol>
+      <li>Identificar la <strong>obligación</strong> concreta del marco, no el marco entero.</li>
+      <li>Traducirla a un <strong>control</strong> técnico u organizativo verificable.</li>
+      <li>Elegir el <strong>mecanismo</strong> que lo implementa y, sobre todo, el que lo <strong>evidencia</strong>.</li>
+      <li>Definir cómo se <strong>demuestra</strong> a un auditor de forma repetible.</li>
+    </ol>
+    <div class="callout exam">
+      <b>Implementar y demostrar no son lo mismo</b>
+      Azure Policy <em>implementa</em> y evita la desviación. Defender for Cloud y Purview
+      <em>evidencian</em> el cumplimiento frente a un marco. Un enunciado que pide «demostrar ante el
+      auditor» no se resuelve con una política: se resuelve con el informe.
+    </div>
+
+    <h2 id="purview">Microsoft Purview para requisitos de cumplimiento (2.4.2)</h2>
+    <ul>
+      <li><strong>Clasificación y etiquetas de confidencialidad</strong> — descubrir dónde está el dato regulado y marcarlo, con protección que viaja con el fichero.</li>
+      <li><strong>Prevención de pérdida de datos</strong> — impedir que salga por correo, endpoint o SaaS.</li>
+      <li><strong>Gestión del ciclo de vida y retención</strong> — conservar lo que la norma obliga y borrar lo que obliga a borrar.</li>
+      <li><strong>Gestión de riesgo interno y barreras de información</strong> — el ángulo de amenaza interna y separación de funciones.</li>
+      <li><strong>Purview Audit</strong> — la evidencia de quién hizo qué.</li>
+    </ul>
+
+    <h2 id="azure-policy">Azure Policy para seguridad y cumplimiento (2.4.3)</h2>
+    <table role="table">
+      <tr><th>Efecto</th><th>Para qué se diseña</th></tr>
+      <tr><td><code>Deny</code></td><td>Impedir que el recurso no conforme llegue a existir. Es el control preventivo.</td></tr>
+      <tr><td><code>Audit</code></td><td>Ver el alcance del problema sin romper nada. Es el primer paso realista en un entorno con recursos ya desplegados.</td></tr>
+      <tr><td><code>DeployIfNotExists</code> / <code>Modify</code></td><td>Corregir: desplegar la configuración que falta o añadir el ajuste. Necesita identidad administrada.</td></tr>
+      <tr><td><strong>Iniciativas</strong></td><td>Agrupar decenas de políticas bajo un marco normativo y asignarlas a un ámbito completo.</td></tr>
+    </table>
+    <div class="callout warn">
+      <b>El orden importa</b>
+      Poner <code>Deny</code> de entrada en una suscripción con recursos existentes no los arregla —solo
+      bloquea los nuevos— y suele romper despliegues. El patrón que busca el examen es
+      <em>Audit primero para medir, remediación para lo existente, Deny después para que no vuelva</em>.
+    </div>
+
+    <h2 id="defender-compliance">Defender for Cloud para validar la normativa (2.4.4)</h2>
+    <p>
+      El panel de <strong>cumplimiento normativo</strong> de Defender for Cloud mapea tus recursos contra
+      estándares —MCSB por defecto, y los que añadas: ISO 27001, PCI DSS, NIST, CIS— y muestra, control a
+      control, qué se cumple y qué no, en Azure y también en las suscripciones de AWS y GCP conectadas. Es
+      la herramienta de la que sale la evidencia continua; el <strong>Secure Score</strong>, en cambio, es
+      una métrica de mejora relativa, no un informe de cumplimiento.
+    </p>
+
+    <h2 id="trampas">Trampas típicas de este dominio</h2>
+    <div class="callout warn">
+      <b>Sentinel donde bastaba Defender XDR</b>
+      Correlacionar señales de endpoint, identidad, correo y aplicaciones de Microsoft ya lo hace XDR. El SIEM entra cuando aparece un origen ajeno o una retención larga.
+    </div>
+    <div class="callout warn">
+      <b>Secure Score como informe de cumplimiento</b>
+      Secure Score mide mejora; el panel de cumplimiento normativo mide conformidad frente a un estándar. No son intercambiables.
+    </div>
+    <div class="callout warn">
+      <b>PIM en lugar de access reviews</b>
+      Reducir el tiempo de activación no responde a si esa persona debería seguir siendo elegible. Muchos escenarios necesitan las dos.
+    </div>
+    <div class="callout warn">
+      <b>Olvidar la cuenta de emergencia</b>
+      Cualquier diseño de acceso condicional que no excluya cuentas de rotura de cristal es un bloqueo total esperando a ocurrir.
+    </div>
+    <div class="callout warn">
+      <b>Azure Arc como si fuera un conector de logs</b>
+      Arc gobierna el recurso desde Azure; llevar sus eventos al SIEM es una decisión distinta.
+    </div>
+
+    <!-- temario:inicio -->
+    <h2 id="temario">Temario oficial cubierto</h2>
+    <p class="lede">Las tareas y skills que Microsoft publica para el dominio 2 en la guía del examen. El 25-30% de las preguntas del examen sale de aquí.</p>
+    <div class="syllabus">
+      <h4>Tarea 2.1 — Diseñar las capacidades de operaciones de seguridad</h4>
+      <ul class="skills">
+        <li><span class="skill-id">2.1.1</span> <span>Diseñar detección y respuesta con XDR y SIEM</span></li>
+        <li><span class="skill-id">2.1.2</span> <span>Diseñar registro y auditoría centralizados, incluido Microsoft Purview Audit</span></li>
+        <li><span class="skill-id">2.1.3</span> <span>Diseñar la monitorización de entornos híbridos y multinube</span></li>
+        <li><span class="skill-id">2.1.4</span> <span>Diseñar orquestación y respuesta automatizada (SOAR) con Microsoft Sentinel y Defender XDR</span></li>
+        <li><span class="skill-id">2.1.5</span> <span>Diseñar y evaluar flujos de trabajo de seguridad: respuesta a incidentes, caza de amenazas y gestión del incidente</span></li>
+        <li><span class="skill-id">2.1.6</span> <span>Diseñar y evaluar la cobertura de detección con las matrices MITRE ATT&amp;CK: Enterprise, Mobile e ICS</span></li>
+      </ul>
+      <h4>Tarea 2.2 — Diseñar la gestión de identidades y accesos</h4>
+      <ul class="skills">
+        <li><span class="skill-id">2.2.1</span> <span>Diseñar identidades de agente con Microsoft Entra Agent ID y políticas de acceso condicional <span class="skill-new" title="Contenido que Microsoft añadió en la revisión del 28 de julio de 2026">nuevo en 2026</span></span></li>
+        <li><span class="skill-id">2.2.2</span> <span>Diseñar el acceso a recursos SaaS, PaaS, IaaS, híbridos y multinube, con controles de identidad, red y aplicación</span></li>
+        <li><span class="skill-id">2.2.3</span> <span>Diseñar la solución de Microsoft Entra ID, incluidos entornos híbridos y multinube</span></li>
+        <li><span class="skill-id">2.2.4</span> <span>Diseñar identidades externas: B2B e identidad descentralizada</span></li>
+        <li><span class="skill-id">2.2.5</span> <span>Diseñar autenticación y autorización modernas: acceso condicional, evaluación continua de acceso, puntuación de riesgo y acciones protegidas</span></li>
+        <li><span class="skill-id">2.2.6</span> <span>Validar que las políticas de acceso condicional encajan con la estrategia Zero Trust</span></li>
+        <li><span class="skill-id">2.2.7</span> <span>Especificar los requisitos para endurecer Active Directory Domain Services</span></li>
+        <li><span class="skill-id">2.2.8</span> <span>Diseñar la gestión de secretos, claves y certificados</span></li>
+      </ul>
+      <h4>Tarea 2.3 — Diseñar la protección del acceso privilegiado</h4>
+      <ul class="skills">
+        <li><span class="skill-id">2.3.1</span> <span>Diseñar la asignación y delegación de roles privilegiados con el enterprise access model</span></li>
+        <li><span class="skill-id">2.3.2</span> <span>Evaluar la seguridad y el gobierno de Entra ID: PIM, entitlement management y revisiones de acceso</span></li>
+        <li><span class="skill-id">2.3.3</span> <span>Evaluar la seguridad y el gobierno de AD DS, incluida su resistencia a los ataques habituales</span></li>
+        <li><span class="skill-id">2.3.4</span> <span>Diseñar la administración segura de tenants en la nube, incluidas plataformas SaaS y multinube</span></li>
+        <li><span class="skill-id">2.3.5</span> <span>Diseñar la gestión de permisos de infraestructura en la nube (CIEM)</span></li>
+        <li><span class="skill-id">2.3.6</span> <span>Evaluar una solución de gestión de revisiones de acceso</span></li>
+        <li><span class="skill-id">2.3.7</span> <span>Diseñar estaciones de trabajo seguras para acceso privilegiado, incluido el acceso remoto</span></li>
+      </ul>
+      <h4>Tarea 2.4 — Diseñar el cumplimiento normativo</h4>
+      <ul class="skills">
+        <li><span class="skill-id">2.4.1</span> <span>Traducir requisitos de cumplimiento en controles de seguridad</span></li>
+        <li><span class="skill-id">2.4.2</span> <span>Diseñar la cobertura de requisitos de cumplimiento con Microsoft Purview</span></li>
+        <li><span class="skill-id">2.4.3</span> <span>Diseñar soluciones con Azure Policy para requisitos de seguridad y cumplimiento</span></li>
+        <li><span class="skill-id">2.4.4</span> <span>Evaluar y validar el alineamiento con estándares y benchmarks con Microsoft Defender for Cloud</span></li>
+      </ul>
+      <p class="syllabus-note">Redacción adaptada al español; la versión normativa es la de la guía oficial de Microsoft. SC-100 (guía oficial, skills medidos a 28 jul. 2026).</p>
+    </div>
+<!-- temario:fin -->
+
+    <h2 id="quiz">Quiz de práctica — Operaciones, identidad y cumplimiento</h2>
+    <p class="lede">48 preguntas de escenario. Elige una opción para ver si es correcta y por qué.</p>
+    <div id="quiz-root"></div>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">Guía independiente, sin relación con Microsoft. Revisada en agosto de 2026.</div>
+</footer>
+
+<script src="quiz-data.js"></script>
+<script src="../../../assets/js/quiz.js?v=9"></script>
+<script src="../../../assets/js/app.js?v=9"></script>
+
+</body>
+</html>

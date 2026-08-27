@@ -23,24 +23,26 @@ const CHECK = process.argv.includes("--check");
 const OPEN = "<!-- temario:inicio -->";
 const CLOSE = "<!-- temario:fin -->";
 
+// Microsoft publishes its weights as a range ("25-30%") and AWS as a single
+// number, so the page prints whatever the guide recorded rather than a figure
+// we computed — a midpoint on the page would not match the official outline.
+const weightOf = (d) => d.weightLabel || `${d.weight}%`;
+
 const T = {
   es: {
     heading: "Temario oficial cubierto",
-    lede: (d) =>
-      `Las tareas y skills que AWS publica para el dominio ${d.id} en la guía del examen. El ${d.weight}% de las preguntas del examen sale de aquí.`,
-    note: "Redacción adaptada al español; la versión normativa es la de la guía oficial de AWS.",
+    lede: (cert, d) =>
+      `Las tareas y skills que ${cert.vendor} publica para el dominio ${d.id} en la guía del examen. El ${weightOf(d)} de las preguntas del examen sale de aquí.`,
+    note: (cert) =>
+      `Redacción adaptada al español; la versión normativa es la de la guía oficial de ${cert.vendor}.`,
     task: "Tarea",
-    isNew: "nuevo en C03",
-    newTitle: "Contenido que AWS añadió al pasar de SCS-C02 a SCS-C03",
   },
   en: {
     heading: "Official exam content covered",
-    lede: (d) =>
-      `The tasks and skills AWS publishes for domain ${d.id} in the exam guide. ${d.weight}% of the exam's questions come from here.`,
-    note: "Wording as published by AWS in the exam guide.",
+    lede: (cert, d) =>
+      `The tasks and skills ${cert.vendor} publishes for domain ${d.id} in the exam guide. ${weightOf(d)} of the exam's questions come from here.`,
+    note: (cert) => `Wording as published by ${cert.vendor} in the exam guide.`,
     task: "Task",
-    isNew: "new in C03",
-    newTitle: "Content AWS added when moving from SCS-C02 to SCS-C03",
   },
 };
 
@@ -48,8 +50,10 @@ function esc(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function block(domain, lang, NEW_IN_C03, GUIDE_EDITION) {
+function block(cert, domain, lang, NEW_IN_C03, GUIDE_EDITION) {
   const t = T[lang];
+  const isNew = cert.newBadge[lang];
+  const newTitle = cert.newTitle[lang];
   const tasks = domain.tasks
     .map((task) => {
       const skills = task.skills
@@ -57,7 +61,7 @@ function block(domain, lang, NEW_IN_C03, GUIDE_EDITION) {
           // Someone who studied with SCS-C02 material has never seen these,
           // so they are worth pointing at rather than leaving in the list.
           const badge = NEW_IN_C03.includes(s.id)
-            ? ` <span class="skill-new" title="${t.newTitle}">${t.isNew}</span>`
+            ? ` <span class="skill-new" title="${newTitle}">${isNew}</span>`
             : "";
           return `        <li><span class="skill-id">${s.id}</span> <span>${esc(
             lang === "es" ? s.textEs : s.text
@@ -76,10 +80,10 @@ function block(domain, lang, NEW_IN_C03, GUIDE_EDITION) {
   return [
     OPEN,
     `    <h2 id="temario">${t.heading}</h2>`,
-    `    <p class="lede">${t.lede(domain)}</p>`,
+    `    <p class="lede">${t.lede(cert, domain)}</p>`,
     `    <div class="syllabus">`,
     tasks,
-    `      <p class="syllabus-note">${t.note} ${esc(GUIDE_EDITION)}.</p>`,
+    `      <p class="syllabus-note">${t.note(cert)} ${esc(GUIDE_EDITION[lang])}.</p>`,
     `    </div>`,
     CLOSE,
   ].join("\n");
@@ -96,7 +100,7 @@ CERTS.forEach((cert) => {
     const file = path.join(REPO, rel);
     if (!fs.existsSync(file)) return; // módulo aún por escribir
     const html = fs.readFileSync(file, "utf8");
-    const want = block(d, lang, NEW_IN_C03, GUIDE_EDITION);
+    const want = block(cert, d, lang, NEW_IN_C03, GUIDE_EDITION);
 
     const from = html.indexOf(OPEN);
     const to = html.indexOf(CLOSE);

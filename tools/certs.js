@@ -24,6 +24,15 @@ const CERTS = [
     // the words each language uses when a page states its question count
     countWord: { es: "preguntas", en: "questions" },
     totalWord: { es: "preguntas", en: "practice questions" },
+    // who publishes the exam guide, and how the syllabus block labels the
+    // skills this edition added, so tools/render-syllabus.js never has to
+    // know which certification it is printing
+    vendor: "AWS",
+    newBadge: { es: "nuevo en C03", en: "new in C03" },
+    newTitle: {
+      es: "Contenido que AWS añadió al pasar de SCS-C02 a SCS-C03",
+      en: "Content AWS added when moving from SCS-C02 to SCS-C03",
+    },
     examEngine: "assets/js/exam.js",
     examTotal: 65,
   },
@@ -44,6 +53,12 @@ const CERTS = [
     },
     countWord: { es: "preguntas", en: "questions" },
     totalWord: { es: "preguntas", en: "practice questions" },
+    vendor: "Microsoft",
+    newBadge: { es: "nuevo en 2026", en: "new in 2026" },
+    newTitle: {
+      es: "Contenido que Microsoft añadió en la revisión del 28 de julio de 2026",
+      en: "Content Microsoft added in the 28 July 2026 revision",
+    },
   },
 ];
 
