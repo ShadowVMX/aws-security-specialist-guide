@@ -1,0 +1,499 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Free interactive study guide for the AWS Certified Security — Specialty (SCS-C03) exam: theory by domain, interactive diagrams, 286 practice questions and a timed simulation.">
+<link rel="icon" href="../../../../assets/img/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Data Protection — AWS Security Specialist (SCS-C03)">
+<meta property="og:description" content="Free interactive study guide for the AWS Certified Security — Specialty (SCS-C03) exam: theory by domain, interactive diagrams, 286 practice questions and a timed simulation.">
+<meta property="og:url" content="https://shadowvmx.github.io/aws-security-specialist-guide/en/modules/data-protection/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+<title>Data Protection — AWS Security Specialist (SCS-C03)</title>
+<link rel="stylesheet" href="../../../../assets/css/style.css?v=9">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="dot">●</span> AWS Security Specialist</div>
+    <nav class="topnav">
+      <a href="../../index.html">← Domains</a>
+      <span class="lang-switch"><a href="../../../modules/data-protection/index.html">ES</a><span class="current">EN</span></span>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero" style="padding-top:40px;">
+    <span class="badge">SCS-C03 · Domain 5 · 18% of the exam</span>
+    <h1>Data Protection</h1>
+    <p>Encryption in transit, encryption at rest, and protection of sensitive data, credentials, and cryptographic material. KMS is the common thread running through the whole domain — once you master envelope encryption, most questions answer themselves.</p>
+    <p class="module-reviewed">Reviewed in August 2026 against the official AWS documentation.</p>
+  </section>
+</div>
+
+<div class="wrap module-layout">
+
+  <aside class="sidebar">
+    <h4>Fundamentals</h4>
+    <a href="#fundamentos">Encryption models</a>
+    <a href="#envelope">Envelope encryption</a>
+    <h4>5.1 Data in transit</h4>
+    <a href="#transit-tls">TLS &amp; private connectivity</a>
+    <a href="#transit-inter">Inter-resource encryption</a>
+    <h4>5.2 Data at rest</h4>
+    <a href="#kms-vs-hsm">KMS, CloudHSM &amp; choosing a service</a>
+    <a href="#integridad">Data integrity</a>
+    <a href="#lifecycle">Lifecycle &amp; retention</a>
+    <a href="#backup">Replication &amp; backup</a>
+    <h4>5.3 Sensitive data &amp; keys</h4>
+    <a href="#secrets">Secrets Manager</a>
+    <a href="#imported-keys">Imported key material &amp; XKS</a>
+    <a href="#masking">Sensitive data masking</a>
+    <a href="#certs">Multi-Region certificates</a>
+    <a href="#fuentes">Official sources</a>
+    <a href="#trampas">Classic traps</a>
+    <a href="#temario">Official exam content</a>
+    <h4>Practice</h4>
+    <a href="#quiz">Quiz (50 questions)</a>
+  </aside>
+
+  <main class="content">
+
+    <h2 id="fundamentos">Encryption models</h2>
+    <p class="lede">Before diving into KMS, you need three axes straight — the exam combines them constantly.</p>
+
+    <table role="table">
+      <tr><th>Axis</th><th>Options</th><th>Key idea</th></tr>
+      <tr><td><strong>Where encryption happens</strong></td><td>Client-side vs Server-side</td><td>Client-side: the data leaves your app already encrypted, AWS never sees the plaintext. Server-side: AWS receives the data (over TLS) and encrypts it itself when storing it.</td></tr>
+      <tr><td><strong>Who manages the key (server-side)</strong></td><td>SSE-S3 / SSE-KMS / SSE-C</td><td>SSE-S3: key managed 100% by S3. SSE-KMS: key lives in KMS, with auditing and granular access control. SSE-C: YOU supply the key on every request; AWS never stores it.</td></tr>
+      <tr><td><strong>Where the hardware lives</strong></td><td>KMS (multi-tenant) vs CloudHSM (single-tenant) vs External Key Store</td><td>See the full comparison below.</td></tr>
+    </table>
+
+    <h2 id="envelope">Envelope encryption — the concept tested most</h2>
+    <p class="lede">KMS almost never encrypts your data directly: it encrypts a "data key" that in turn encrypts your data. Click each step.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="ae-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#7c8aa0"></path>
+          </marker>
+        </defs>
+
+        <line class="dline" x1="230" y1="60" x2="230" y2="90" marker-end="url(#ae-arrow)"></line>
+        <line class="dline" x1="230" y1="160" x2="230" y2="190" marker-end="url(#ae-arrow)"></line>
+        <line class="dline" x1="230" y1="260" x2="230" y2="290" marker-end="url(#ae-arrow)"></line>
+        <line class="dline" x1="230" y1="360" x2="230" y2="390" marker-end="url(#ae-arrow)"></line>
+
+        <g class="dstep" data-label="1. GenerateDataKey." data-explain="The application calls kms:GenerateDataKey specifying the Key ID of your customer managed key (CMK). No data is sent to KMS yet.">
+          <rect class="dbox" x="40" y="10" width="380" height="50" rx="8"></rect>
+          <text x="60" y="40" class="dtitle">1. App calls KMS: GenerateDataKey</text>
+        </g>
+
+        <g class="dstep" data-label="2. KMS responds with TWO versions." data-explain="KMS returns the data key in plaintext (to use RIGHT NOW) AND the same data key encrypted by the CMK (the 'encrypted blob', to store). The CMK itself is never transmitted.">
+          <rect class="dbox" x="40" y="90" width="380" height="70" rx="8"></rect>
+          <text x="60" y="118" class="dtitle">2. KMS returns: plaintext data key</text>
+          <text x="60" y="136" class="dtitle">+ data key encrypted by the CMK</text>
+        </g>
+
+        <g class="dstep" data-label="3. Local encryption." data-explain="The app uses the plaintext data key to encrypt the file/object LOCALLY (typically AES-256-GCM), with no size limit — unlike calling Encrypt directly on KMS, which is capped at ~4KB.">
+          <rect class="dbox" x="40" y="190" width="380" height="70" rx="8"></rect>
+          <text x="60" y="218" class="dtitle">3. App encrypts the data locally with</text>
+          <text x="60" y="236" class="dtitle">the plaintext data key</text>
+        </g>
+
+        <g class="dstep" data-label="4. Discard + storage." data-explain="The plaintext data key is DELETED from memory immediately. Only the encrypted object is stored, alongside the ENCRYPTED data key (useless without access to the CMK in KMS).">
+          <rect class="dbox" x="40" y="290" width="380" height="70" rx="8"></rect>
+          <text x="60" y="318" class="dtitle">4. The plaintext data key is discarded; the</text>
+          <text x="60" y="336" class="dtitle">encrypted object + encrypted data key are stored</text>
+        </g>
+
+        <g class="dstep" data-label="5. To decrypt: KMS Decrypt." data-explain="When the data needs to be read, the app sends the ENCRYPTED data key (not the full object) to kms:Decrypt. KMS checks permissions (key policy + IAM) and returns the plaintext data key again.">
+          <rect class="dbox" x="40" y="390" width="380" height="50" rx="8"></rect>
+          <text x="60" y="420" class="dtitle">5. To read: the encrypted data key is sent to KMS Decrypt → the object is decrypted locally</text>
+        </g>
+      </svg>
+      <div class="dexplain">Click any step in the diagram to see the detailed explanation.</div>
+      <p class="diagram-note">Envelope encryption: KMS never sees your data, only the data key</p>
+    </div>
+
+    <div class="callout azure">
+      <b>Coming from Azure</b>
+      Azure Key Vault also supports an envelope encryption pattern (using <code>WrapKey</code>/<code>UnwrapKey</code>), conceptually identical. The organizational difference: <strong>Azure Key Vault is ONE service</strong> that stores keys, secrets, AND certificates together. AWS spreads that same functionality across <strong>three distinct services</strong>: KMS (encryption keys), Secrets Manager (credentials/secrets), and ACM (certificates) — each with its own console, pricing, and API. Mentally, "Key Vault" ≈ "KMS + Secrets Manager + ACM" combined.
+    </div>
+
+    <p class="code-label">Envelope encryption step by step with the CLI</p>
+    <pre><code># 1. Pedir a KMS una data key: devuelve la version en claro Y la cifrada.
+aws kms generate-data-key \
+  --key-id alias/datos-cliente \
+  --key-spec AES_256 \
+  --query &#x27;{EnClaro:Plaintext,Cifrada:CiphertextBlob}&#x27;
+
+# 2. Cifrar el fichero LOCALMENTE con la clave en claro.
+#    Los datos nunca viajan a KMS: Encrypt esta limitado a 4 KB.
+openssl enc -aes-256-cbc -in backup.tar -out backup.tar.enc -K &quot;$CLAVE_HEX&quot;
+
+# 3. Descartar la clave en claro y guardar solo la cifrada junto al dato.
+unset CLAVE_HEX
+
+# Para descifrar, KMS devuelve la clave en claro a partir de la cifrada.
+aws kms decrypt \
+  --ciphertext-blob fileb://data-key.enc \
+  --query Plaintext --output text</code></pre>
+
+    <h2 id="transit-tls">TLS &amp; private connectivity (5.1.1 / 5.1.2)</h2>
+    <p class="lede">Two distinct questions: do I encrypt the channel? and do I keep the traffic off the public network?</p>
+
+    <table role="table">
+      <tr><th>Mechanism</th><th>Solves</th></tr>
+      <tr><td><strong>ELB Security Policies</strong></td><td>Enforces a minimum TLS version and allowed cipher suites on an ALB/NLB's HTTPS/TLS listener.</td></tr>
+      <tr><td><strong>AWS PrivateLink / VPC endpoints</strong></td><td>Access AWS services or third-party SaaS without leaving the public Internet — the traffic never crosses the open Internet.</td></tr>
+      <tr><td><strong>AWS Client VPN</strong></td><td>Traditional remote-access VPN tunnel (OpenVPN-based) from user devices into your VPC.</td></tr>
+      <tr><td><strong>AWS Verified Access</strong></td><td>Zero Trust: evaluates identity + device posture on every request at the application layer, without exposing a full network tunnel.</td></tr>
+    </table>
+
+    <p class="code-label">Enforce TLS 1.2+ on an ALB listener via CLI</p>
+    <pre><code>aws elbv2 modify-listener \
+  --listener-arn "arn:aws:elasticloadbalancing:eu-west-1:111122223333:listener/app/my-alb/abc/def" \
+  --ssl-policy "ELBSecurityPolicy-TLS13-1-2-2021-06"</code></pre>
+
+    <div class="callout azure">
+      <b>Coming from Azure</b>
+      <table role="table">
+        <tr><th>Azure</th><th>AWS</th><th>Key difference</th></tr>
+        <tr><td><strong>Azure Private Link</strong></td><td><strong>AWS PrivateLink</strong></td><td>Practically identical in concept: expose a service as a private endpoint inside a VNet/VPC without going over the Internet.</td></tr>
+        <tr><td><strong>Point-to-Site (P2S) VPN</strong></td><td><strong>AWS Client VPN</strong></td><td>Same model: individual client VPN tunnel into the virtual network.</td></tr>
+        <tr><td>Azure AD Application Proxy / Entra Private Access</td><td><strong>AWS Verified Access</strong></td><td>Both implement Zero Trust Network Access (ZTNA) at the application layer instead of the full network.</td></tr>
+      </table>
+    </div>
+
+    <h2 id="transit-inter">Inter-resource encryption (5.1.3 — new in SCS-C03)</h2>
+    <p class="lede">A skill added in the current version of the exam: encrypting traffic BETWEEN nodes of the same distributed service, not just client↔service.</p>
+    <ul>
+      <li><strong>Amazon EMR</strong>: "in-transit encryption" in the cluster's Security Configuration encrypts traffic between nodes (including Spark shuffle) with TLS.</li>
+      <li><strong>Amazon EKS</strong>: inter-node encryption typically goes through a service mesh (App Mesh, Istio) or a CNI with encryption support — it's not automatic by default in the data plane.</li>
+      <li><strong>Amazon SageMaker AI</strong>: "inter-container traffic encryption" encrypts communication between the containers of a distributed training job.</li>
+      <li><strong>Nitro encryption</strong>: on EC2 instances running on the Nitro System, traffic between Nitro instances (and local memory) is automatically encrypted at the infrastructure level, with no client configuration.</li>
+    </ul>
+
+    <div class="callout plain">
+      <b>Plain-language example</b>
+      Encrypting your S3 bucket with SSE-KMS protects data AT REST on disk. But if you have a 20-node EMR cluster processing that data and shuffling intermediate results BETWEEN those 20 nodes, that internal traffic travels unencrypted unless you explicitly enable "in-transit encryption" in the Security Configuration — an easy point to miss, because "everything is already encrypted" (at rest) doesn't mean "all traffic is encrypted" (in transit, even internal traffic).
+    </div>
+
+    <h2 id="kms-vs-hsm">KMS, CloudHSM &amp; choosing the right service (5.2.1)</h2>
+    <p class="lede">Skill 5.2.1 asks this explicitly: "select the appropriate key service." Follow this decision tree.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 700 480" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="kd-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#7c8aa0"></path>
+          </marker>
+          <marker id="kd-arrow-si" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#3ecf8e"></path>
+          </marker>
+        </defs>
+
+        <line class="dline" x1="230" y1="80" x2="230" y2="140" marker-end="url(#kd-arrow)"></line>
+        <line class="dline" x1="230" y1="210" x2="230" y2="270" marker-end="url(#kd-arrow)"></line>
+        <line class="dline" x1="230" y1="340" x2="230" y2="380" marker-end="url(#kd-arrow)"></line>
+
+        <line class="dline-deny" style="stroke:#3ecf8e" x1="420" y1="45" x2="470" y2="45" marker-end="url(#kd-arrow-si)"></line>
+        <line class="dline-deny" style="stroke:#3ecf8e" x1="420" y1="175" x2="470" y2="175" marker-end="url(#kd-arrow-si)"></line>
+        <line class="dline-deny" style="stroke:#3ecf8e" x1="420" y1="305" x2="470" y2="305" marker-end="url(#kd-arrow-si)"></line>
+
+        <g class="dstep" data-label="Dedicated, exportable HSM?" data-explain="Do you need FIPS 140-2 Level 3, a single-tenant HSM under your exclusive control, and the ability to export the key material if you migrate providers?">
+          <rect class="dbox" x="40" y="10" width="380" height="70" rx="8"></rect>
+          <text x="60" y="38" class="dtitle">Do you need a dedicated (single-tenant)</text>
+          <text x="60" y="56" class="dtitle">HSM and the ability to export the key?</text>
+        </g>
+        <g class="dstep" data-label="→ AWS CloudHSM." data-explain="CloudHSM gives you a dedicated physical HSM (clustered for high availability), FIPS 140-2 Level 3, and full lifecycle control — including key export, something KMS never allows. You manage the infrastructure.">
+          <rect class="dbox dbox-allow" x="470" y="10" width="190" height="70" rx="8"></rect>
+          <text x="490" y="50" class="dtitle">AWS CloudHSM</text>
+        </g>
+
+        <g class="dstep" data-label="Full sovereignty outside AWS?" data-explain="Must the key material reside and be managed PHYSICALLY outside AWS infrastructure (on-premises or with a third party), while still wanting AWS services to keep using it transparently?">
+          <rect class="dbox" x="40" y="140" width="380" height="70" rx="8"></rect>
+          <text x="60" y="168" class="dtitle">Must the key material reside</text>
+          <text x="60" y="186" class="dtitle">physically OUTSIDE AWS?</text>
+        </g>
+        <g class="dstep" data-label="→ KMS External Key Store (XKS)." data-explain="XKS connects KMS to your external key manager via a proxy: the material never enters AWS, but KMS API calls keep working transparently for integrated services.">
+          <rect class="dbox dbox-allow" x="470" y="140" width="190" height="70" rx="8"></rect>
+          <text x="490" y="170" class="dtitle">KMS External</text>
+          <text x="490" y="188" class="dtitle">Key Store (XKS)</text>
+        </g>
+
+        <g class="dstep" data-label="Bring your own material?" data-explain="Do you already have key material generated by your own process (BYOK) and want to import it into a KMS key, accepting that automatic rotation is no longer available?">
+          <rect class="dbox" x="40" y="270" width="380" height="70" rx="8"></rect>
+          <text x="60" y="298" class="dtitle">Do you need to import your own</text>
+          <text x="60" y="316" class="dtitle">key material (BYOK)?</text>
+        </g>
+        <g class="dstep" data-label="→ KMS with imported key material." data-explain="You create an 'empty' KMS key (origin EXTERNAL) and import your own cryptographic material. You lose AWS-managed automatic rotation; you can set an expiration date for the material.">
+          <rect class="dbox dbox-allow" x="470" y="270" width="190" height="70" rx="8"></rect>
+          <text x="490" y="300" class="dtitle">KMS with Imported</text>
+          <text x="490" y="318" class="dtitle">Key Material</text>
+        </g>
+
+        <g class="dstep" data-label="General case → KMS customer managed key." data-explain="For the vast majority of cases (encrypting S3, EBS, RDS, Secrets Manager...) a KMS customer managed key is the default choice: multi-tenant but strongly isolated, native integration in nearly every AWS service, optional automatic rotation, and no infrastructure to manage.">
+          <rect class="dbox dbox-allow" x="40" y="380" width="380" height="60" rx="8"></rect>
+          <text x="60" y="415" class="dtitle">General case → KMS customer managed key</text>
+        </g>
+      </svg>
+      <div class="dexplain">Click any step in the diagram to see the detailed explanation.</div>
+      <p class="diagram-note">Decision tree: which key management service to choose (Skill 5.2.1)</p>
+    </div>
+
+    <table role="table">
+      <tr><th>Key type</th><th>Rotation</th><th>Own key policy</th><th>Multi-Region</th><th>Exportable</th></tr>
+      <tr><td>AWS managed (<code>aws/s3</code>...)</td><td>Automatic annual, no control</td><td>No</td><td>No</td><td>No</td></tr>
+      <tr><td>Customer managed</td><td>Optional, automatic (annual) or manual</td><td>Yes</td><td>Yes</td><td>No</td></tr>
+      <tr><td>Imported key material</td><td>Manual (re-import)</td><td>Yes</td><td>Yes</td><td>No (but you can set an expiration)</td></tr>
+      <tr><td>CloudHSM</td><td>Manual, managed by you</td><td>N/A (you manage the HSM directly)</td><td>Not native</td><td><strong>Yes</strong></td></tr>
+    </table>
+
+    <div class="callout exam">
+      <b>Exam tip</b>
+      If the question mentions "exporting the key" or "exclusive control of the hardware" → <strong>CloudHSM</strong>, almost always (KMS never exports keys, not even with imported key material). If it mentions "the material must never enter AWS" → <strong>XKS</strong>. Every other case involving native AWS integration is almost always a <strong>KMS customer managed key</strong>.
+    </div>
+
+    <p class="code-label">Key policy enabling use from another account</p>
+    <pre><code>{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [
+    {
+      &quot;Sid&quot;: &quot;LaCuentaPropietariaAdministraLaClave&quot;,
+      &quot;Effect&quot;: &quot;Allow&quot;,
+      &quot;Principal&quot;: { &quot;AWS&quot;: &quot;arn:aws:iam::111122223333:root&quot; },
+      &quot;Action&quot;: &quot;kms:*&quot;,
+      &quot;Resource&quot;: &quot;*&quot;
+    },
+    {
+      &quot;Sid&quot;: &quot;LaCuentaConsumidoraSoloDescifra&quot;,
+      &quot;Effect&quot;: &quot;Allow&quot;,
+      &quot;Principal&quot;: { &quot;AWS&quot;: &quot;arn:aws:iam::444455556666:role/AppRole&quot; },
+      &quot;Action&quot;: [&quot;kms:Decrypt&quot;, &quot;kms:DescribeKey&quot;],
+      &quot;Resource&quot;: &quot;*&quot;,
+      &quot;Condition&quot;: {
+        &quot;StringEquals&quot;: { &quot;kms:ViaService&quot;: &quot;s3.eu-west-1.amazonaws.com&quot; }
+      }
+    }
+  ]
+}
+
+# Esto es solo UNA punta: el rol de la cuenta 4444... necesita ademas
+# kms:Decrypt sobre esta clave en su propia politica de identidad.</code></pre>
+
+    <h2 id="integridad">Data integrity (5.2.2)</h2>
+    <ul>
+      <li><strong>S3 Object Lock</strong>: WORM (Write Once Read Many) at the object level. <strong>Governance</strong> mode (bypassable with a special permission) vs <strong>Compliance</strong> mode (immutable, not even root can bypass it).</li>
+      <li><strong>S3 Glacier Vault Lock</strong>: a retention policy that, once confirmed ("locked"), is permanent and immutable — useful for verifiable regulatory compliance (SEC 17a-4, etc.).</li>
+      <li><strong>S3 Versioning</strong> (+ MFA Delete): keeps every version of an object; MFA Delete requires an additional MFA code to delete versions or disable versioning.</li>
+      <li><strong>AWS Signer</strong>: digital code signing (Lambda, containers, IoT firmware) to verify it hasn't been tampered with.</li>
+      <li><strong>CloudTrail file validation</strong>: each log file includes a digitally signed hash to detect later tampering with the logs.</li>
+    </ul>
+
+    <p class="code-label">Configure Object Lock in Compliance mode via CLI</p>
+    <pre><code>aws s3api put-object-retention \
+  --bucket "regulated-records" \
+  --key "contracts/2026-report.pdf" \
+  --retention '{"Mode":"COMPLIANCE","RetainUntilDate":"2033-01-01T00:00:00Z"}'</code></pre>
+
+    <div class="callout plain">
+      <b>Plain-language example</b>
+      Governance mode is like a "do not touch except in an emergency with special authorization" — an administrator with the <code>s3:BypassGovernanceRetention</code> permission can bypass it if truly necessary. Compliance mode is a lock with no key: not even the AWS account owner can open it before the set date. Use it only when regulation truly requires it, because there's no going back.
+    </div>
+
+    <h2 id="lifecycle">Lifecycle &amp; retention (5.2.3)</h2>
+    <ul>
+      <li><strong>S3 Lifecycle policies</strong>: <em>transition</em> rules (moving to a different storage class by age) and <em>expiration</em> rules (automatic deletion after N days).</li>
+      <li><strong>Amazon EFS Lifecycle Management</strong>: automatically moves infrequently accessed files to EFS Infrequent Access.</li>
+      <li><strong>Amazon FSx for Lustre backup policies</strong>: automatic scheduled snapshots of the file system.</li>
+    </ul>
+
+    <h2 id="backup">Replication &amp; backup (5.2.4)</h2>
+    <table role="table">
+      <tr><th>Service</th><th>What it's for</th></tr>
+      <tr><td><strong>AWS Backup</strong></td><td>Centralized backup policy (retention, scheduling, cross-Region/cross-account copying) for EBS, RDS, DynamoDB, EFS, FSx, etc. Supports <strong>Vault Lock</strong> (WORM immutability) as a defense against ransomware.</td></tr>
+      <tr><td><strong>Amazon Data Lifecycle Manager (DLM)</strong></td><td>Automates EBS snapshots and AMI creation/retention specifically.</td></tr>
+      <tr><td><strong>AWS DataSync</strong></td><td>Migration/synchronization of large volumes of data on-premises↔AWS or between AWS storage services. Not a backup tool — it's a transfer tool.</td></tr>
+    </table>
+
+    <div class="callout azure">
+      <b>Coming from Azure</b>
+      <strong>AWS Backup</strong> ↔ <strong>Azure Backup</strong> (centralized, multi-resource policy). <strong>AWS DataSync</strong> ↔ <strong>Azure Migrate</strong> / Azure File Sync for migration and synchronization. The piece WITHOUT a direct equivalent that gets asked about a lot is <strong>AWS Backup Vault Lock</strong>: Azure Backup has "immutable vaults," conceptually similar, but on the AWS exam what matters is the Governance-like vs Compliance-like nuance within Vault Lock itself (compliance mode = irreversible, not even by AWS Support).
+    </div>
+
+    <h2 id="secrets">AWS Secrets Manager (5.3.1)</h2>
+    <p class="lede">Managing and rotating credentials and secrets — the piece that most distinguishes Secrets Manager from simply "storing an encrypted value."</p>
+    <ul>
+      <li><strong>Native automatic rotation</strong> with built-in Lambda functions for RDS, Aurora, Redshift, and DocumentDB: it rotates the credential AND updates it in the database in the same cycle, with no downtime if configured correctly (alternating two-user rotation).</li>
+      <li>For other secrets (third-party API keys, tokens), you can write your own rotation Lambda function following the 4 standard phases: createSecret, setSecret, testSecret, finishSecret.</li>
+      <li>Native integration with IAM (secret resource policies) and KMS (encryption at rest).</li>
+    </ul>
+
+    <p class="code-label">Rotate an RDS secret every 30 days via CLI</p>
+    <pre><code>aws secretsmanager rotate-secret \
+  --secret-id "prod/rds/app-db" \
+  --rotation-lambda-arn "arn:aws:lambda:eu-west-1:111122223333:function:SecretsManagerRDSRotation" \
+  --rotation-rules '{"AutomaticallyAfterDays": 30}'</code></pre>
+
+    <div class="callout azure">
+      <b>Coming from Azure</b>
+      Azure Key Vault Secrets covers encrypted storage, but <strong>it doesn't come with built-in automatic rotation for databases the way Secrets Manager does</strong> — in Azure you typically need Event Grid + custom Azure Functions to replicate that flow. It's a real difference in "included features," not just naming.
+    </div>
+
+    <h2 id="imported-keys">Imported key material &amp; External Key Store (5.3.2 / 5.3.3)</h2>
+    <p class="lede">See also the decision tree above. The nuance tested most here: the practical differences from a key generated by AWS.</p>
+    <table role="table">
+      <tr><th></th><th>Generated by AWS</th><th>Imported material (BYOK)</th></tr>
+      <tr><td>Automatic rotation</td><td>Yes (optional, annual)</td><td>No — must be re-imported manually</td></tr>
+      <tr><td>Configurable expiration</td><td>No</td><td>Yes, optional (or "never expire")</td></tr>
+      <tr><td>Source of the material</td><td>Generated inside AWS's HSM</td><td>Generated by you, imported via a public RSA wrapping key</td></tr>
+      <tr><td>If the material is deleted</td><td>N/A</td><td>The key becomes immediately unusable (useful as a "kill switch")</td></tr>
+    </table>
+
+    <div class="callout azure">
+      <b>Coming from Azure</b>
+      Azure Key Vault also supports BYOK (importing keys generated outside, even HSM-protected via a validated transfer package). The concept is equivalent. Where AWS goes a step further is <strong>External Key Store (XKS)</strong>: the material NEVER enters AWS at any point, not even during import — Azure has no direct equivalent that strict (the closest would be a BYOK integration managed entirely outside via Managed HSM with your own access control, but XKS's "external proxy for every cryptographic operation" model is more AWS-specific).
+    </div>
+
+    <h2 id="masking">Sensitive data masking (5.3.4 — new in SCS-C03)</h2>
+    <p class="lede">Masking sensitive data that shows up where it shouldn't, without blocking the log/message flow entirely.</p>
+    <ul>
+      <li><strong>CloudWatch Logs data protection policies</strong>: detect sensitive data types (credit card numbers, SSNs, AWS access keys, or custom regex-based detectors) and mask the value in views/queries. Only principals with <code>logs:Unmask</code> see the real value.</li>
+      <li><strong>Amazon SNS message data protection</strong>: the same idea applied to SNS messages — detects and masks (or blocks) sensitive data before the message reaches subscribers.</li>
+    </ul>
+
+    <p class="code-label">Data protection policy on a log group (excerpt)</p>
+    <pre><code>{
+  "Name": "mask-pii-policy",
+  "Statement": [
+    {
+      "Sid": "audit-and-mask-credit-cards",
+      "DataIdentifier": ["arn:aws:dataprotection::aws:data-identifier/CreditCardNumber"],
+      "Operation": {
+        "Audit": { "FindingsDestination": {} },
+        "Deidentify": { "MaskConfig": {} }
+      }
+    }
+  ]
+}</code></pre>
+
+    <h2 id="certs">Multi-Region certificates &amp; keys (5.3.5)</h2>
+    <table role="table">
+      <tr><th>Service</th><th>What it's for</th></tr>
+      <tr><td><strong>ACM (public)</strong></td><td>Free, publicly trusted TLS certificates with automatic renewal. For verifiable public domains.</td></tr>
+      <tr><td><strong>AWS Private CA</strong></td><td>Your own private CA hierarchy: internal certificates for mTLS between microservices, IoT, IAM Roles Anywhere. Trusted only where you distribute the root certificate. Cost per active CA.</td></tr>
+      <tr><td><strong>KMS Multi-Region keys</strong></td><td>Replicas that share the SAME cryptographic material across regions — encrypt in one region, decrypt in another without re-encrypting. Different from independently creating identical keys in each region (those would have distinct, incompatible material).</td></tr>
+    </table>
+
+    <div class="callout warn">
+      <b>Watch out if you're coming from Azure</b>
+      Azure Key Vault is a <em>regional</em> resource: to get multi-region high availability for your keys, you manually replicate the entire Key Vault (or use Managed HSM with its own mechanism). AWS KMS Multi-Region keys are conceptually different: they aren't "the same service replicated" — they're <strong>replicas of ONE key with shared material</strong> managed natively by KMS (<code>ReplicateKey</code>), with different Key IDs per region but cryptographically interchangeable. Don't assume it's "the same thing under a different name."
+    </div>
+
+    <h2 id="fuentes">Official sources</h2>
+    <p class="lede">The AWS documentation this module rests on. If something doesn't add up or you want more depth, start here: it is the only source that counts.</p>
+    <ul class="sources">
+      <li><a href="https://docs.aws.amazon.com/kms/latest/developerguide/overview.html" target="_blank" rel="noopener">AWS KMS ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/kms/latest/developerguide/key-policies.html" target="_blank" rel="noopener">KMS — key policies ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html" target="_blank" rel="noopener">KMS — concepts and envelope encryption ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/kms/latest/developerguide/multi-region-keys-overview.html" target="_blank" rel="noopener">KMS — multi-Region keys ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/UsingEncryption.html" target="_blank" rel="noopener">Encryption in Amazon S3 ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lock.html" target="_blank" rel="noopener">S3 Object Lock ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html" target="_blank" rel="noopener">AWS Secrets Manager ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html" target="_blank" rel="noopener">AWS Certificate Manager ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/introduction.html" target="_blank" rel="noopener">AWS CloudHSM ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/aws-certification/latest/security-specialty-03/security-specialty-03.html" target="_blank" rel="noopener">Official SCS-C03 exam guide ↗</a></li>
+    </ul>
+
+    <h2 id="trampas">Classic exam traps</h2>
+    <p class="lede">The mistakes that repeat most in this domain. If you're short on time before the exam, review just this and the quiz.</p>
+
+    <div class="callout exam">
+      <b>KMS doesn't encrypt large files</b>
+      KMS's direct <code>Encrypt</code> operation is capped at <strong>4 KB</strong>. Everything else uses <strong>envelope encryption</strong>: KMS encrypts a data key and bulk encryption happens locally. Any option sending the data to KMS to be encrypted there is false as soon as the volume is real.
+    </div>
+
+    <div class="callout exam">
+      <b>AWS managed keys can't be shared or customized</b>
+      An <strong>AWS managed key</strong> takes no custom key policy, isn't shared across accounts and its rotation isn't yours to control. As soon as the scenario asks for cross-account access, a tailored policy or rotation on your terms, the answer is a <strong>customer managed key</strong>.
+    </div>
+
+    <div class="callout exam">
+      <b>Compliance and governance are not the same</b>
+      In S3 Object Lock, <strong>compliance</strong> mode is genuinely immutable: not even root can delete before retention expires. <strong>Governance</strong> mode allows an override for anyone holding <code>s3:BypassGovernanceRetention</code>. If the requirement is regulatory and says "nobody, under any circumstances", only compliance qualifies. And Object Lock requires <strong>versioning</strong>.
+    </div>
+
+    <div class="callout exam">
+      <b>Deleting a KMS key is never immediate</b>
+      Scheduled deletion carries a mandatory waiting period of <strong>7 to 30 days</strong>, precisely because losing a key means losing the data. If an option promises immediate deletion, it's false. To cut access right now, you <strong>disable</strong> the key.
+    </div>
+
+    <div class="callout exam">
+      <b>Multi-Region keys are not a global key</b>
+      They are <strong>replicas</strong> sharing key material, which lets you decrypt in another Region without calling the original. Each replica is still an independent key with its own key policy and permissions. It is not "one key everywhere".
+    </div>
+
+    <div class="callout exam">
+      <b>With SSE-C, the key is on you</b>
+      With SSE-C, AWS <strong>does not store</strong> the key: you must send it on every request, and if you lose it the data is unrecoverable. That's the key difference from SSE-KMS, where AWS custodies the key and logs its use in CloudTrail.
+    </div>
+
+    <div class="callout exam">
+      <b>Secrets Manager rotates, Parameter Store doesn't</b>
+      If the scenario asks for <strong>automatic rotation</strong> of credentials, it's Secrets Manager. Parameter Store stores encrypted parameters and secrets more cheaply, but rotation is something you'd have to build. Cost is the usual reason for the distractor.
+    </div>
+
+
+    <!-- temario:inicio -->
+    <h2 id="temario">Official exam content covered</h2>
+    <p class="lede">The tasks and skills AWS publishes for domain 5 in the exam guide. 18% of the exam's questions come from here.</p>
+    <div class="syllabus">
+      <h4>Task 5.1 — Design and implement controls for data in transit</h4>
+      <ul class="skills">
+        <li><span class="skill-id">5.1.1</span> <span>Require encryption when connecting to resources (ELB security policies, TLS configurations)</span></li>
+        <li><span class="skill-id">5.1.2</span> <span>Design secure and private access to resources (PrivateLink, VPC endpoints, Client VPN, Verified Access)</span></li>
+        <li><span class="skill-id">5.1.3</span> <span>Design inter-resource encryption in transit (EMR, EKS, SageMaker AI inter-node encryption, Nitro encryption) <span class="skill-new" title="Content AWS added when moving from SCS-C02 to SCS-C03">new in C03</span></span></li>
+      </ul>
+      <h4>Task 5.2 — Design and implement controls for data at rest</h4>
+      <ul class="skills">
+        <li><span class="skill-id">5.2.1</span> <span>Design and configure data encryption at rest (CloudHSM vs KMS, client-side vs server-side)</span></li>
+        <li><span class="skill-id">5.2.2</span> <span>Protect data integrity (S3 Object Lock, Glacier Vault Lock, versioning, code signing, file validation)</span></li>
+        <li><span class="skill-id">5.2.3</span> <span>Design automatic lifecycle management and retention (S3 Lifecycle, Object Lock, EFS Lifecycle, FSx for Lustre backup policies)</span></li>
+        <li><span class="skill-id">5.2.4</span> <span>Design secure data replication and backup (Data Lifecycle Manager, AWS Backup, ransomware protection, DataSync)</span></li>
+      </ul>
+      <h4>Task 5.3 — Design and implement controls to protect confidential data, credentials, secrets, and cryptographic key materials</h4>
+      <ul class="skills">
+        <li><span class="skill-id">5.3.1</span> <span>Design management and rotation of credentials and secrets (Secrets Manager)</span></li>
+        <li><span class="skill-id">5.3.2</span> <span>Manage and use imported key material (rotating imported key material, external key stores)</span></li>
+        <li><span class="skill-id">5.3.3</span> <span>Describe the differences between imported key material and AWS generated key material <span class="skill-new" title="Content AWS added when moving from SCS-C02 to SCS-C03">new in C03</span></span></li>
+        <li><span class="skill-id">5.3.4</span> <span>Mask sensitive data (CloudWatch Logs data protection policies, SNS message data protection) <span class="skill-new" title="Content AWS added when moving from SCS-C02 to SCS-C03">new in C03</span></span></li>
+        <li><span class="skill-id">5.3.5</span> <span>Create and manage encryption keys and certificates across one or multiple Regions (KMS customer managed keys, Private CA) <span class="skill-new" title="Content AWS added when moving from SCS-C02 to SCS-C03">new in C03</span></span></li>
+      </ul>
+      <p class="syllabus-note">Wording as published by AWS in the exam guide. SCS-C03 (guía oficial, edición 2026).</p>
+    </div>
+<!-- temario:fin -->
+
+    <h2 id="quiz">Practice quiz — Data Protection</h2>
+    <p class="lede">46 exam-style questions. Pick an option to see whether it's correct and why.</p>
+    <div id="quiz-root"></div>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">Personal study guide — not official AWS material. Content reviewed as of 2026.</div>
+</footer>
+
+<script src="quiz-data.js"></script>
+<script src="../../../../assets/js/quiz.js?v=9"></script>
+<script src="../../../../assets/js/app.js?v=9"></script>
+</body>
+</html>

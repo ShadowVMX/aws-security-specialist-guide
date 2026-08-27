@@ -4,25 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="color-scheme" content="light dark">
-<meta name="description" content="Free interactive study guide for the AWS Certified Security — Specialty (SCS-C03) exam: theory by domain, interactive diagrams, 286 practice questions and a timed simulation.">
+<meta name="description" content="Free interactive study guides for cloud security certifications: theory by official domain, interactive diagrams, questions with a verifiable source and timed simulations.">
 <link rel="icon" href="../assets/img/favicon.svg" type="image/svg+xml">
 <meta property="og:type" content="website">
-<meta property="og:title" content="AWS Security Specialist (SCS-C03) — Study Guide">
-<meta property="og:description" content="Free interactive study guide for the AWS Certified Security — Specialty (SCS-C03) exam: theory by domain, interactive diagrams, 286 practice questions and a timed simulation.">
-<meta property="og:url" content="https://shadowvmx.github.io/aws-security-specialist-guide/en/">
+<meta property="og:title" content="Cloud security certification guides">
+<meta property="og:description" content="Free interactive study guides for cloud security certifications: theory by official domain, interactive diagrams, questions with a verifiable source and timed simulations.">
+<meta property="og:url" content="https://shadowvmx.github.io/en/">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary">
-<title>AWS Security Specialist (SCS-C03) — Study Guide</title>
-<link rel="stylesheet" href="../assets/css/style.css?v=8">
+<title>Cloud security certification guides</title>
+<link rel="stylesheet" href="../assets/css/style.css?v=9">
 </head>
 <body>
 
 <header class="topbar">
   <div class="wrap">
-    <div class="brand"><span class="dot">●</span> AWS Security Specialist</div>
+    <div class="brand"><span class="dot">●</span> Certification guides</div>
     <nav class="topnav">
-      <a href="index.html" class="active">Domains</a>
-      <a href="https://docs.aws.amazon.com/aws-certification/latest/security-specialty-03/security-specialty-03.html" target="_blank" rel="noopener">Official exam guide ↗</a>
       <span class="lang-switch"><a href="../index.html">ES</a><span class="current">EN</span></span>
     </nav>
   </div>
@@ -30,81 +28,61 @@
 
 <div class="wrap">
   <section class="hero">
-    <span class="badge">SCS-C03 · in effect since Dec. 2025</span>
-    <h1>Interactive AWS Certified Security — Specialty study guide</h1>
-    <p>A review organized by exam domain: structured theory, interactive diagrams, real CLI/JSON commands, and exam-style quizzes.</p>
-    <div class="callout warn" style="max-width:640px;">
-      <b>Version note</b>
-      The <strong>SCS-C02 exam retired on Dec. 1, 2025</strong>. Since Dec. 2, 2025, the only active exam is <strong>SCS-C03</strong>, with restructured domains (Detection and Incident Response split apart, IAM weight increased). This guide follows SCS-C03's official domain numbering and weights.
-    </div>
+    <span class="badge">Cloud security · AWS and Microsoft</span>
+    <h1>Cloud security certification guides</h1>
+    <p>
+      Each guide follows its exam's official outline: the domains with their real weights, theory
+      organised around the published <em>task statements</em>, and questions carrying the documentation
+      page that backs each answer. All free, in Spanish and English, and account-free: your progress
+      stays in your browser.
+    </p>
   </section>
 
   <div class="grid">
 
-    <a class="card enabled exam-card" href="exam/index.html">
+    <a class="card enabled" href="../aws-scs-c03/en/index.html">
       <div class="card-link" aria-hidden="true"></div>
-      <span class="status ready">New</span>
-      <div class="num">SIMULATION · 65 QUESTIONS</div>
-      <h3>Full timed exam</h3>
-      <p>170 minutes with the real domain mix. No grading until you submit, with a per-domain breakdown at the end.</p>
+      <span class="status ready">Complete</span>
+      <div class="num">AWS · SCS-C03</div>
+      <h3>AWS Certified Security — Specialty</h3>
+      <p>Six domains, 286 questions and a 65-question, 170-minute simulation. Verified coverage of all 70 official skills.</p>
     </a>
 
-    <a class="card enabled" href="modules/detection/index.html">
+    <a class="card enabled" href="../sc-100/en/index.html">
       <div class="card-link" aria-hidden="true"></div>
-      <span class="status ready">Ready</span>
-      <div class="num">DOMAIN 1 · 16%</div>
-      <h3>Detection</h3>
-      <p>Account/organization-level monitoring and alerting, logging design (CloudTrail, Config, VPC Flow Logs), GuardDuty, Security Hub.</p>
+      <span class="status wip">In progress</span>
+      <div class="num">MICROSOFT · SC-100</div>
+      <h3>Microsoft Cybersecurity Architect</h3>
+      <p>Four design domains: best practices and priorities, security operations and identity, infrastructure, and applications and data.</p>
     </a>
 
-    <a class="card enabled" href="modules/incident-response/index.html">
-      <div class="card-link" aria-hidden="true"></div>
-      <span class="status ready">Ready</span>
-      <div class="num">DOMAIN 2 · 14%</div>
-      <h3>Incident Response</h3>
-      <p>Designing and testing an incident response plan, responding to security events, forensics on AWS.</p>
-    </a>
-
-    <a class="card enabled" href="modules/infrastructure-security/index.html">
-      <div class="card-link" aria-hidden="true"></div>
-      <span class="status ready">Ready</span>
-      <div class="num">DOMAIN 3 · 18%</div>
-      <h3>Infrastructure Security</h3>
-      <p>Edge services, network controls (VPC, SG, NACLs, WAF, Shield, Network Firewall), compute workload security.</p>
-    </a>
-
-    <a class="card enabled" href="modules/iam/index.html">
-      <div class="card-link" aria-hidden="true"></div>
-      <span class="status ready">Ready</span>
-      <div class="num">DOMAIN 4 · 20%</div>
-      <h3>Identity and Access Management</h3>
-      <p>Policies, roles, IAM Identity Center, STS, Access Analyzer, permission boundaries, SCPs/RCPs, data perimeter.</p>
-    </a>
-
-    <a class="card enabled" href="modules/data-protection/index.html">
-      <div class="card-link" aria-hidden="true"></div>
-      <span class="status ready">Ready</span>
-      <div class="num">DOMAIN 5 · 18%</div>
-      <h3>Data Protection</h3>
-      <p>KMS, encryption in transit/at rest, Secrets Manager, key and certificate management.</p>
-    </a>
-
-    <a class="card enabled" href="modules/governance/index.html">
-      <div class="card-link" aria-hidden="true"></div>
-      <span class="status ready">Ready</span>
-      <div class="num">DOMAIN 6 · 14%</div>
-      <h3>Security Foundations &amp; Governance</h3>
-      <p>Organizations, Control Tower, multi-account strategy, secure and consistent deployment, compliance evaluation.</p>
-    </a>
+    <span class="card">
+      <span class="status soon">Planned</span>
+      <div class="num">MICROSOFT · SC-500</div>
+      <h3>Cloud and AI Security Engineer</h3>
+      <p>Replaces AZ-500, retired on 31 August 2026. Adds a domain on securing AI workloads that AZ-500 never had.</p>
+    </span>
 
   </div>
+
+  <section style="margin:48px 0 64px;">
+    <h2>How it is built</h2>
+    <p>
+      All three guides share one engine and the same guarantees, checked automatically on every change:
+    </p>
+    <ul>
+      <li>The <strong>domains and their weights</strong> come from the official exam guide, not from an interpretation.</li>
+      <li>Every <strong>official skill</strong> has questions; if one is left without any, the site does not publish.</li>
+      <li>Every correct answer links to the <strong>documentation page</strong> that backs it, checked against the server to confirm it is alive and on topic.</li>
+      <li>Questions are audited against the <strong>shortcuts that let you score without knowing</strong>: the answer always in the same position, or the longest option.</li>
+      <li>No real exam dumps. Original content written from public documentation.</li>
+    </ul>
+  </section>
 </div>
 
 <footer>
-  <div class="wrap">Personal study guide — not official AWS material. Content reviewed as of 2026.</div>
+  <div class="wrap">Independent guide, not affiliated with Amazon Web Services or Microsoft. Reviewed August 2026.</div>
 </footer>
-
-<script src="../assets/js/progress.js?v=8"></script>
 
 </body>
 </html>

@@ -100,3 +100,6 @@ jobs:
       # so a KMS question can't quietly cite a VPC page.
       - name: Sources match the question that cites them
         run: node tools/check-sources.js --titles
+
+      - name: Fetch the Microsoft study guides
+        run: node tools/.fetch-guides.tmp.js

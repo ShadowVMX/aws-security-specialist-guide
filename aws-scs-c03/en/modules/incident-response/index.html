@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Free interactive study guide for the AWS Certified Security — Specialty (SCS-C03) exam: theory by domain, interactive diagrams, 286 practice questions and a timed simulation.">
+<link rel="icon" href="../../../../assets/img/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Incident Response — AWS Security Specialist (SCS-C03)">
+<meta property="og:description" content="Free interactive study guide for the AWS Certified Security — Specialty (SCS-C03) exam: theory by domain, interactive diagrams, 286 practice questions and a timed simulation.">
+<meta property="og:url" content="https://shadowvmx.github.io/aws-security-specialist-guide/en/modules/incident-response/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+<title>Incident Response — AWS Security Specialist (SCS-C03)</title>
+<link rel="stylesheet" href="../../../../assets/css/style.css?v=9">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="dot">●</span> AWS Security Specialist</div>
+    <nav class="topnav">
+      <a href="../../index.html">← Domains</a>
+      <span class="lang-switch"><a href="../../../modules/incident-response/index.html">ES</a><span class="current">EN</span></span>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero" style="padding-top:40px;">
+    <span class="badge">SCS-C03 · Domain 2 · 14% of the exam</span>
+    <h1>Incident Response</h1>
+    <p>It used to be part of SCS-C02's Domain 1; now it's its own domain. Two blocks: PREPARE the response plan before anything happens, and RESPOND once something is already happening.</p>
+    <p class="module-reviewed">Reviewed in August 2026 against the official AWS documentation.</p>
+  </section>
+</div>
+
+<div class="wrap module-layout">
+
+  <aside class="sidebar">
+    <h4>2.1 Design &amp; test the plan</h4>
+    <a href="#runbooks">Runbooks &amp; OpsCenter</a>
+    <a href="#preparacion">Preparation: blast radius &amp; access</a>
+    <a href="#testing">Testing the plan: FIS &amp; Resilience Hub</a>
+    <a href="#auto-remediation">Automated remediation</a>
+    <h4>2.2 Respond to events</h4>
+    <a href="#forensics-flow">EC2 forensics flow</a>
+    <a href="#validar-findings">Validating findings before acting</a>
+    <a href="#detective">Amazon Detective &amp; root cause</a>
+    <a href="#recovery">Containment, eradication &amp; recovery</a>
+    <a href="#fuentes">Official sources</a>
+    <a href="#trampas">Classic traps</a>
+    <a href="#temario">Official exam content</a>
+    <h4>Practice</h4>
+    <a href="#quiz">Quiz (44 questions)</a>
+  </aside>
+
+  <main class="content">
+
+    <h2 id="runbooks">Runbooks &amp; AWS Systems Manager OpsCenter (2.1.1)</h2>
+    <p class="lede">A response plan that only exists as a PDF is useless during a real incident — it has to be executable.</p>
+    <ul>
+      <li><strong>Systems Manager Automation runbooks</strong>: executable documents (SSM Documents) that automate response steps (isolating an instance, rotating a credential, capturing a snapshot) in a repeatable, audited way.</li>
+      <li><strong>OpsCenter</strong>: centralizes "OpsItems" (incidents/problems) with context already linked in (affected resources, related alarms, executable runbooks) — saves the investigator from having to hop console to console gathering context manually.</li>
+      <li><strong>Amazon SageMaker AI notebooks</strong>: explicitly called out as a forensic workbench — an isolated Jupyter environment for analyzing captured artifacts (memory dumps, logs) with reproducible scripts.</li>
+    </ul>
+
+    <h2 id="preparacion">Preparation: minimizing blast radius &amp; provisioning access (2.1.2)</h2>
+    <p class="lede">Preparation happens BEFORE the incident. The exam treats it as its own phase, not an afterthought.</p>
+    <table role="table">
+      <tr><th>Practice</th><th>Why it matters</th></tr>
+      <tr><td>Multi-account strategy + least privilege</td><td>Limits how far an attacker can get if a single workload is compromised.</td></tr>
+      <tr><td>Pre-provisioned, audited IR role</td><td>Avoids creating emergency permissions in a hurry (with the risk of over-granting) in the middle of a crisis.</td></tr>
+      <tr><td>Shield Advanced already contracted on critical resources</td><td>DRT protection/support can't be improvised during an active DDoS attack.</td></tr>
+      <tr><td>Golden AMIs / IaC ready to go</td><td>Lets you rebuild quickly instead of "cleaning up" a compromised resource.</td></tr>
+    </table>
+
+    <div class="callout plain">
+      <b>Plain-language example</b>
+      It's the difference between keeping a spare house key in a known drawer and having to call a locksmith at 3 AM because you got locked out. An "IR-Responder" IAM role with broad read-only permissions plus a handful of specific containment actions (modify SG, create snapshot), already created and tested, is the spare key. Creating that role IN THE MIDDLE of the incident is calling the locksmith — slower and with more room for error.
+    </div>
+
+    <p class="code-label">Pre-provisioned, scoped incident response role</p>
+    <pre><code>{
+  &quot;Version&quot;: &quot;2012-10-17&quot;,
+  &quot;Statement&quot;: [
+    {
+      &quot;Effect&quot;: &quot;Allow&quot;,
+      &quot;Principal&quot;: { &quot;AWS&quot;: &quot;arn:aws:iam::444455556666:role/SecurityResponders&quot; },
+      &quot;Action&quot;: &quot;sts:AssumeRole&quot;,
+      &quot;Condition&quot;: {
+        &quot;Bool&quot;: { &quot;aws:MultiFactorAuthPresent&quot;: &quot;true&quot; },
+        &quot;StringEquals&quot;: { &quot;aws:PrincipalOrgID&quot;: &quot;o-abc123&quot; }
+      }
+    }
+  ]
+}</code></pre>
+
+    <h2 id="testing">Testing the plan: Fault Injection Service &amp; Resilience Hub (2.1.3)</h2>
+    <table role="table">
+      <tr><th>Tool</th><th>What it validates</th></tr>
+      <tr><td><strong>Tabletop exercise</strong></td><td>Whether the TEAM knows what to do and communicates well (discussion only, no touching real systems).</td></tr>
+      <tr><td><strong>AWS Fault Injection Service (FIS)</strong></td><td>Whether the TECHNOLOGY actually responds: controlled failure experiments (AZ outage, latency, terminating instances) with automatic guardrails/stop conditions.</td></tr>
+      <tr><td><strong>AWS Resilience Hub</strong></td><td>Whether the architecture meets defined RTO/RPO objectives; identifies gaps and can orchestrate FIS experiments to validate it.</td></tr>
+    </table>
+
+    <div class="callout azure">
+      <b>Coming from Azure</b>
+      <strong>AWS Fault Injection Service</strong> ↔ <strong>Azure Chaos Studio</strong>: a very direct mapping — both are managed chaos engineering services with predefined experiments and safety guardrails. Resilience Hub doesn't have as neatly packaged an equivalent in Azure — the closest thing would be combining Azure Monitor with manual reviews against the Azure Well-Architected Framework.
+    </div>
+
+    <h2 id="auto-remediation">Automated remediation (2.1.4)</h2>
+    <p class="lede">The standard pattern: finding → EventBridge → Lambda/Step Functions → containment action, without waiting for a human for initial containment.</p>
+    <p class="code-label">EventBridge rule that triggers containment on a critical GuardDuty finding</p>
+    <pre><code>aws events put-rule \
+  --name "guardduty-critical-auto-contain" \
+  --event-pattern '{
+    "source": ["aws.guardduty"],
+    "detail-type": ["GuardDuty Finding"],
+    "detail": {"severity": [{"numeric": [">=", 7]}]}
+  }' \
+  --targets "Id"="1","Arn"="arn:aws:lambda:eu-west-1:111122223333:function:IsolateCompromisedInstance"</code></pre>
+
+    <p class="code-label">Trigger automatic remediation with EventBridge</p>
+    <pre><code>{
+  &quot;source&quot;: [&quot;aws.guardduty&quot;],
+  &quot;detail-type&quot;: [&quot;GuardDuty Finding&quot;],
+  &quot;detail&quot;: {
+    &quot;severity&quot;: [{ &quot;numeric&quot;: [&quot;&gt;=&quot;, 7] }],
+    &quot;type&quot;: [&quot;UnauthorizedAccess:EC2/MaliciousIPCaller.Custom&quot;]
+  }
+}
+
+# La regla invoca un documento de SSM Automation que aisla la instancia.
+# Config DETECTA la desviacion; quien ACTUA es la automatizacion.</code></pre>
+
+    <h2 id="forensics-flow">Automated forensics flow on EC2 (2.1.4 / 2.2.1 / 2.2.4)</h2>
+    <p class="lede">This flow combines several skills at once — it's the "textbook" scenario on the exam. Click each step.</p>
+
+    <div class="diagram">
+      <svg viewBox="0 0 700 500" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="fr-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#7c8aa0"></path>
+          </marker>
+        </defs>
+        <line class="dline" x1="230" y1="60" x2="230" y2="90" marker-end="url(#fr-arrow)"></line>
+        <line class="dline" x1="230" y1="160" x2="230" y2="190" marker-end="url(#fr-arrow)"></line>
+        <line class="dline" x1="230" y1="260" x2="230" y2="290" marker-end="url(#fr-arrow)"></line>
+        <line class="dline" x1="230" y1="360" x2="230" y2="390" marker-end="url(#fr-arrow)"></line>
+
+        <g class="dstep" data-label="1. Detection." data-explain="GuardDuty generates a high-severity finding (e.g. an instance communicating with a known C2 IP). EventBridge captures the event in real time.">
+          <rect class="dbox" x="40" y="10" width="380" height="50" rx="8"></rect>
+          <text x="60" y="40" class="dtitle">1. GuardDuty detects → EventBridge captures</text>
+        </g>
+
+        <g class="dstep" data-label="2. Network isolation (no shutdown)." data-explain="A Step Functions/Lambda workflow switches the instance's Security Group to a quarantine one (no inbound/outbound traffic, except toward the forensics subnet). The instance stays POWERED ON so as not to lose RAM memory.">
+          <rect class="dbox" x="40" y="90" width="380" height="70" rx="8"></rect>
+          <text x="60" y="118" class="dtitle">2. The instance is isolated (quarantine</text>
+          <text x="60" y="136" class="dtitle">Security Group) WITHOUT powering it off</text>
+        </g>
+
+        <g class="dstep" data-label="3. Evidence capture." data-explain="An EBS volume snapshot and a memory capture are taken (via Systems Manager). Both artifacts are tagged with a timestamp and context for chain of custody.">
+          <rect class="dbox" x="40" y="190" width="380" height="70" rx="8"></rect>
+          <text x="60" y="218" class="dtitle">3. EBS snapshot + memory capture,</text>
+          <text x="60" y="236" class="dtitle">tagged for chain of custody</text>
+        </g>
+
+        <g class="dstep" data-label="4. Analysis." data-explain="The snapshot is mounted in an isolated forensics environment (or analyzed via a SageMaker AI notebook); Detective helps trace what else the attacker touched before/after this event.">
+          <rect class="dbox" x="40" y="290" width="380" height="70" rx="8"></rect>
+          <text x="60" y="318" class="dtitle">4. Analysis in an isolated environment +</text>
+          <text x="60" y="336" class="dtitle">Detective for root cause</text>
+        </g>
+
+        <g class="dstep" data-label="5. Recovery." data-explain="The compromised instance is TERMINATED (not reused) and replaced with a new one from a known-good hardened AMI. Rules/alarms are updated with the lessons learned.">
+          <rect class="dbox dbox-allow" x="40" y="390" width="380" height="50" rx="8"></rect>
+          <text x="60" y="420" class="dtitle">5. It's terminated and replaced from a golden AMI</text>
+        </g>
+      </svg>
+      <div class="dexplain">Click any step in the diagram for the detailed explanation.</div>
+      <p class="diagram-note">Automated forensics flow (inspired by the Automated Forensics Orchestrator for EC2)</p>
+    </div>
+
+    <div class="callout warn">
+      <b>Watch out — common exam trap</b>
+      The intuitive first reaction to a compromised instance is "shut it down now." That's the WRONG answer if there's forensic value at stake: powering off destroys RAM memory (running processes, active connections, in-memory keys) before you can capture it. The correct sequence is isolate at the NETWORK level first, capture evidence, and only THEN terminate the instance.
+    </div>
+
+    <p class="code-label">Capture evidence before touching the lifecycle</p>
+    <pre><code># Snapshot de cada volumen, etiquetado para la cadena de custodia.
+aws ec2 create-snapshot \
+  --volume-id vol-0123456789abcdef0 \
+  --description &quot;Evidencia INC-2026-014 - i-0abcd1234efgh5678&quot; \
+  --tag-specifications &#x27;ResourceType=snapshot,Tags=[
+      {Key=Incidente,Value=INC-2026-014},
+      {Key=Origen,Value=i-0abcd1234efgh5678},
+      {Key=Recogido,Value=2026-08-25T10:14:00Z}
+    ]&#x27;
+
+# Compartir el snapshot solo con la cuenta forense.
+aws ec2 modify-snapshot-attribute \
+  --snapshot-id snap-0fedcba9876543210 \
+  --attribute createVolumePermission \
+  --operation-type add --user-ids 999988887777</code></pre>
+
+    <p class="code-label">Isolate a compromised instance without powering it off</p>
+    <pre><code># 1. Un security group de cuarentena: sin reglas de entrada ni de salida.
+QUARANTINE=$(aws ec2 create-security-group \
+  --group-name forensics-quarantine \
+  --description &quot;Sin trafico: aislamiento forense&quot; \
+  --vpc-id vpc-0a1b2c3d4e5f67890 \
+  --query GroupId --output text)
+
+# create-security-group crea una regla de salida abierta por defecto: quitarla.
+aws ec2 revoke-security-group-egress \
+  --group-id &quot;$QUARANTINE&quot; \
+  --protocol -1 --port -1 --cidr 0.0.0.0/0
+
+# 2. Sustituir los security groups de la instancia por el de cuarentena.
+#    La instancia sigue encendida: no se pierde la memoria.
+aws ec2 modify-instance-attribute \
+  --instance-id i-0abcd1234efgh5678 \
+  --groups &quot;$QUARANTINE&quot;</code></pre>
+
+    <h2 id="validar-findings">Validating findings before acting (2.2.3 — new in SCS-C03)</h2>
+    <p class="lede">A skill added in this version of the exam: not every alert deserves the highest-impact response immediately.</p>
+    <ul>
+      <li>Correlate the finding with other sources (VPC Flow Logs, CloudTrail, Detective) before escalating to a high-impact action (e.g. terminating a production resource).</li>
+      <li>Confirm the actual scope: which resources are REALLY affected, not just the one that generated the finding?</li>
+      <li>Rule out known false positives (e.g. an authorized vulnerability scan that GuardDuty may flag as suspicious if it isn't in the trusted IP list allowlist).</li>
+    </ul>
+
+    <h2 id="detective">Amazon Detective &amp; root cause analysis (2.2.5)</h2>
+    <p class="lede">GuardDuty/Security Hub tell you WHAT happened. Detective helps reconstruct HOW it got to that point.</p>
+    <ul>
+      <li>Automatically builds a graph of relationships between entities (IAM roles, instances, IPs) from CloudTrail, VPC Flow Logs, and GuardDuty findings — without you having to correlate it manually.</li>
+      <li>Retains up to 1 year of data for retrospective analysis, but only from when it was ENABLED — turn it on as part of preparation, don't wait for the incident.</li>
+      <li>It doesn't replace CloudTrail/Flow Logs: it CONSUMES them. If those sources weren't active, Detective won't have anything to correlate for that period either.</li>
+    </ul>
+
+    <div class="callout azure">
+      <b>Coming from Azure</b>
+      The closest equivalent to Amazon Detective is the <strong>Investigation Graph in Microsoft Sentinel</strong>: both visualize relationships between entities (users, IPs, resources) over time to support root cause analysis, instead of forcing you to correlate isolated events manually.
+    </div>
+
+    <p class="code-label">Reconstruct what a compromised credential did</p>
+    <pre><code>aws cloudtrail lookup-events \
+  --lookup-attributes AttributeKey=AccessKeyId,AttributeValue=AKIAIOSFODNN7EXAMPLE \
+  --start-time 2026-08-18T00:00:00Z \
+  --end-time 2026-08-25T00:00:00Z \
+  --query &#x27;Events[].{Hora:EventTime,Accion:EventName,Origen:Username}&#x27; \
+  --output table
+
+# Buscar persistencia: usuarios, roles o claves creados por el atacante.
+aws cloudtrail lookup-events \
+  --lookup-attributes AttributeKey=EventName,AttributeValue=CreateAccessKey \
+  --start-time 2026-08-18T00:00:00Z</code></pre>
+
+    <h2 id="recovery">Containment, eradication &amp; recovery (2.2.4)</h2>
+    <table role="table">
+      <tr><th>Phase</th><th>Typical action</th></tr>
+      <tr><td><strong>Containment</strong></td><td>Isolate at the network level (quarantine SG), revoke/rotate compromised credentials, revoke active sessions (STS).</td></tr>
+      <tr><td><strong>Eradication</strong></td><td>Remove the compromise vector (patch, close the misconfigured permission that allowed it).</td></tr>
+      <tr><td><strong>Recovery</strong></td><td>Rebuild from a golden AMI/IaC (don't reuse the compromised resource); restore data from an IMMUTABLE backup that predates the compromise.</td></tr>
+    </table>
+
+    <div class="callout plain">
+      <b>Plain-language example</b>
+      Facing ransomware that encrypted a database, restoring "yesterday's 11 PM" backup seems obvious — but if the attacker had already been inside for 3 days before triggering the encryption, that backup from yesterday ALREADY contains their backdoor. That's why the exam leans so hard on <strong>immutable</strong> backups (Vault Lock) with enough retention depth: you need to be able to go back further than "the most recent available backup," to a point verifiably before the compromise.
+    </div>
+
+    <p class="code-label">Controlled regional recovery</p>
+    <p>For availability incidents at the region level (not just a security compromise), <strong>Amazon Application Recovery Controller</strong> continuously verifies that the backup region is ready (readiness checks) and offers safe "routing controls" to execute failover without improvising under pressure.</p>
+
+    <h2 id="fuentes">Official sources</h2>
+    <p class="lede">The AWS documentation this module rests on. If something doesn't add up or you want more depth, start here: it is the only source that counts.</p>
+    <ul class="sources">
+      <li><a href="https://docs.aws.amazon.com/whitepapers/latest/aws-security-incident-response-guide/aws-security-incident-response-guide.html" target="_blank" rel="noopener">AWS Security Incident Response Guide (whitepaper) ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/detective/latest/userguide/what-is-detective.html" target="_blank" rel="noopener">Amazon Detective ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/incident-manager/latest/userguide/what-is-incident-manager.html" target="_blank" rel="noopener">Systems Manager Incident Manager ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/fis/latest/userguide/what-is.html" target="_blank" rel="noopener">AWS Fault Injection Service ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/aws-backup/latest/devguide/whatisbackup.html" target="_blank" rel="noopener">AWS Backup ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/ebs/latest/userguide/ebs-snapshots.html" target="_blank" rel="noopener">EBS snapshots ↗</a></li>
+      <li><a href="https://docs.aws.amazon.com/aws-certification/latest/security-specialty-03/security-specialty-03.html" target="_blank" rel="noopener">Official SCS-C03 exam guide ↗</a></li>
+    </ul>
+
+    <h2 id="trampas">Classic exam traps</h2>
+    <p class="lede">The mistakes that repeat most in this domain. If you're short on time before the exam, review just this and the quiz.</p>
+
+    <div class="callout exam">
+      <b>Containing is not destroying</b>
+      Terminating the compromised instance stops the threat and <strong>destroys the evidence</strong> at the same time. The right move is network isolation (a security group with no rules), an EBS snapshot and a memory capture. If an option solves the incident by deleting the resource, it is almost always the trap.
+    </div>
+
+    <div class="callout exam">
+      <b>Stopping or rebooting wipes memory</b>
+      Fileless malware lives in memory. A <code>reboot</code> or <code>stop</code> loses it, and the case with it. Memory capture comes <strong>before</strong> any action that touches the instance lifecycle.
+    </div>
+
+    <div class="callout exam">
+      <b>GuardDuty detects, Detective investigates</b>
+      GuardDuty tells you <em>that</em> something happened. <strong>Amazon Detective</strong> helps you understand <em>why</em> and how far it went, by correlating history. If the question asks for root-cause or scope analysis, the answer is Detective, not more GuardDuty.
+    </div>
+
+    <div class="callout exam">
+      <b>Deactivating a key is not the same as deleting it</b>
+      For a leaked access key you <strong>disable</strong> it immediately, then review CloudTrail to establish scope. Deleting also cuts access, but cut first and analyze after: the urgent part is that it stops working, and IAM access keys <strong>never expire on their own</strong>.
+    </div>
+
+    <div class="callout exam">
+      <b>Evidence is analyzed on copies</b>
+      Working on the original volumes modifies them and breaks the chain of custody. Always analyze restored snapshots in a <strong>separate forensics account</strong>, with restricted and logged access, plus integrity hashes.
+    </div>
+
+    <div class="callout exam">
+      <b>Automating response isn't Config alone</b>
+      AWS Config <strong>detects</strong> the drift; what performs remediation is an <strong>SSM Automation</strong> triggered by Config or an EventBridge rule. An option saying Config "fixes" or "blocks" on its own confuses detection with enforcement.
+    </div>
+
+
+    <!-- temario:inicio -->
+    <h2 id="temario">Official exam content covered</h2>
+    <p class="lede">The tasks and skills AWS publishes for domain 2 in the exam guide. 14% of the exam's questions come from here.</p>
+    <div class="syllabus">
+      <h4>Task 2.1 — Design and test an incident response plan</h4>
+      <ul class="skills">
+        <li><span class="skill-id">2.1.1</span> <span>Design response plans and runbooks (Systems Manager OpsCenter, SageMaker AI notebooks)</span></li>
+        <li><span class="skill-id">2.1.2</span> <span>Configure services to be prepared for incidents (provisioning access, deploying tools, minimizing blast radius, Shield Advanced)</span></li>
+        <li><span class="skill-id">2.1.3</span> <span>Test and validate the effectiveness of an incident response plan (Fault Injection Service, Resilience Hub)</span></li>
+        <li><span class="skill-id">2.1.4</span> <span>Automatically remediate incidents (Systems Manager, Automated Forensics Orchestrator, Step Functions, Application Recovery Controller, Lambda)</span></li>
+      </ul>
+      <h4>Task 2.2 — Respond to security events</h4>
+      <ul class="skills">
+        <li><span class="skill-id">2.2.1</span> <span>Capture and store relevant system and application logs as forensic artifacts</span></li>
+        <li><span class="skill-id">2.2.2</span> <span>Search and correlate logs for security events across applications and AWS services</span></li>
+        <li><span class="skill-id">2.2.3</span> <span>Validate findings from AWS security services to assess scope and impact <span class="skill-new" title="Content AWS added when moving from SCS-C02 to SCS-C03">new in C03</span></span></li>
+        <li><span class="skill-id">2.2.4</span> <span>Contain and eradicate threats, and recover resources (network containment, restoring backups)</span></li>
+        <li><span class="skill-id">2.2.5</span> <span>Conduct root cause analysis (Detective)</span></li>
+      </ul>
+      <p class="syllabus-note">Wording as published by AWS in the exam guide. SCS-C03 (guía oficial, edición 2026).</p>
+    </div>
+<!-- temario:fin -->
+
+    <h2 id="quiz">Practice quiz — Incident Response</h2>
+    <p class="lede">41 exam-style questions. Choose an option to see whether it's correct and why.</p>
+    <div id="quiz-root"></div>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">Personal study guide — not official AWS material. Content reviewed as of 2026.</div>
+</footer>
+
+<script src="quiz-data.js"></script>
+<script src="../../../../assets/js/quiz.js?v=9"></script>
+<script src="../../../../assets/js/app.js?v=9"></script>
+</body>
+</html>

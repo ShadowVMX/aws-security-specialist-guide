@@ -18,15 +18,10 @@
 const fs = require("fs");
 const path = require("path");
 
+const { selected } = require("./certs.js");
+
 const REPO = path.join(__dirname, "..");
-const MODULES = [
-  "detection",
-  "incident-response",
-  "infrastructure-security",
-  "iam",
-  "data-protection",
-  "governance",
-];
+const CERTS = selected(process.argv.slice(2));
 
 function load(relPath) {
   const src = fs.readFileSync(path.join(REPO, relPath), "utf8");
@@ -65,9 +60,11 @@ let longestIsCorrect = 0;
 let longestComparable = 0;
 const multiPairs = [];
 
-for (const mod of MODULES) {
-  const es = load(`modules/${mod}/quiz-data.js`);
-  const en = load(`en/modules/${mod}/quiz-data.js`);
+for (const cert of CERTS) {
+ const { DOMAINS } = require(cert.guide);
+ for (const mod of DOMAINS.map((d) => d.module)) {
+  const es = load(`${cert.dir}/${cert.lang.es.modules}/${mod}/quiz-data.js`);
+  const en = load(`${cert.dir}/${cert.lang.en.modules}/${mod}/quiz-data.js`);
 
   /* ---- parity between languages ---- */
   if (es.length !== en.length) {
@@ -174,6 +171,7 @@ for (const mod of MODULES) {
       warn(`${where}: explicación muy corta (${q.explain.length} caracteres)`);
     }
   });
+ }
 }
 
 /* ---- bank-wide biases ---- */

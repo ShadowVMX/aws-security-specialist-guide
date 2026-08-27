@@ -15,9 +15,10 @@
 
 const fs = require("fs");
 const path = require("path");
-const { DOMAINS, NEW_IN_C03, GUIDE_EDITION } = require("./exam-guide.js");
+const { selected } = require("./certs.js");
 
 const REPO = path.join(__dirname, "..");
+const CERTS = selected(process.argv.slice(2));
 const CHECK = process.argv.includes("--check");
 const OPEN = "<!-- temario:inicio -->";
 const CLOSE = "<!-- temario:fin -->";
@@ -47,7 +48,7 @@ function esc(s) {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 }
 
-function block(domain, lang) {
+function block(domain, lang, NEW_IN_C03, GUIDE_EDITION) {
   const t = T[lang];
   const tasks = domain.tasks
     .map((task) => {
@@ -85,14 +86,16 @@ function block(domain, lang) {
 }
 
 let stale = 0;
-DOMAINS.forEach((d) => {
+CERTS.forEach((cert) => {
+ const { DOMAINS, NEW_IN_C03, GUIDE_EDITION } = require(cert.guide);
+ DOMAINS.forEach((d) => {
   [
-    [`modules/${d.module}/index.html`, "es"],
-    [`en/modules/${d.module}/index.html`, "en"],
+    [`${cert.dir}/${cert.lang.es.modules}/${d.module}/index.html`, "es"],
+    [`${cert.dir}/${cert.lang.en.modules}/${d.module}/index.html`, "en"],
   ].forEach(([rel, lang]) => {
     const file = path.join(REPO, rel);
     const html = fs.readFileSync(file, "utf8");
-    const want = block(d, lang);
+    const want = block(d, lang, NEW_IN_C03, GUIDE_EDITION);
 
     const from = html.indexOf(OPEN);
     const to = html.indexOf(CLOSE);
@@ -111,6 +114,7 @@ DOMAINS.forEach((d) => {
     fs.writeFileSync(file, html.slice(0, from) + want + html.slice(to + CLOSE.length));
     console.log(`actualizado ${rel}`);
   });
+ });
 });
 
 if (stale) process.exit(1);

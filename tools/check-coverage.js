@@ -20,17 +20,11 @@
 
 const fs = require("fs");
 const path = require("path");
-const {
-  DOMAINS,
-  IN_SCOPE_SERVICES,
-  OUT_OF_SCOPE,
-  NEW_IN_C03,
-  GUIDE_EDITION,
-  allSkills,
-} = require("./exam-guide.js");
+const { selected } = require("./certs.js");
 
 const REPO = path.join(__dirname, "..");
 const FULL = process.argv.includes("--full");
+const CERTS = selected(process.argv.slice(2));
 
 function load(rel) {
   const src = fs.readFileSync(path.join(REPO, rel), "utf8");
@@ -40,10 +34,20 @@ function load(rel) {
 const errors = [];
 const warnings = [];
 
+for (const cert of CERTS) {
+const {
+  DOMAINS,
+  IN_SCOPE_SERVICES,
+  OUT_OF_SCOPE,
+  NEW_IN_C03,
+  GUIDE_EDITION,
+  allSkills,
+} = require(cert.guide);
+
 /* ---- load every question once, with the text used for matching ---- */
 const banks = {};
 DOMAINS.forEach((d) => {
-  banks[d.module] = load(`modules/${d.module}/quiz-data.js`).map((q, i) => ({
+  banks[d.module] = load(`${cert.dir}/${cert.lang.es.modules}/${d.module}/quiz-data.js`).map((q, i) => ({
     i,
     q,
     text: `${q.tag} ${q.q} ${q.options.join(" ")} ${q.explain}`,
@@ -52,7 +56,7 @@ DOMAINS.forEach((d) => {
 const theory = {};
 DOMAINS.forEach((d) => {
   theory[d.module] = fs.readFileSync(
-    path.join(REPO, `modules/${d.module}/index.html`),
+    path.join(REPO, `${cert.dir}/${cert.lang.es.modules}/${d.module}/index.html`),
     "utf8"
   );
 });
@@ -123,8 +127,8 @@ thinService.forEach((t) => warnings.push(`servicio en alcance apenas cubierto �
 void allText;
 
 /* ---- the simulator must mirror the official weights ---- */
-const examSrc = fs.readFileSync(path.join(REPO, "assets/js/exam.js"), "utf8");
-const TOTAL = 65;
+const examSrc = fs.readFileSync(path.join(REPO, cert.examEngine), "utf8");
+const TOTAL = cert.examTotal;
 DOMAINS.forEach((d) => {
   const m = examSrc.match(
     new RegExp(`id:\\s*"${d.module}",\\s*weight:\\s*(\\d+),\\s*count:\\s*(\\d+)`)
@@ -158,8 +162,8 @@ const TOTAL_QUESTIONS = DOMAINS.reduce((n, d) => n + banks[d.module].length, 0);
 
 DOMAINS.forEach((d) => {
   [
-    [`modules/${d.module}/index.html`, "preguntas", `${d.weight}%`],
-    [`en/modules/${d.module}/index.html`, "questions", `${d.weight}%`],
+    [`${cert.dir}/${cert.lang.es.modules}/${d.module}/index.html`, cert.countWord.es, `${d.weight}%`],
+    [`${cert.dir}/${cert.lang.en.modules}/${d.module}/index.html`, cert.countWord.en, `${d.weight}%`],
   ].forEach(([rel, word, weight]) => {
     const html = fs.readFileSync(path.join(REPO, rel), "utf8");
     const n = banks[d.module].length;
@@ -178,10 +182,10 @@ DOMAINS.forEach((d) => {
 });
 
 [
-  ["index.html", "preguntas"],
-  ["en/index.html", "practice questions"],
-  ["examen/index.html", "preguntas"],
-  ["en/exam/index.html", "practice questions"],
+  [`${cert.dir}/${cert.lang.es.hub}`, cert.totalWord.es],
+  [`${cert.dir}/${cert.lang.en.hub}`, cert.totalWord.en],
+  [`${cert.dir}/${cert.lang.es.exam}`, cert.totalWord.es],
+  [`${cert.dir}/${cert.lang.en.exam}`, cert.totalWord.en],
 ].forEach(([rel, word]) => {
   const html = fs.readFileSync(path.join(REPO, rel), "utf8");
   if (!html.includes(`${TOTAL_QUESTIONS} ${word}`)) {
@@ -190,7 +194,7 @@ DOMAINS.forEach((d) => {
 });
 
 /* ---- report ---- */
-console.log(`Cobertura del temario oficial — ${GUIDE_EDITION}\n`);
+console.log(`\n=== ${cert.name} (${cert.code}) — ${GUIDE_EDITION} ===\n`);
 
 DOMAINS.forEach((d) => {
   const mine = rows.filter((r) => r.skill.domain.id === d.id);
@@ -222,6 +226,8 @@ const one = rows.filter((r) => r.n === 1).length;
 console.log(
   `\n${"—".repeat(64)}\nskills totales: ${rows.length}  ·  sin preguntas: ${zero}  ·  con una sola: ${one}`
 );
+
+} /* fin del bucle por certificación */
 
 if (warnings.length) {
   console.log(`\nAvisos (${warnings.length}):`);
