@@ -266,7 +266,18 @@ aws cloudtrail start-logging --name org-security-trail</code></pre>
       <tr><td><strong>Amazon Athena</strong></td><td>SQL estándar sobre grandes volúmenes históricos en S3 (ej. sobre el data lake de Security Lake).</td></tr>
       <tr><td><strong>Amazon OpenSearch Service</strong></td><td>Búsqueda full-text y dashboards sobre grandes volúmenes de logs semi-estructurados.</td></tr>
       <tr><td><strong>Amazon Managed Grafana</strong></td><td>Visualización/correlación de métricas y logs de múltiples fuentes de datos en un solo dashboard.</td></tr>
+      <tr><td><strong>CloudTrail Lake</strong></td><td>SQL sobre los propios eventos de CloudTrail, con retención de hasta diez años, sin montar bucket, tabla ni particiones. Es la opción cuando la investigación es <em>solo</em> de actividad de la API y el enunciado pide mínimo esfuerzo operativo.</td></tr>
     </table>
+    <div class="callout exam">
+      <b>Lake o Athena</b>
+      Los dos responden con SQL, y el enunciado los separa por lo que hay que montar y por lo que hay
+      que consultar. <strong>CloudTrail Lake</strong> es un almacén gestionado del propio CloudTrail: se
+      activa un event data store y ya se consulta, con la retención puesta en años. <strong>Athena</strong>
+      consulta S3, así que hay que entregar los logs, definir la tabla y mantener las particiones — pero
+      es lo único que sirve cuando la consulta tiene que cruzar CloudTrail con VPC Flow Logs, logs de
+      aplicación o el data lake de Security Lake.
+    </div>
+
 
     <p class="code-label">Consulta Athena: buscar llamadas denegadas en CloudTrail</p>
     <pre><code>SELECT eventtime,
