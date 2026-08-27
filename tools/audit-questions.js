@@ -63,8 +63,17 @@ const multiPairs = [];
 for (const cert of CERTS) {
  const { DOMAINS } = require(cert.guide);
  for (const mod of DOMAINS.map((d) => d.module)) {
-  const es = load(`${cert.dir}/${cert.lang.es.modules}/${mod}/quiz-data.js`);
-  const en = load(`${cert.dir}/${cert.lang.en.modules}/${mod}/quiz-data.js`);
+  const esPath = `${cert.dir}/${cert.lang.es.modules}/${mod}/quiz-data.js`;
+  const enPath = `${cert.dir}/${cert.lang.en.modules}/${mod}/quiz-data.js`;
+  // Un módulo todavía sin escribir no tiene nada que auditar; que le falten
+  // preguntas es asunto del informe de cobertura, no de este.
+  if (!fs.existsSync(path.join(REPO, esPath))) continue;
+  if (!fs.existsSync(path.join(REPO, enPath))) {
+    err(`${cert.id}/${mod}: existe el banco en español y falta el inglés`);
+    continue;
+  }
+  const es = load(esPath);
+  const en = load(enPath);
 
   /* ---- parity between languages ---- */
   if (es.length !== en.length) {

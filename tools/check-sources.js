@@ -96,7 +96,9 @@ async function titleOf(url, attempt = 0) {
   for (const cert of CERTS) {
     const { DOMAINS } = require(cert.guide);
     for (const mod of DOMAINS.map((d) => d.module)) {
-      load(`${cert.dir}/${cert.lang.es.modules}/${mod}/quiz-data.js`).forEach((q, i) => {
+      const bank = `${cert.dir}/${cert.lang.es.modules}/${mod}/quiz-data.js`;
+      if (!fs.existsSync(path.join(REPO, bank))) continue;
+      load(bank).forEach((q, i) => {
         const url = (q.explain.match(/href=\\?"(https:\/\/[^"\\]+)/) || [])[1];
         items.push({ mod: `${cert.id}/${mod}`, i, url: url || null, q });
       });

@@ -94,6 +94,7 @@ CERTS.forEach((cert) => {
     [`${cert.dir}/${cert.lang.en.modules}/${d.module}/index.html`, "en"],
   ].forEach(([rel, lang]) => {
     const file = path.join(REPO, rel);
+    if (!fs.existsSync(file)) return; // módulo aún por escribir
     const html = fs.readFileSync(file, "utf8");
     const want = block(d, lang, NEW_IN_C03, GUIDE_EDITION);
 

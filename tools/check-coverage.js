@@ -35,6 +35,9 @@ const errors = [];
 const warnings = [];
 
 for (const cert of CERTS) {
+// A draft's gaps are the work still to do, not a regression: they are
+// reported in full but recorded as warnings.
+const problem = cert.draft ? warnings : errors;
 const {
   DOMAINS,
   IN_SCOPE_SERVICES,
@@ -47,18 +50,21 @@ const {
 /* ---- load every question once, with the text used for matching ---- */
 const banks = {};
 DOMAINS.forEach((d) => {
-  banks[d.module] = load(`${cert.dir}/${cert.lang.es.modules}/${d.module}/quiz-data.js`).map((q, i) => ({
-    i,
-    q,
-    text: `${q.tag} ${q.q} ${q.options.join(" ")} ${q.explain}`,
-  }));
+  const bankPath = `${cert.dir}/${cert.lang.es.modules}/${d.module}/quiz-data.js`;
+  banks[d.module] = fs.existsSync(path.join(REPO, bankPath))
+    ? load(bankPath).map((q, i) => ({
+        i,
+        q,
+        text: `${q.tag} ${q.q} ${q.options.join(" ")} ${q.explain}`,
+      }))
+    : [];
 });
 const theory = {};
 DOMAINS.forEach((d) => {
-  theory[d.module] = fs.readFileSync(
-    path.join(REPO, `${cert.dir}/${cert.lang.es.modules}/${d.module}/index.html`),
-    "utf8"
+  const page = path.join(
+    REPO, `${cert.dir}/${cert.lang.es.modules}/${d.module}/index.html`
   );
+  theory[d.module] = fs.existsSync(page) ? fs.readFileSync(page, "utf8") : "";
 });
 
 /* ---- nothing out of scope may be a correct answer ---- */
@@ -67,7 +73,7 @@ DOMAINS.forEach((d) => {
     const correct = Array.isArray(q.correct) ? q.correct : [q.correct];
     OUT_OF_SCOPE.forEach((s) => {
       if (correct.some((j) => s.match.test(q.options[j]))) {
-        errors.push(
+        problem.push(
           `${d.module}[${i}]: la respuesta correcta es ${s.name}, que la guía lista como fuera de alcance`
         );
       }
@@ -87,7 +93,7 @@ allSkills().forEach((s) => {
   rows.push({ skill: s, n: hits.length, inTheory, hits });
 
   if (hits.length === 0) {
-    errors.push(
+    problem.push(
       `skill ${s.id} sin ninguna pregunta en ${mod}: ${s.text.slice(0, 74)}`
     );
   } else if (hits.length === 1) {
@@ -96,7 +102,7 @@ allSkills().forEach((s) => {
     );
   }
   if (!inTheory) {
-    errors.push(
+    problem.push(
       `skill ${s.id} no está anotado en ningún encabezado de la teoría de ${mod}`
     );
   }
@@ -122,14 +128,16 @@ IN_SCOPE_SERVICES.forEach(([group, list]) => {
     }
   });
 });
-missingService.forEach((m) => errors.push(`servicio en alcance sin cubrir — ${m}`));
+missingService.forEach((m) => problem.push(`servicio en alcance sin cubrir — ${m}`));
 thinService.forEach((t) => warnings.push(`servicio en alcance apenas cubierto — ${t}`));
 void allText;
 
 /* ---- the simulator must mirror the official weights ---- */
-const examSrc = fs.readFileSync(path.join(REPO, cert.examEngine), "utf8");
-const TOTAL = cert.examTotal;
-DOMAINS.forEach((d) => {
+const examSrc = cert.examEngine
+  ? fs.readFileSync(path.join(REPO, cert.examEngine), "utf8")
+  : "";
+const TOTAL = cert.examTotal || 0;
+if (cert.examEngine) DOMAINS.forEach((d) => {
   const m = examSrc.match(
     new RegExp(`id:\\s*"${d.module}",\\s*weight:\\s*(\\d+),\\s*count:\\s*(\\d+)`)
   );
@@ -162,9 +170,10 @@ const TOTAL_QUESTIONS = DOMAINS.reduce((n, d) => n + banks[d.module].length, 0);
 
 DOMAINS.forEach((d) => {
   [
-    [`${cert.dir}/${cert.lang.es.modules}/${d.module}/index.html`, cert.countWord.es, `${d.weight}%`],
-    [`${cert.dir}/${cert.lang.en.modules}/${d.module}/index.html`, cert.countWord.en, `${d.weight}%`],
+    [`${cert.dir}/${cert.lang.es.modules}/${d.module}/index.html`, cert.countWord.es, d.weightLabel || `${d.weight}%`],
+    [`${cert.dir}/${cert.lang.en.modules}/${d.module}/index.html`, cert.countWord.en, d.weightLabel || `${d.weight}%`],
   ].forEach(([rel, word, weight]) => {
+    if (!fs.existsSync(path.join(REPO, rel))) return;
     const html = fs.readFileSync(path.join(REPO, rel), "utf8");
     const n = banks[d.module].length;
     const stated = [...html.matchAll(new RegExp(`(\\d+) ${word}`, "g"))]
@@ -176,7 +185,7 @@ DOMAINS.forEach((d) => {
       );
     }
     if (!html.includes(weight)) {
-      errors.push(`${rel}: no muestra el ${weight} que la guía asigna al dominio`);
+      problem.push(`${rel}: no muestra el ${weight} que la guía asigna al dominio`);
     }
   });
 });
@@ -187,21 +196,24 @@ DOMAINS.forEach((d) => {
   [`${cert.dir}/${cert.lang.es.exam}`, cert.totalWord.es],
   [`${cert.dir}/${cert.lang.en.exam}`, cert.totalWord.en],
 ].forEach(([rel, word]) => {
+  // Un borrador sin banco todavía no anuncia ninguna cifra, y no debe: lo que
+  // se comprueba es que no mienta, no que presuma.
+  if (!fs.existsSync(path.join(REPO, rel)) || TOTAL_QUESTIONS === 0) return;
   const html = fs.readFileSync(path.join(REPO, rel), "utf8");
   if (!html.includes(`${TOTAL_QUESTIONS} ${word}`)) {
-    errors.push(`${rel}: no anuncia las ${TOTAL_QUESTIONS} preguntas que hay realmente`);
+    problem.push(`${rel}: no anuncia las ${TOTAL_QUESTIONS} preguntas que hay realmente`);
   }
 });
 
 /* ---- report ---- */
-console.log(`\n=== ${cert.name} (${cert.code}) — ${GUIDE_EDITION} ===\n`);
+console.log(`\n=== ${cert.name} (${cert.code})${cert.draft ? " · BORRADOR" : ""} — ${GUIDE_EDITION} ===\n`);
 
 DOMAINS.forEach((d) => {
   const mine = rows.filter((r) => r.skill.domain.id === d.id);
   const covered = mine.filter((r) => r.n > 0).length;
   const total = banks[d.module].length;
   console.log(
-    `Dominio ${d.id} · ${d.nameEs} (${d.weight}%) — ${covered}/${mine.length} skills con preguntas, ${total} preguntas en el módulo`
+    `Dominio ${d.id} · ${d.nameEs} (${d.weightLabel || d.weight + "%"}) — ${covered}/${mine.length} skills con preguntas, ${total} preguntas en el módulo`
   );
   mine.forEach((r) => {
     const flag = r.n === 0 ? "  ✗" : r.n === 1 ? "  !" : "   ";
