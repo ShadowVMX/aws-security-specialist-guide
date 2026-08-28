@@ -359,7 +359,7 @@ const DOMAINS = [
           },
           {
             id: "3.1.3",
-            match: /postura.{0,25}(híbrid|multinube|multicloud)|defender for cloud.{0,30}multi/i,
+            match: /postura.{0,25}(híbrid|multinube|multicloud)|defender for cloud.{0,30}multi|conector(es)? (de )?(aws|gcp|multinube)|multicloud connector|aws connector|postura unificada|unified.{0,15}posture|sin agentes?\b|agentless/i,
             text: "Design integrated security posture management solutions that include Microsoft Defender for Cloud in hybrid and multi-cloud environments",
             textEs: "Diseñar una gestión de postura integrada con Defender for Cloud en entornos híbridos y multinube",
           },
@@ -383,7 +383,7 @@ const DOMAINS = [
           },
           {
             id: "3.1.7",
-            match: /exposure management|ruta de ataque|attack path|reducción de superficie/i,
+            match: /exposure management|rutas? de ataque|attack path|reducción de superficie|attack surface reduction|activos? críticos?|critical asset|iniciativas? de seguridad|security initiative/i,
             text: "Specify requirements and priorities for a posture management process that uses Microsoft Security Exposure Management attack paths, attack surface reduction, security insights, and initiatives",
             textEs: "Especificar requisitos y prioridades de un proceso de gestión de postura con Security Exposure Management: rutas de ataque, reducción de superficie, insights e iniciativas",
           },
@@ -473,7 +473,7 @@ const DOMAINS = [
           },
           {
             id: "3.3.6",
-            match: /azure ai|servicios de ia|ai service/i,
+            match: /azure ai|servicios? de ia|ai service|azure openai|prompt shield|escudos? de prompt|inyección de instrucciones|prompt injection|filtros? de contenido|content filter/i,
             text: "Evaluate solutions that include Azure AI services security",
             textEs: "Evaluar soluciones que incluyan la seguridad de los servicios de IA de Azure",
           },
@@ -488,7 +488,7 @@ const DOMAINS = [
         skills: [
           {
             id: "3.4.1",
-            match: /diseño de red|network design|segmentaci/i,
+            match: /diseños? de red|network design|segmentaci|endpoint privado|private endpoint|endpoint de servicio|service endpoint|grupos? de seguridad de (red|aplicación)|(network|application) security group|azure firewall/i,
             text: "Evaluate network designs to align with security requirements and best practices",
             textEs: "Evaluar diseños de red frente a los requisitos de seguridad y las buenas prácticas",
           },
