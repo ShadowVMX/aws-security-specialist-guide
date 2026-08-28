@@ -1,0 +1,580 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Dominio 3 de SC-100: postura de seguridad híbrida y multinube, servidores y clientes, IoT y OT, SaaS/PaaS/IaaS, contenedores, IA y Security Service Edge. Criterios de decisión, trampas de examen y preguntas de escenario.">
+<link rel="icon" href="../../../assets/img/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Soluciones de seguridad para infraestructura — Microsoft Cybersecurity Architect (SC-100)">
+<meta property="og:description" content="Dominio 3 de SC-100: postura de seguridad híbrida y multinube, servidores y clientes, IoT y OT, SaaS/PaaS/IaaS, contenedores, IA y Security Service Edge.">
+<meta property="og:url" content="https://shadowvmx.github.io/sc-100/modules/infrastructure/">
+<meta property="og:locale" content="es_ES">
+<meta name="twitter:card" content="summary">
+<title>Soluciones de seguridad para infraestructura — Microsoft Cybersecurity Architect (SC-100)</title>
+<link rel="stylesheet" href="../../../assets/css/style.css?v=9">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="dot">●</span> Microsoft SC-100</div>
+    <nav class="topnav">
+      <a href="../../index.html">← Dominios</a>
+      <span class="lang-switch"><span class="current">ES</span><a href="../../en/modules/infrastructure/index.html">EN</a></span>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero" style="padding-top:40px;">
+    <span class="badge">SC-100 · Dominio 3 · 25-30% del examen</span>
+    <h1>Soluciones de seguridad para infraestructura</h1>
+    <p>El otro dominio de máximo peso. Cuatro tareas que van de fuera hacia dentro: primero <strong>saber en qué estado estás</strong> —postura— y luego proteger lo que ejecuta el trabajo: servidores y clientes, servicios gestionados, contenedores, IA, y por dónde entra y sale el tráfico. Casi todas las preguntas se ganan sabiendo <em>qué producto responde a qué pregunta</em>, no cómo se configura.</p>
+    <p class="module-reviewed">Escrito contra el <em>skills outline</em> oficial con los skills medidos a 28 de julio de 2026.</p>
+  </section>
+</div>
+
+<div class="wrap module-layout">
+
+  <aside class="sidebar">
+    <h4>Cómo leer este dominio</h4>
+    <a href="#mapa">El mapa de productos</a>
+    <h4>3.1 Postura</h4>
+    <a href="#defender-cloud">Defender for Cloud y el MCSB</a>
+    <a href="#secure-score">Los dos Secure Score</a>
+    <a href="#postura-multinube">Postura híbrida y multinube</a>
+    <a href="#planes">Planes de protección de cargas</a>
+    <a href="#arc">Azure Arc</a>
+    <a href="#easm">Defender EASM</a>
+    <a href="#exposure">Security Exposure Management</a>
+    <h4>3.2 Servidores y clientes</h4>
+    <a href="#servidores">Servidores multiplataforma</a>
+    <a href="#clientes">Móviles y equipos cliente</a>
+    <a href="#iot-embebidos">IoT y sistemas embebidos</a>
+    <a href="#ot-ics">OT e ICS con Defender for IoT</a>
+    <a href="#baselines">Líneas base de seguridad</a>
+    <a href="#laps">Windows LAPS</a>
+    <h4>3.3 SaaS, PaaS e IaaS</h4>
+    <a href="#baselines-servicios">Líneas base de servicio</a>
+    <a href="#iot-cargas">Cargas de trabajo IoT</a>
+    <a href="#web">Cargas web</a>
+    <a href="#contenedores">Contenedores</a>
+    <a href="#orquestacion">Orquestación y AKS</a>
+    <a href="#ia">Seguridad de los servicios de IA</a>
+    <h4>3.4 Red y SSE</h4>
+    <a href="#red">Diseños de red</a>
+    <a href="#internet-access">Entra Internet Access</a>
+    <a href="#internet-access-ms">Tráfico de Microsoft y entre tenants</a>
+    <a href="#private-access">Entra Private Access</a>
+    <a href="#trampas">Trampas típicas</a>
+    <a href="#temario">Temario oficial</a>
+    <h4>Práctica</h4>
+    <a href="#quiz">Quiz (46 preguntas)</a>
+  </aside>
+
+  <main class="content">
+
+    <h2 id="mapa">El mapa de productos, que es lo que de verdad se pregunta</h2>
+    <p>
+      Este dominio tiene muchos nombres propios y el examen los enfrenta entre sí. Antes de entrar al
+      detalle conviene fijar qué pregunta responde cada uno, porque casi todos los fallos vienen de
+      contestar con el producto que responde a <em>otra</em> pregunta.
+    </p>
+    <table role="table">
+      <tr><th>La pregunta del enunciado</th><th>El producto</th></tr>
+      <tr><td>«¿Qué recursos tengo mal configurados, en Azure, AWS y GCP?»</td><td>Defender for Cloud, postura (CSPM) contra el MCSB</td></tr>
+      <tr><td>«¿Qué me falta por configurar en el tenant, en identidad, correo y dispositivos?»</td><td>Microsoft Secure Score, en el portal de Defender</td></tr>
+      <tr><td>«¿Qué activos expuestos a internet tengo que ni siquiera sé que existen?»</td><td>Defender EASM</td></tr>
+      <tr><td>«De todo lo que está mal, ¿qué arreglo primero?»</td><td>Security Exposure Management: rutas de ataque</td></tr>
+      <tr><td>«¿Cómo gobierno desde Azure un servidor que no está en Azure?»</td><td>Azure Arc</td></tr>
+      <tr><td>«¿Cómo detecto un ataque en marcha sobre esa carga?»</td><td>El plan de Defender for Cloud que corresponda</td></tr>
+      <tr><td>«¿Cómo veo lo que pasa en la red de planta, sin tocar nada?»</td><td>Defender for IoT, sensor OT pasivo</td></tr>
+      <tr><td>«¿Cómo sustituyo la VPN para acceder a una aplicación interna?»</td><td>Entra Private Access</td></tr>
+    </table>
+    <div class="callout exam">
+      <b>Postura no es detección</b>
+      La distinción que más se explota en este dominio: la <strong>postura</strong> mira la
+      <em>configuración</em> y dice qué podría pasar; la <strong>protección de cargas</strong> mira el
+      <em>comportamiento</em> y dice qué está pasando. Un enunciado que habla de recomendaciones,
+      benchmark o cumplimiento pide postura; uno que habla de alerta, actividad sospechosa o incidente
+      pide un plan de Defender.
+    </div>
+
+    <h2 id="defender-cloud">Defender for Cloud y el Microsoft Cloud Security Benchmark (3.1.1)</h2>
+    <p>
+      Defender for Cloud es dos productos bajo un mismo nombre, y saber cuál está pidiendo el enunciado
+      resuelve la mitad de las preguntas de esta tarea:
+    </p>
+    <ul>
+      <li><strong>CSPM</strong> —gestión de la postura— evalúa continuamente la configuración de los
+        recursos contra un estándar y devuelve recomendaciones priorizadas. Su capa básica viene activada
+        y sin coste sobre las suscripciones; <strong>Defender CSPM</strong> es el plan de pago que añade
+        análisis sin agente, rutas de ataque, el gráfico de seguridad de la nube y la gobernanza de las
+        recomendaciones.</li>
+      <li><strong>CWPP</strong> —protección de cargas— son los planes por tipo de recurso: servidores,
+        almacenamiento, SQL, contenedores, App Service, Key Vault, APIs, servicios de IA. Estos sí detectan
+        y alertan.</li>
+    </ul>
+    <p>
+      El estándar por defecto es el <strong>Microsoft Cloud Security Benchmark</strong>: los controles de
+      seguridad que Microsoft considera la línea base de cualquier nube, mapeados a CIS y NIST, y aplicados
+      no solo a Azure sino también a las cuentas de <strong>AWS y GCP</strong> conectadas. Encima de él se
+      pueden añadir estándares normativos —ISO 27001, PCI DSS, NIST— y estándares propios.
+    </p>
+    <div class="callout warn">
+      <b>El MCSB no se elige, se amplía</b>
+      Un enunciado que pide «una línea base de seguridad para toda la nube con el mínimo esfuerzo» está
+      pidiendo el MCSB, que ya está asignado. Escribir una iniciativa de Azure Policy propia desde cero
+      para eso es la respuesta cara, y suele ser el distractor.
+    </div>
+
+    <h2 id="secure-score">Los dos Secure Score, que no son el mismo (3.1.2)</h2>
+    <p>
+      Microsoft tiene dos puntuaciones con nombre casi idéntico y el examen las cruza a propósito:
+    </p>
+    <table role="table">
+      <tr><th></th><th>Microsoft Secure Score</th><th>Secure score de Defender for Cloud</th></tr>
+      <tr><td>Dónde vive</td><td>Portal de Microsoft Defender</td><td>Defender for Cloud, en Azure</td></tr>
+      <tr><td>Qué mide</td><td>La configuración del <strong>tenant</strong>: identidad, correo, aplicaciones, dispositivos gestionados con Intune.</td><td>La configuración de los <strong>recursos</strong> de Azure, AWS y GCP.</td></tr>
+      <tr><td>Para qué sirve</td><td>Priorizar acciones de mejora y comparar tu progreso con el de organizaciones parecidas.</td><td>Priorizar recomendaciones de postura sobre la infraestructura.</td></tr>
+    </table>
+    <div class="callout warn">
+      <b>Una puntuación no es un informe de cumplimiento</b>
+      Ninguno de los dos demuestra conformidad con una norma. Un comité que pide «grado de cumplimiento de
+      ISO 27001, control a control» necesita el <strong>panel de cumplimiento normativo</strong>. Confundir
+      mejora relativa con conformidad es de los errores que más se repiten en este examen.
+    </div>
+
+    <h2 id="postura-multinube">Postura integrada en entornos híbridos y multinube (3.1.3)</h2>
+    <p>
+      La pregunta llega casi siempre igual: «tenemos Azure, tenemos AWS, tenemos servidores en nuestro
+      centro de datos, y queremos ver todo en un sitio». El diseño tiene tres piezas y cada una cubre un
+      hueco distinto:
+    </p>
+    <table role="table">
+      <tr><th>Qué hay fuera de Azure</th><th>Cómo entra</th></tr>
+      <tr><td>Suscripciones de AWS o proyectos de GCP</td><td>Los <strong>conectores multinube</strong> de Defender for Cloud, que leen la configuración de la otra nube <em>sin agentes</em> y aplican el MCSB también allí.</td></tr>
+      <tr><td>Servidores on-premises o en otra nube, como recurso</td><td><strong>Azure Arc</strong>, que los proyecta al plano de control de Azure para poder aplicarles Policy, Machine Configuration y los planes de Defender.</td></tr>
+      <tr><td>Kubernetes fuera de Azure</td><td><strong>Arc-enabled Kubernetes</strong>, que habilita Defender for Containers y Azure Policy sobre clústeres ajenos.</td></tr>
+    </table>
+    <div class="callout exam">
+      <b>Conector para la nube, Arc para la máquina</b>
+      Es el par que más se confunde. El conector de AWS o GCP da postura de <em>la cuenta y sus servicios</em>
+      sin instalar nada. Arc es para tratar <em>una máquina o un clúster</em> como recurso de Azure. Un
+      escenario con cuentas de AWS y servidores propios lleva los dos.
+    </div>
+
+    <h2 id="planes">Elegir los planes de protección de cargas (3.1.4)</h2>
+    <p>
+      Los planes se activan por tipo de recurso y por suscripción, y el examen quiere que elijas el que
+      corresponde al riesgo que describe el enunciado, no todos por si acaso:
+    </p>
+    <table role="table">
+      <tr><th>Plan</th><th>Qué aporta</th></tr>
+      <tr><td><strong>Defender for Servers P1</strong></td><td>Integra <strong>Defender for Endpoint</strong> en el servidor: EDR, detección y respuesta en el sistema operativo.</td></tr>
+      <tr><td><strong>Defender for Servers P2</strong></td><td>Todo lo de P1 más análisis de vulnerabilidades y malware <em>sin agente</em>, <strong>acceso just-in-time</strong> a los puertos de administración, y supervisión de integridad de archivos.</td></tr>
+      <tr><td><strong>Defender for Storage</strong></td><td>Detección de malware en la subida, análisis de sensibilidad del dato y alertas sobre accesos anómalos.</td></tr>
+      <tr><td><strong>Defender for Containers</strong></td><td>Análisis de imágenes en el registro, detección en tiempo de ejecución sobre los nodos y postura del clúster.</td></tr>
+      <tr><td><strong>Defender for SQL / App Service / Key Vault / Resource Manager</strong></td><td>Detección específica del servicio: inyección SQL, ejecución de código en la aplicación, acceso anómalo al almacén, operaciones sospechosas del plano de control.</td></tr>
+      <tr><td><strong>Defender for APIs</strong></td><td>Inventario, postura y detección sobre las APIs publicadas en API Management.</td></tr>
+    </table>
+    <div class="callout warn">
+      <b>La pista de los puertos</b>
+      «Los administradores necesitan RDP o SSH, pero no queremos el puerto abierto de forma permanente» es
+      <strong>just-in-time</strong>, y eso vive en <strong>Defender for Servers P2</strong>. Si además el
+      enunciado dice «sin desplegar agentes en cada máquina», la pista apunta al análisis sin agente del
+      mismo plan.
+    </div>
+
+    <h2 id="arc">Azure Arc como plano de control único (3.1.5)</h2>
+    <p>
+      Arc no es un agente de seguridad: es la pieza que hace que un servidor de tu centro de datos, una
+      máquina en AWS o un clúster de Kubernetes ajeno <strong>existan como recursos de Azure</strong>. Una
+      vez proyectados, se les puede aplicar lo mismo que a un recurso nativo:
+    </p>
+    <ul>
+      <li><strong>Azure Policy</strong> y <strong>Machine Configuration</strong> para exigir y auditar la
+        configuración del sistema operativo.</li>
+      <li>Los <strong>planes de Defender for Cloud</strong>, con Defender for Endpoint desplegado como
+        extensión.</li>
+      <li><strong>Etiquetas, RBAC y grupos de administración</strong>, de modo que el gobierno sea uno solo.</li>
+      <li>Extensiones para llevar sus registros a <strong>Log Analytics</strong> y, desde ahí, a Sentinel.</li>
+    </ul>
+    <div class="callout exam">
+      <b>Gobernar y registrar son dos decisiones</b>
+      Arc gobierna el recurso; que sus eventos lleguen al SIEM exige además la extensión de agente de
+      Azure Monitor y su regla de recopilación. Un enunciado que pide las dos cosas necesita las dos piezas
+      en la respuesta.
+    </div>
+
+    <h2 id="easm">Defender External Attack Surface Management (3.1.6)</h2>
+    <p>
+      EASM mira tu organización <strong>desde fuera</strong>, como lo haría un atacante. A partir de unas
+      semillas —dominios, rangos de IP, nombres de organización— descubre y mantiene un inventario de lo
+      que está publicado en internet y te pertenece: dominios y subdominios, hosts, certificados, páginas
+      y direcciones IP, con los problemas que encuentra en ellos.
+    </p>
+    <div class="callout warn">
+      <b>La palabra que lo delata</b>
+      El valor de EASM está en lo que <em>no sabías que tenías</em>: el subdominio de una campaña
+      olvidada, el entorno de pruebas que quedó publicado, el certificado a punto de caducar de un
+      servicio que nadie reclama. Si el enunciado dice «activos desconocidos», «shadow IT expuesto» o
+      «lo que ve un atacante desde internet», es EASM. Defender for Cloud solo ve lo que está en las
+      suscripciones que le has conectado.
+    </div>
+
+    <h2 id="exposure">Security Exposure Management: de la lista a la prioridad (3.1.7)</h2>
+    <p>
+      El problema que resuelve no es encontrar problemas: es que hay demasiados. Microsoft Security
+      Exposure Management une la señal de Defender XDR y de Defender for Cloud en un grafo y responde
+      «¿por dónde entrarían de verdad?».
+    </p>
+    <table role="table">
+      <tr><th>Pieza</th><th>Qué aporta al proceso</th></tr>
+      <tr><td><strong>Rutas de ataque</strong></td><td>Cadenas encadenadas —desde un activo expuesto hasta uno crítico— con sus puntos de estrangulamiento. Arreglar uno de esos puntos corta muchas rutas a la vez, y ese es el criterio de prioridad que espera el examen.</td></tr>
+      <tr><td><strong>Mapa y reducción de superficie</strong></td><td>Ver el entorno como un grafo de activos y relaciones, y medir qué se reduce al cerrar cada cosa.</td></tr>
+      <tr><td><strong>Iniciativas</strong></td><td>Programas de seguridad con métricas —ransomware, protección de la identidad, seguridad de SaaS— para seguir el progreso con un objetivo, no con una lista.</td></tr>
+      <tr><td><strong>Activos críticos</strong></td><td>Marcar qué recursos importan de verdad, para que la priorización pese el impacto y no solo la severidad técnica.</td></tr>
+    </table>
+    <div class="callout exam">
+      <b>Severidad no es prioridad</b>
+      Diez vulnerabilidades críticas en máquinas aisladas importan menos que una media en el camino hacia
+      un controlador de dominio. Si el enunciado pide «priorizar según el riesgo real para el negocio»,
+      la respuesta son las <strong>rutas de ataque</strong>, no ordenar por CVSS.
+    </div>
+
+    <h2 id="servidores">Requisitos para servidores, en varias plataformas (3.2.1)</h2>
+    <p>
+      Lo que se espera que sepas especificar, y que se repite escenario tras escenario:
+    </p>
+    <ul>
+      <li><strong>EDR en todos ellos</strong>: Defender for Endpoint cubre Windows Server y Linux, y en los
+        servidores se despliega a través de Defender for Servers.</li>
+      <li><strong>Línea base del sistema operativo</strong> aplicada y auditada con Azure Policy y
+        <strong>Machine Configuration</strong>, también en las máquinas conectadas con Arc.</li>
+      <li><strong>Gestión de vulnerabilidades y de parches</strong>, con Azure Update Manager para el ciclo
+        de actualización.</li>
+      <li><strong>Sin credenciales en la máquina</strong>: identidades administradas para lo que consuma
+        servicios de Azure.</li>
+      <li><strong>Acceso de administración acotado</strong>: sin IP pública, con Bastion o just-in-time, y
+        desde estaciones dedicadas.</li>
+      <li><strong>Cifrado de disco</strong> y, cuando la norma lo exija, claves gestionadas por el cliente.</li>
+    </ul>
+
+    <h2 id="clientes">Móviles y equipos cliente (3.2.2)</h2>
+    <table role="table">
+      <tr><th>Necesidad</th><th>Pieza</th></tr>
+      <tr><td>Inscribir y gestionar el dispositivo corporativo</td><td><strong>Microsoft Intune</strong>, con directivas de configuración y de cumplimiento</td></tr>
+      <tr><td>Que el estado del dispositivo condicione el acceso</td><td>La señal de <strong>cumplimiento</strong> consumida por el acceso condicional</td></tr>
+      <tr><td>Proteger el dato corporativo en un móvil personal, sin gestionar el dispositivo</td><td><strong>Directivas de protección de aplicaciones</strong> (MAM), que cifran y acotan el dato dentro de la aplicación</td></tr>
+      <tr><td>Detección y respuesta en el equipo</td><td><strong>Defender for Endpoint</strong>, que cubre Windows, macOS, Linux, iOS y Android</td></tr>
+      <tr><td>Endurecimiento del sistema operativo</td><td><strong>Líneas base de seguridad</strong> de Intune y reglas de reducción de superficie de ataque</td></tr>
+    </table>
+    <div class="callout warn">
+      <b>BYOD no se inscribe</b>
+      Un enunciado que dice «el empleado usa su propio móvil y la empresa no puede administrarlo» está
+      descartando la inscripción. La respuesta son las <strong>directivas de protección de aplicaciones</strong>,
+      que protegen el dato sin tocar el dispositivo. Exigir inscripción ahí es el distractor.
+    </div>
+
+    <h2 id="iot-embebidos">IoT y sistemas embebidos (3.2.3)</h2>
+    <p>
+      El principio de diseño: un dispositivo IoT es un equipo más, con menos capacidad de defenderse.
+      Lo que se especifica:
+    </p>
+    <ul>
+      <li><strong>Identidad por dispositivo</strong> —certificado X.509 o TPM, nunca una clave compartida
+        entre todos— provisionada con el <em>Device Provisioning Service</em> de Azure IoT Hub.</li>
+      <li><strong>Actualización remota y firmada</strong> del firmware, porque un dispositivo que no se
+        puede parchear es una deuda permanente.</li>
+      <li><strong>Segmentación de red</strong>: los dispositivos hablan con su hub y con nada más.</li>
+      <li><strong>Arranque seguro y almacenamiento de claves en hardware</strong> en los embebidos que lo
+        admitan.</li>
+      <li>Para el IoT de oficina —cámaras, impresoras, controladores— el descubrimiento va con
+        <strong>Enterprise IoT</strong> integrado en Defender for Endpoint.</li>
+    </ul>
+
+    <h2 id="ot-ics">Tecnología operacional e ICS con Defender for IoT (3.2.4)</h2>
+    <p>
+      La red de planta tiene una restricción que lo cambia todo: <strong>no se puede instalar nada en los
+      dispositivos</strong> ni interrumpir el proceso. Por eso Defender for IoT trabaja con un
+      <strong>sensor de red pasivo</strong> conectado a un puerto espejo: escucha el tráfico, identifica
+      los protocolos industriales —Modbus, DNP3, S7, EtherNet/IP— y de ahí saca el inventario de activos,
+      las vulnerabilidades y las anomalías, sin enviar un solo paquete.
+    </p>
+    <div class="callout exam">
+      <b>Cómo se reconoce el escenario</b>
+      «Planta de producción», «PLC», «no podemos instalar agentes», «no se puede parar la línea». La
+      respuesta es Defender for IoT con sensores OT, y la matriz de <strong>MITRE ATT&amp;CK for ICS</strong>
+      es la que se usa para evaluar cobertura. Defender for Endpoint no entra: no hay dónde instalarlo.
+    </div>
+
+    <h2 id="baselines">Líneas base para servidores y clientes (3.2.5)</h2>
+    <table role="table">
+      <tr><th>Dónde</th><th>Con qué se aplica y se audita</th></tr>
+      <tr><td>Clientes Windows y móviles gestionados</td><td><strong>Líneas base de seguridad de Intune</strong>, con su directiva de cumplimiento</td></tr>
+      <tr><td>Servidores en Azure, en Arc o en otra nube</td><td><strong>Azure Policy</strong> con <strong>Machine Configuration</strong> sobre la configuración del sistema operativo</td></tr>
+      <tr><td>Dominio de Active Directory</td><td>Directivas de grupo alineadas con las líneas base de seguridad de Windows</td></tr>
+      <tr><td>Servicios de nube</td><td>El <strong>MCSB</strong> en Defender for Cloud</td></tr>
+    </table>
+    <p>
+      El patrón de despliegue es el mismo que en gobierno: <strong>auditar primero</strong> para medir el
+      alcance real, remediar lo existente y solo entonces exigir, para no romper lo que ya funciona.
+    </p>
+
+    <h2 id="laps">Windows LAPS (3.2.6)</h2>
+    <p>
+      La contraseña de administrador local repetida en toda la flota es el clásico habilitador de
+      movimiento lateral: un equipo comprometido abre todos los demás. <strong>Windows LAPS</strong> viene
+      integrado en el sistema operativo, genera una contraseña <strong>distinta por equipo</strong>, la
+      rota sola y guarda la copia en <strong>Entra ID</strong> o en <strong>AD DS</strong>, con permiso de
+      lectura acotado y auditado.
+    </p>
+    <div class="callout warn">
+      <b>Lo que no vale como alternativa</b>
+      Renombrar la cuenta no impide reutilizar el hash. Una contraseña distinta por departamento fijada
+      con directiva de grupo sigue siendo compartida —y visible en la propia directiva—. Y deshabilitar la
+      cuenta local deja sin salida el día que el equipo pierde la conexión con el dominio.
+    </div>
+
+    <h2 id="baselines-servicios">Líneas base para SaaS, PaaS e IaaS (3.3.1)</h2>
+    <p>
+      La misma idea aplicada a servicios gestionados: fijar por escrito qué configuración es aceptable y
+      hacerla verificable. Para los servicios de Azure, el <strong>MCSB</strong> ya trae esa línea base y
+      Defender for Cloud la evalúa sola; lo que hay que añadir es lo que la organización decida por encima,
+      con <strong>iniciativas de Azure Policy</strong> asignadas a un grupo de administración. Para el SaaS
+      —aplicaciones de terceros que nadie configura desde Azure— la línea base se evalúa y se aplica desde
+      <strong>Defender for Cloud Apps</strong>, con su gestión de la postura de SaaS.
+    </p>
+    <div class="callout exam">
+      <b>Tres superficies, tres herramientas</b>
+      IaaS y PaaS: Defender for Cloud y Azure Policy. SaaS: Defender for Cloud Apps. Configuración del
+      tenant de Microsoft 365: Secure Score y las directivas de cada carga. Contestar con la herramienta de
+      otra superficie es el error más común de esta tarea.
+    </div>
+
+    <h2 id="iot-cargas">Requisitos para cargas de trabajo IoT (3.3.2)</h2>
+    <p>
+      Aquí ya no se habla del aparato sino de la <em>plataforma</em> que lo recibe. Lo que se especifica:
+      autenticación por dispositivo contra <strong>IoT Hub</strong> con certificados, permisos mínimos por
+      dispositivo, endpoints privados para que el hub no esté expuesto a internet, cifrado en tránsito y en
+      reposo, y separación entre el plano de datos —telemetría— y el de administración. Y lo que suele
+      faltar en el diseño: cómo se <strong>revoca</strong> un dispositivo comprometido, que es donde brilla
+      tener identidad individual en vez de una clave común.
+    </p>
+
+    <h2 id="web">Requisitos para cargas web (3.3.3)</h2>
+    <table role="table">
+      <tr><th>Riesgo</th><th>Control</th></tr>
+      <tr><td>Ataques de capa de aplicación: inyección, XSS, bots</td><td><strong>WAF</strong> sobre Azure Front Door (global) o Application Gateway (regional)</td></tr>
+      <tr><td>Volumétricos y de protocolo</td><td><strong>Azure DDoS Protection</strong>, con la protección de red o de IP según el alcance</td></tr>
+      <tr><td>Que el origen sea alcanzable saltándose el WAF</td><td>Restringir el origen para que solo acepte tráfico del servicio de borde: enlace privado o filtrado por el identificador del servicio</td></tr>
+      <tr><td>Que el backend salga a internet o sea accesible desde él</td><td><strong>Endpoints privados</strong> y desactivar el acceso público del servicio PaaS</td></tr>
+      <tr><td>Amenazas en la propia aplicación</td><td><strong>Defender for App Service</strong>, y <strong>Defender for APIs</strong> si se publica por API Management</td></tr>
+    </table>
+    <div class="callout warn">
+      <b>Front Door o Application Gateway</b>
+      Los dos llevan WAF. <strong>Front Door</strong> es global y entra cuando el enunciado habla de varias
+      regiones, latencia mundial o conmutación entre regiones. <strong>Application Gateway</strong> es
+      regional, dentro de la red virtual, y entra cuando el tráfico no debe salir de ella.
+    </div>
+
+    <h2 id="contenedores">Requisitos para contenedores (3.3.4)</h2>
+    <p>
+      El examen recorre el ciclo entero y espera un control en cada fase:
+    </p>
+    <ul>
+      <li><strong>Imagen</strong> — análisis de vulnerabilidades en el registro y en el pipeline, imágenes
+        base mínimas y firmadas, y un registro privado con acceso por identidad administrada.</li>
+      <li><strong>Despliegue</strong> — control de admisión que impida lo que no cumple: <strong>Azure
+        Policy para Kubernetes</strong>, que rechaza contenedores privilegiados, montajes del host o
+        imágenes de registros no aprobados.</li>
+      <li><strong>Ejecución</strong> — <strong>Defender for Containers</strong>, con detección en el nodo y
+        en el plano de control del clúster.</li>
+      <li><strong>Secretos</strong> — nunca en la imagen ni en variables de entorno: Key Vault con el
+        controlador CSI y una identidad de carga de trabajo.</li>
+    </ul>
+
+    <h2 id="orquestacion">Seguridad de la orquestación (3.3.5)</h2>
+    <table role="table">
+      <tr><th>Superficie del clúster</th><th>Control</th></tr>
+      <tr><td>Quién entra al servidor de API</td><td>Integración con <strong>Entra ID</strong> y <strong>Azure RBAC para Kubernetes</strong>, en lugar de kubeconfig repartidos</td></tr>
+      <tr><td>Desde dónde se entra</td><td><strong>Clúster privado</strong>, o rangos de IP autorizados sobre el servidor de API</td></tr>
+      <tr><td>Qué puede hablar con qué dentro</td><td><strong>Directivas de red</strong> entre pods, y espacios de nombres separados por confianza</td></tr>
+      <tr><td>Qué se admite en el clúster</td><td>El complemento de <strong>Azure Policy</strong>, con sus iniciativas de línea base y restringidas</td></tr>
+      <tr><td>Cómo se autentican las cargas contra Azure</td><td><strong>Identidad de carga de trabajo</strong> federada, sin secretos en el pod</td></tr>
+      <tr><td>Los nodos</td><td>Actualización automática del sistema operativo y de la versión de Kubernetes</td></tr>
+    </table>
+
+    <h2 id="ia">Seguridad de los servicios de IA de Azure (3.3.6)</h2>
+    <p>
+      Contenido nuevo del temario y de lo más preguntable, porque combina cosas que ya sabes con dos
+      riesgos que no existían. Un servicio de IA se protege en cuatro planos:
+    </p>
+    <table role="table">
+      <tr><th>Plano</th><th>Qué se especifica</th></tr>
+      <tr><td><strong>Acceso</strong></td><td>Desactivar las claves locales del recurso y autenticar con <strong>Entra ID</strong> e identidades administradas, con RBAC por rol de servicio.</td></tr>
+      <tr><td><strong>Red</strong></td><td><strong>Endpoint privado</strong> y acceso público deshabilitado, para que el modelo solo se alcance desde la red de la aplicación.</td></tr>
+      <tr><td><strong>Dato</strong></td><td>Claves gestionadas por el cliente, control de qué se registra en las trazas, y saber qué datos salen en el <em>prompt</em> y cuáles se quedan.</td></tr>
+      <tr><td><strong>Contenido y abuso</strong></td><td><strong>Filtros de contenido</strong> y <em>prompt shields</em> frente a la inyección de instrucciones, directa e indirecta, y el plan de <strong>Defender for Cloud para servicios de IA</strong> para detectar el abuso en ejecución.</td></tr>
+    </table>
+    <div class="callout warn">
+      <b>El riesgo propio de la IA</b>
+      La <strong>inyección de instrucciones</strong> —que el contenido que el modelo lee acabe dirigiendo
+      lo que hace— no la resuelve ninguna medida de red ni de identidad, y ese es justo el punto de la
+      pregunta. Se responde con los filtros y escudos del propio servicio, y acotando lo que el modelo
+      puede hacer con la identidad que se le da.
+    </div>
+
+    <h2 id="red">Evaluar un diseño de red (3.4.1)</h2>
+    <p>
+      Rara vez piden diseñar la red desde cero; piden mirar una y decir qué falla. La lista con la que se
+      revisa:
+    </p>
+    <ul>
+      <li><strong>Segmentación</strong> — hub y radios, con las cargas separadas por confianza y no por
+        equipo propietario.</li>
+      <li><strong>Inspección de la salida</strong> — <strong>Azure Firewall</strong> como punto de salida
+        controlado; la versión Premium añade IDPS e inspección de TLS cuando el requisito lo pide.</li>
+      <li><strong>Filtrado fino</strong> — grupos de seguridad de red apoyados en <strong>grupos de
+        seguridad de aplicación</strong>, para que las reglas hablen de roles y no de direcciones.</li>
+      <li><strong>PaaS sin internet</strong> — endpoints privados y acceso público deshabilitado; el
+        endpoint de servicio deja el tráfico dentro de la red de Azure, pero no da una IP privada al
+        servicio.</li>
+      <li><strong>Borde</strong> — WAF y DDoS delante de lo publicado.</li>
+      <li><strong>Sin salto directo</strong> — nada de IP pública ni RDP publicado: Bastion y just-in-time.</li>
+    </ul>
+
+    <h2 id="internet-access">Entra Internet Access como pasarela web segura (3.4.2)</h2>
+    <p>
+      Es la pieza de <strong>Security Service Edge</strong> para el tráfico de salida. Sustituye al proxy
+      del centro de datos: el cliente de acceso seguro global reenvía la navegación al servicio de
+      Microsoft, donde se aplican <strong>filtrado de contenido web</strong> por categoría y nombre,
+      inspección, y —lo que la diferencia de un proxy clásico— el mismo <strong>acceso condicional</strong>
+      que ya gobierna las aplicaciones, con la identidad del usuario y el estado de su dispositivo como
+      señales.
+    </p>
+    <div class="callout exam">
+      <b>La ventaja que buscan que digas</b>
+      La política sigue al usuario. Da igual que esté en la oficina, en casa o en un aeropuerto: no
+      depende de que el tráfico pase por la red corporativa, y por eso resuelve el escenario del trabajo
+      híbrido sin retorno del tráfico al centro de datos.
+    </div>
+
+    <h2 id="internet-access-ms">Tráfico de Microsoft y escenarios entre tenants (3.4.3)</h2>
+    <p>
+      El perfil de <strong>tráfico de Microsoft</strong> se ocupa del tráfico hacia Microsoft 365 y los
+      servicios de Entra, y habilita dos controles que el examen pregunta por su nombre:
+    </p>
+    <ul>
+      <li><strong>Red conforme</strong> — una condición de acceso condicional que exige que la petición
+        llegue a través del servicio, con lo que un token robado no sirve fuera de él. Es más fuerte que
+        una condición por rango de IP, porque no se puede falsificar cambiando de red.</li>
+      <li><strong>Restricciones de tenant v2</strong> — impedir que, desde un dispositivo corporativo, un
+        usuario inicie sesión en <em>otro</em> tenant con sus credenciales personales o de otra empresa.
+        Es el control del escenario «no quiero que salga dato de aquí subiéndolo a su propio OneDrive».</li>
+    </ul>
+
+    <h2 id="private-access">Entra Private Access (3.4.4)</h2>
+    <p>
+      La otra mitad del SSE: el acceso a lo <em>interno</em>. Publica aplicaciones privadas —web y no web,
+      por puerto y protocolo— a través de conectores instalados junto a ellas, sin abrir nada al exterior y
+      sin dar al usuario una IP en la red corporativa. Cada aplicación es su propio recurso, con su política
+      de acceso condicional, que es lo que lo convierte en <strong>acceso de confianza cero</strong> en vez
+      de en una VPN.
+    </p>
+    <table role="table">
+      <tr><th></th><th>VPN clásica</th><th>Entra Private Access</th></tr>
+      <tr><td>Qué concede</td><td>Acceso a la red; desde ahí se alcanza todo lo que la red alcance.</td><td>Acceso a <strong>una aplicación</strong>, evaluado en cada sesión.</td></tr>
+      <tr><td>Qué se publica</td><td>Un concentrador expuesto a internet.</td><td>Nada: el conector abre la conexión hacia fuera.</td></tr>
+      <tr><td>Con qué se decide</td><td>Credenciales al establecer el túnel.</td><td>Acceso condicional: identidad, dispositivo, riesgo, y continuo con CAE.</td></tr>
+    </table>
+
+    <h2 id="trampas">Trampas típicas de este dominio</h2>
+    <div class="callout warn">
+      <b>Confundir los dos Secure Score</b>
+      El del portal de Defender mide el tenant; el de Defender for Cloud mide los recursos. Y ninguno de los dos es un informe de cumplimiento normativo.
+    </div>
+    <div class="callout warn">
+      <b>Arc donde tocaba un conector multinube</b>
+      Arc proyecta máquinas y clústeres. La postura de una cuenta de AWS o GCP entra con el conector de Defender for Cloud, sin agentes.
+    </div>
+    <div class="callout warn">
+      <b>Agentes en la red OT</b>
+      En planta no se instala nada y no se interrumpe el proceso: sensor pasivo de Defender for IoT sobre un puerto espejo.
+    </div>
+    <div class="callout warn">
+      <b>Inscribir el móvil personal</b>
+      Si el enunciado dice que la empresa no gestiona el dispositivo, la respuesta son directivas de protección de aplicaciones, no MDM.
+    </div>
+    <div class="callout warn">
+      <b>Endpoint de servicio en vez de endpoint privado</b>
+      El endpoint de servicio mantiene el tráfico dentro de la red de Azure, pero el recurso sigue teniendo dirección pública. Si el requisito es «solo accesible desde la red virtual», es endpoint privado con el acceso público deshabilitado.
+    </div>
+    <div class="callout warn">
+      <b>Priorizar por severidad</b>
+      Lo que pide este examen es cortar rutas de ataque hacia activos críticos, no vaciar la lista de findings por orden de CVSS.
+    </div>
+
+    <!-- temario:inicio -->
+    <h2 id="temario">Temario oficial cubierto</h2>
+    <p class="lede">Las tareas y skills que Microsoft publica para el dominio 3 en la guía del examen. El 25-30% de las preguntas del examen sale de aquí.</p>
+    <div class="syllabus">
+      <h4>Tarea 3.1 — Diseñar la gestión de la postura de seguridad en entornos híbridos y multinube</h4>
+      <ul class="skills">
+        <li><span class="skill-id">3.1.1</span> <span>Evaluar la postura de seguridad con Defender for Cloud y el MCSB</span></li>
+        <li><span class="skill-id">3.1.2</span> <span>Evaluar la postura de seguridad con Microsoft Secure Score</span></li>
+        <li><span class="skill-id">3.1.3</span> <span>Diseñar una gestión de postura integrada con Defender for Cloud en entornos híbridos y multinube</span></li>
+        <li><span class="skill-id">3.1.4</span> <span>Elegir los planes de protección de cargas de trabajo de Defender for Cloud</span></li>
+        <li><span class="skill-id">3.1.5</span> <span>Diseñar la integración de entornos híbridos y multinube con Azure Arc</span></li>
+        <li><span class="skill-id">3.1.6</span> <span>Diseñar la gestión de superficie de ataque externa con Defender EASM</span></li>
+        <li><span class="skill-id">3.1.7</span> <span>Especificar requisitos y prioridades de un proceso de gestión de postura con Security Exposure Management: rutas de ataque, reducción de superficie, insights e iniciativas</span></li>
+      </ul>
+      <h4>Tarea 3.2 — Especificar los requisitos para proteger servidores y equipos cliente</h4>
+      <ul class="skills">
+        <li><span class="skill-id">3.2.1</span> <span>Especificar requisitos de seguridad para servidores en varias plataformas y sistemas operativos</span></li>
+        <li><span class="skill-id">3.2.2</span> <span>Especificar requisitos para móviles y clientes: protección de endpoint, endurecimiento y configuración</span></li>
+        <li><span class="skill-id">3.2.3</span> <span>Especificar requisitos de seguridad para dispositivos IoT y sistemas embebidos</span></li>
+        <li><span class="skill-id">3.2.4</span> <span>Evaluar la protección de tecnología operacional (OT) y sistemas de control industrial (ICS) con Defender for IoT</span></li>
+        <li><span class="skill-id">3.2.5</span> <span>Especificar líneas base de seguridad para servidores y clientes</span></li>
+        <li><span class="skill-id">3.2.6</span> <span>Evaluar Windows LAPS como solución de contraseñas de administrador local</span></li>
+      </ul>
+      <h4>Tarea 3.3 — Especificar los requisitos para proteger servicios SaaS, PaaS e IaaS</h4>
+      <ul class="skills">
+        <li><span class="skill-id">3.3.1</span> <span>Especificar líneas base de seguridad para servicios SaaS, PaaS e IaaS</span></li>
+        <li><span class="skill-id">3.3.2</span> <span>Especificar requisitos de seguridad para cargas de trabajo IoT</span></li>
+        <li><span class="skill-id">3.3.3</span> <span>Especificar requisitos de seguridad para cargas web</span></li>
+        <li><span class="skill-id">3.3.4</span> <span>Especificar requisitos de seguridad para contenedores</span></li>
+        <li><span class="skill-id">3.3.5</span> <span>Especificar requisitos de seguridad para la orquestación de contenedores</span></li>
+        <li><span class="skill-id">3.3.6</span> <span>Evaluar soluciones que incluyan la seguridad de los servicios de IA de Azure <span class="skill-new" title="Contenido que Microsoft añadió en la revisión del 28 de julio de 2026">nuevo en 2026</span></span></li>
+      </ul>
+      <h4>Tarea 3.4 — Evaluar soluciones de seguridad de red y Security Service Edge (SSE)</h4>
+      <ul class="skills">
+        <li><span class="skill-id">3.4.1</span> <span>Evaluar diseños de red frente a los requisitos de seguridad y las buenas prácticas</span></li>
+        <li><span class="skill-id">3.4.2</span> <span>Evaluar soluciones que usan Entra Internet Access como pasarela web segura</span></li>
+        <li><span class="skill-id">3.4.3</span> <span>Evaluar Entra Internet Access para servicios de Microsoft, incluidas configuraciones entre tenants</span></li>
+        <li><span class="skill-id">3.4.4</span> <span>Evaluar soluciones que usan Microsoft Entra Private Access</span></li>
+      </ul>
+      <p class="syllabus-note">Redacción adaptada al español; la versión normativa es la de la guía oficial de Microsoft. SC-100 (guía oficial, skills medidos a 28 jul. 2026).</p>
+    </div>
+<!-- temario:fin -->
+
+    <h2 id="quiz">Quiz de práctica — Infraestructura</h2>
+    <p class="lede">46 preguntas de escenario. Elige una opción para ver si es correcta y por qué.</p>
+    <div id="quiz-root"></div>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">Guía independiente, sin relación con Microsoft. Revisada en agosto de 2026.</div>
+</footer>
+
+<script src="quiz-data.js"></script>
+<script src="../../../assets/js/quiz.js?v=9"></script>
+<script src="../../../assets/js/app.js?v=9"></script>
+
+</body>
+</html>
