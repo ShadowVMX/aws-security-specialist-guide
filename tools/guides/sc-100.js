@@ -576,7 +576,7 @@ const DOMAINS = [
           },
           {
             id: "4.2.2",
-            match: /modelado de amenazas|threat model/i,
+            match: /modelado de amenazas|threat model|\bSTRIDE\b|elevación de privilegio|elevation of privilege/i,
             text: "Evaluate threats to business-critical applications by using threat modeling",
             textEs: "Evaluar amenazas a aplicaciones críticas mediante modelado de amenazas",
           },
@@ -588,13 +588,13 @@ const DOMAINS = [
           },
           {
             id: "4.2.4",
-            match: /proceso de desarrollo|development process|\bsdl\b|devsecops/i,
+            match: /proceso de desarrollo|development process|\bsdl\b|devsecops|ramas? protegidas?|protected branch|federación de identidad de carga de trabajo|workload identity federation|pipeline/i,
             text: "Design and implement standards and practices for securing the application development process",
             textEs: "Diseñar estándares y prácticas que aseguren el proceso de desarrollo",
           },
           {
             id: "4.2.5",
-            match: /requisitos de seguridad de la aplicaci|application security requirement/i,
+            match: /requisitos? de seguridad de la aplicaci|application security requirement|external id|identidades? de cliente|customer identit|integración con la red virtual|virtual network integration/i,
             text: "Map technologies to application security requirements",
             textEs: "Asociar tecnologías concretas a los requisitos de seguridad de la aplicación",
           },
@@ -645,7 +645,7 @@ const DOMAINS = [
           },
           {
             id: "4.3.4",
-            match: /cargas de ia|ai workload|dato.{0,20}\bia\b/i,
+            match: /cargas? de ia|ai workload|dato.{0,20}\bia\b|corpus|asistente|assistant|\bprompt\b|ia generativa|generative ai/i,
             text: "Design security for data used in AI workloads",
             textEs: "Diseñar la seguridad del dato que consumen las cargas de IA",
           },
