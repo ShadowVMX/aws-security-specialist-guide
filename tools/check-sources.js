@@ -98,9 +98,15 @@ async function titleOf(url, attempt = 0) {
     for (const mod of DOMAINS.map((d) => d.module)) {
       const bank = `${cert.dir}/${cert.lang.es.modules}/${mod}/quiz-data.js`;
       if (!fs.existsSync(path.join(REPO, bank))) continue;
+      // The page titles are in English, so comparing only the Spanish question
+      // flagged perfectly good pairs whenever the question is phrased in
+      // concepts rather than product names. The English twin sits at the same
+      // index and cites the same page, so both are compared.
+      const twinPath = `${cert.dir}/${cert.lang.en.modules}/${mod}/quiz-data.js`;
+      const twin = fs.existsSync(path.join(REPO, twinPath)) ? load(twinPath) : [];
       load(bank).forEach((q, i) => {
         const url = (q.explain.match(/href=\\?"(https:\/\/[^"\\]+)/) || [])[1];
-        items.push({ mod: `${cert.id}/${mod}`, i, url: url || null, q });
+        items.push({ mod: `${cert.id}/${mod}`, i, url: url || null, q, en: twin[i] || null });
       });
     }
   }
@@ -159,16 +165,16 @@ async function titleOf(url, attempt = 0) {
   const broken = [];
   const suspect = [];
 
-  linked.forEach(({ mod, i, url, q }) => {
+  linked.forEach(({ mod, i, url, q, en }) => {
     const got = titles.get(url);
     if (got.error) {
       broken.push(`[${mod}/${i}] ${got.error} — ${url}`);
       return;
     }
     const correct = Array.isArray(q.correct) ? q.correct : [q.correct];
-    const asked = terms(
-      `${q.tag} ${q.q} ${correct.map((j) => q.options[j]).join(" ")}`
-    );
+    const text = (x) =>
+      x ? `${x.tag} ${x.q} ${correct.map((j) => x.options[j] || "").join(" ")}` : "";
+    const asked = terms(`${text(q)} ${text(en)}`);
     // the URL slug is written by AWS and describes the page as well as the title
     const page = terms(
       `${got.title} ${got.h1 || ""} ${url.split("/").slice(3).join(" ")}`
