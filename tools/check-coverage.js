@@ -208,7 +208,7 @@ DOMAINS.forEach((d) => {
 });
 
 /* ---- report ---- */
-console.log(`\n=== ${cert.name} (${cert.code})${cert.draft ? " · BORRADOR" : ""} — ${GUIDE_EDITION} ===\n`);
+console.log(`\n=== ${cert.name} (${cert.code})${cert.draft ? " · BORRADOR" : ""} — ${typeof GUIDE_EDITION === "string" ? GUIDE_EDITION : GUIDE_EDITION.es} ===\n`);
 
 DOMAINS.forEach((d) => {
   const mine = rows.filter((r) => r.skill.domain.id === d.id);

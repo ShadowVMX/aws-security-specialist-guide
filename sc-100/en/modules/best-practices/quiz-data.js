@@ -91,7 +91,7 @@ var QUIZ_DATA = [
     q: "An indispensable legacy system has a known vulnerability and the vendor will publish no fix. What does the design capture?",
     options: [
       "Accepting and documenting the risk, since no vendor fix is available",
-      "Retiring the system immediately and replacing it with a supported alternative",
+      "Retiring the system immediately and replacing it with a fully vendor-supported alternative product",
       "Applying a later version's update even though the vendor does not support it",
       "Compensating mitigation — isolation and filtering — with a planned retirement and its date",
     ],
@@ -306,7 +306,7 @@ var QUIZ_DATA = [
     tag: "Making the control count",
     q: "The pipeline's security scan has been producing findings nobody acts on for months, and releases carry on regardless. Which process change fixes it?",
     options: [
-      "Sending a weekly summary of open findings to each development team's manager",
+      "Sending a weekly summary of the open findings to each development team's engineering manager",
       "Increasing the scan's sensitivity so no relevant finding slips through",
       "Having a finding above the agreed threshold break the build, with a documented exception",
       "Moving the findings into the team's issue tracker so they enter their planning",

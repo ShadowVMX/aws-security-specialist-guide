@@ -289,7 +289,7 @@ const DOMAINS = [
           },
           {
             id: "2.3.7",
-            match: /\bpaw\b|estaci(ón|ones) .{0,20}privilegiad|privileged access workstation|bastion/i,
+            match: /\bpaw\b|estaci(ón|ones) .{0,30}privilegiad|privileged access workstation|bastion/i,
             text: "Design a solution for secure workstations for privileged access, including remote access",
             textEs: "Diseñar estaciones de trabajo seguras para acceso privilegiado, incluido el acceso remoto",
           },

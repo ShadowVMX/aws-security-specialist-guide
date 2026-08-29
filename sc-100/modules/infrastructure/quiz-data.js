@@ -462,7 +462,7 @@ var QUIZ_DATA = [
     tag: "Endpoint privado o de servicio",
     q: "El requisito dice que una cuenta de almacenamiento solo debe ser accesible desde la red virtual de la aplicación. El equipo propone un endpoint de servicio. ¿Qué señalas?",
     options: [
-      "Que el endpoint de servicio sirve, siempre que además se abra un grupo de seguridad de red hacia el servicio",
+      "Que el endpoint de servicio sirve, siempre que además se abra un grupo de seguridad de red hacia el servicio de almacenamiento",
       "Que el endpoint de servicio no da dirección privada al recurso: hace falta endpoint privado y acceso público deshabilitado",
       "Que el endpoint de servicio sirve, porque el tráfico deja de salir a internet y viaja por la red de Azure",
       "Que ninguno de los dos cumple el requisito y hay que mover el dato a un servidor de ficheros propio",

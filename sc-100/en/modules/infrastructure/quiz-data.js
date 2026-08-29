@@ -138,7 +138,7 @@ var QUIZ_DATA = [
     tag: "Inside or outside",
     q: "Presenting the design, someone proposes replacing Defender EASM with Defender for Cloud \"because it already gives posture and costs less\". What do you answer?",
     options: [
-      "That it is reasonable, because Defender for Cloud also discovers external assets from the seeds you give it",
+      "That it is perfectly reasonable, because Defender for Cloud also discovers internet-facing external assets from the seed domains you give it",
       "That they look at different things: Defender for Cloud sees what is connected, EASM sees what is published even if you don't know it",
       "That it is reasonable provided Defender CSPM is enabled, which extends discovery to internet-facing assets",
       "That it only makes sense if an external penetration testing service is also contracted periodically",
@@ -176,7 +176,7 @@ var QUIZ_DATA = [
     options: [
       "A different EDR product per platform, chosen by whichever team administers each one",
       "Defender for Servers, which brings Defender for Endpoint to Windows and Linux, on Azure, Arc and AWS",
-      "Sentinel analytics rules over the operating system logs each server already generates",
+      "Sentinel analytics rules written over the operating system logs that each server already generates today",
       "Hardening group policies on Windows and hand-reviewed bastion guides on Linux",
     ],
     correct: 1,
@@ -224,7 +224,7 @@ var QUIZ_DATA = [
     options: [
       "Keeping the shared key but rotating it every six months through a mass firmware update",
       "Per-device identity with an X.509 certificate or TPM, provisioned with the Device Provisioning Service",
-      "A different key per manufacturing batch, so a compromise only affects that batch of sensors",
+      "A different shared key per manufacturing batch, so that a compromise only affects that one batch of sensors",
       "Encrypting the firmware so the shared key cannot easily be extracted from the device",
     ],
     correct: 1,
@@ -273,7 +273,7 @@ var QUIZ_DATA = [
       "With a hardened golden image, redeploying any machine that drifts from the configuration",
       "With Azure Policy and Machine Configuration, which audits and remediates configuration inside the server",
       "With Intune security baselines, assigned to the device group holding the servers",
-      "With a Sentinel analytics rule alerting whenever a critical operating system setting changes",
+      "With a Sentinel analytics rule that alerts whenever a critical operating system setting changes on a server",
     ],
     correct: 1,
     explain: "<b>Machine Configuration</b> is the Azure Policy extension that looks <em>inside</em> the operating system: it audits configuration against a baseline and, if allowed, remediates it, on Azure machines and on <b>Arc</b>-connected ones alike. The golden image sets the starting point but does not watch for drift. Intune is for clients. And an alert detects the change, it does not prevent it. <a href=\"https://learn.microsoft.com/en-us/azure/governance/machine-configuration/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
@@ -294,7 +294,7 @@ var QUIZ_DATA = [
     tag: "A repeated local password",
     q: "A penetration test shows that, from one compromised laptop, any other in the estate can be reached by replaying the local administrator hash. What cuts it?",
     options: [
-      "Renaming the local administrator account on every machine to make it harder to locate",
+      "Renaming the local administrator account on every machine to make it harder for an attacker to locate",
       "Windows LAPS, with a different password per machine, rotated automatically and held in Entra ID",
       "A group policy setting a long, distinct password for each department in the company",
       "Permanently disabling the local administrator account on every machine in the estate",
