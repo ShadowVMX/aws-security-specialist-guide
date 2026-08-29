@@ -1,9 +1,14 @@
 /**
- * Full exam simulator. Draws a weighted sample from the six domain banks
+ * Full exam simulator. Draws a weighted sample from the domain banks
  * registered in window.QUIZ_BANK and runs it like the real thing: one
  * question at a time, a countdown, flags, no feedback until you submit.
  *
  * Mounts into <div id="exam-root"></div>.
+ *
+ * The exam's shape is not baked in here: the page declares it in
+ * window.EXAM_CONFIG before loading this script, so the same engine serves
+ * every certification. Without one it falls back to SCS-C03, which is the
+ * exam it was written for.
  */
 (function () {
   const root = document.getElementById("exam-root");
@@ -13,20 +18,20 @@
 
   // SCS-C03 is 65 questions in 170 minutes. The per-domain counts follow the
   // official weights (16/14/18/20/18/14) and are chosen to total exactly 65.
-  const TOTAL_MINUTES = 170;
-  const PASS_PERCENT = 75;
-  const BLUEPRINT = [
-    { id: "detection", weight: 16, count: 10 },
-    { id: "incident-response", weight: 14, count: 9 },
-    { id: "infrastructure-security", weight: 18, count: 12 },
-    { id: "iam", weight: 20, count: 13 },
-    { id: "data-protection", weight: 18, count: 12 },
-    { id: "governance", weight: 14, count: 9 },
-  ];
-
-  const STRINGS = {
-    es: {
-      domains: {
+  const DEFAULT_CONFIG = {
+    id: "scs-c03",
+    minutes: 170,
+    pass: 75,
+    blueprint: [
+      { id: "detection", weight: 16, count: 10 },
+      { id: "incident-response", weight: 14, count: 9 },
+      { id: "infrastructure-security", weight: 18, count: 12 },
+      { id: "iam", weight: 20, count: 13 },
+      { id: "data-protection", weight: 18, count: 12 },
+      { id: "governance", weight: 14, count: 9 },
+    ],
+    domains: {
+      es: {
         detection: "Detection",
         "incident-response": "Incident Response",
         "infrastructure-security": "Infrastructure Security",
@@ -34,11 +39,24 @@
         "data-protection": "Data Protection",
         governance: "Security Foundations & Governance",
       },
+    },
+  };
+  DEFAULT_CONFIG.domains.en = DEFAULT_CONFIG.domains.es;
+
+  const CONFIG = window.EXAM_CONFIG || DEFAULT_CONFIG;
+  const TOTAL_MINUTES = CONFIG.minutes;
+  const PASS_PERCENT = CONFIG.pass;
+  const BLUEPRINT = CONFIG.blueprint;
+  const TOTAL_QUESTIONS = BLUEPRINT.reduce((n, d) => n + d.count, 0);
+
+  const STRINGS = {
+    es: {
+      domains: (CONFIG.domains || {}).es || {},
       introTitle: "Simulacro de examen completo",
       introBody:
-        "65 preguntas en 170 minutos, con la misma mezcla por dominio que el examen real. No verás si aciertas hasta que entregues.",
+        `${TOTAL_QUESTIONS} preguntas en ${TOTAL_MINUTES} minutos, con la misma mezcla por dominio que el examen real. No verás si aciertas hasta que entregues.`,
       introList: [
-        "Las preguntas se eligen al azar de los seis bancos, respetando los pesos oficiales.",
+        "Las preguntas se eligen al azar de los bancos de cada dominio, respetando los pesos oficiales.",
         "Puedes marcar preguntas y volver a ellas desde el navegador de abajo.",
         "El progreso se guarda: si cierras la pestaña, retomas donde lo dejaste.",
         "Al entregar verás la nota, el desglose por dominio y la explicación de cada pregunta.",
@@ -80,19 +98,12 @@
       weight: "Peso",
     },
     en: {
-      domains: {
-        detection: "Detection",
-        "incident-response": "Incident Response",
-        "infrastructure-security": "Infrastructure Security",
-        iam: "Identity and Access Management",
-        "data-protection": "Data Protection",
-        governance: "Security Foundations & Governance",
-      },
+      domains: (CONFIG.domains || {}).en || {},
       introTitle: "Full exam simulation",
       introBody:
-        "65 questions in 170 minutes, with the same domain mix as the real exam. You won't see whether you're right until you submit.",
+        `${TOTAL_QUESTIONS} questions in ${TOTAL_MINUTES} minutes, with the same domain mix as the real exam. You won't see whether you're right until you submit.`,
       introList: [
-        "Questions are drawn at random from the six banks, following the official weights.",
+        "Questions are drawn at random from each domain's bank, following the official weights.",
         "You can flag questions and jump back to them from the navigator below.",
         "Progress is saved: close the tab and you pick up where you left off.",
         "On submit you get your score, the per-domain breakdown and every explanation.",
@@ -137,8 +148,8 @@
 
   const LANG = (document.documentElement.lang || "es").slice(0, 2);
   const T = STRINGS[LANG] || STRINGS.es;
-  const STORE_KEY = `scs-c03:exam:${LANG}`;
-  const EXAM_SUMMARY_KEY = `scs-c03:examsummary:${LANG}`;
+  const STORE_KEY = `${CONFIG.id}:exam:${LANG}`;
+  const EXAM_SUMMARY_KEY = `${CONFIG.id}:examsummary:${LANG}`;
 
   /* ---- helpers -------------------------------------------------------- */
 

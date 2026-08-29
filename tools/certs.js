@@ -48,6 +48,10 @@ const CERTS = [
     },
     countWord: { es: "preguntas", en: "questions" },
     totalWord: { es: "preguntas", en: "practice questions" },
+    // The SC-100 blueprint lives in the exam page's window.EXAM_CONFIG rather
+    // than in the shared engine, which now reads its shape from the page.
+    examEngine: "sc-100/examen/index.html",
+    examTotal: 48,
     vendor: "Microsoft",
     newBadge: { es: "nuevo en 2026", en: "new in 2026" },
     newTitle: {

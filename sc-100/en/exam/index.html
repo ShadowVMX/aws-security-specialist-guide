@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Timed simulation of the Microsoft SC-100 exam: 48 questions in 100 minutes with the official domain mix, drawn from the guide's 160 practice questions.">
+<link rel="icon" href="../../../assets/img/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Exam Simulation — Microsoft Cybersecurity Architect (SC-100)">
+<meta property="og:description" content="Timed simulation of the Microsoft SC-100 exam: 48 questions in 100 minutes with the official domain mix, no feedback until you submit.">
+<meta property="og:url" content="https://shadowvmx.github.io/sc-100/en/exam/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+<title>Exam Simulation — Microsoft Cybersecurity Architect (SC-100)</title>
+<link rel="stylesheet" href="../../../assets/css/style.css?v=9">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="dot">●</span> Microsoft SC-100</div>
+    <nav class="topnav">
+      <a href="../index.html">← Domains</a>
+      <span class="lang-switch"><a href="../../examen/index.html">ES</a><span class="current">EN</span></span>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero" style="padding-top:40px;">
+    <span class="badge">SC-100 · 48 questions · 100 minutes</span>
+    <h1>Exam simulation</h1>
+    <p>A full exam with the same domain mix as the real one, timed and with no feedback until you submit. It trains what the per-module quizzes cannot: reading long stems under time pressure and budgeting the clock.</p>
+    <div class="callout warn" style="max-width:680px;">
+      <b>About the question count and the score</b>
+      Microsoft does not publish a fixed number: SC-100 usually carries between 40 and 60 questions. This
+      simulation uses <strong>48 in 100 minutes</strong> with each domain's official weight. The real score
+      is scaled out of 1000 and you pass at <strong>700</strong>, which is not a straight 70% of correct
+      answers; the 70% this simulation marks is a working reference, not the exam's grade.
+    </div>
+    <p class="module-reviewed">Questions are drawn at random from the guide's 160 practice questions, so
+    every attempt comes out different.</p>
+  </section>
+
+  <div id="exam-root" style="padding-bottom:100px;"></div>
+</div>
+
+<footer>
+  <div class="wrap">Independent study guide, not affiliated with Microsoft. Reviewed as of August 2026.</div>
+</footer>
+
+<script>
+  // The exam engine is shared across certifications and reads its shape from here.
+  // The weights are the official skills outline ones (midpoint of the published
+  // range) and the counts spread the 48 questions using those weights.
+  window.EXAM_CONFIG = {
+    id: "sc-100",
+    minutes: 100,
+    pass: 70,
+    blueprint: [
+      { id: "best-practices", weight: 22.5, count: 11 },
+      { id: "operations-identity", weight: 27.5, count: 13 },
+      { id: "infrastructure", weight: 27.5, count: 13 },
+      { id: "apps-data", weight: 22.5, count: 11 },
+    ],
+    domains: {
+      es: {
+        "best-practices": "Buenas prácticas y prioridades",
+        "operations-identity": "Operaciones, identidad y cumplimiento",
+        infrastructure: "Infraestructura",
+        "apps-data": "Aplicaciones y datos",
+      },
+      en: {
+        "best-practices": "Best practices and priorities",
+        "operations-identity": "Security operations, identity and compliance",
+        infrastructure: "Infrastructure",
+        "apps-data": "Applications and data",
+      },
+    },
+  };
+</script>
+<script src="../../en/modules/best-practices/quiz-data.js"></script>
+<script src="../../en/modules/operations-identity/quiz-data.js"></script>
+<script src="../../en/modules/infrastructure/quiz-data.js"></script>
+<script src="../../en/modules/apps-data/quiz-data.js"></script>
+<script src="../../../assets/js/exam.js?v=10"></script>
+
+</body>
+</html>
