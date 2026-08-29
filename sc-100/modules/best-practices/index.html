@@ -13,7 +13,7 @@
 <meta property="og:locale" content="es_ES">
 <meta name="twitter:card" content="summary">
 <title>Buenas prácticas y prioridades — Microsoft Cybersecurity Architect (SC-100)</title>
-<link rel="stylesheet" href="../../../assets/css/style.css?v=9">
+<link rel="stylesheet" href="../../../assets/css/style.css?v=10">
 </head>
 <body>
 
@@ -121,6 +121,103 @@
       pieza</strong>. Se puede tener replicación continua —RPO bajo— y tardar un día en levantar, si nadie
       preparó ni probó el procedimiento. Por eso el examen separa «copia» de «plan de recuperación probado».
     </p>
+
+    <h3>Quién responde de qué, modelo a modelo</h3>
+    <div class="diagram">
+      <svg viewBox="0 0 700 412" xmlns="http://www.w3.org/2000/svg">
+        <g>
+          <text x="287" y="26" class="dtitle" text-anchor="middle">On-prem</text>
+          <text x="403" y="26" class="dtitle" text-anchor="middle">IaaS</text>
+          <text x="519" y="26" class="dtitle" text-anchor="middle">PaaS</text>
+          <text x="635" y="26" class="dtitle" text-anchor="middle">SaaS</text>
+        </g>
+        <g class="dstep" data-label="Información y datos — On-prem: Cliente · IaaS: Cliente · PaaS: Cliente · SaaS: Cliente" data-explain="Nunca cambia de dueño. El proveedor no clasifica tu dato, no decide quién lo ve y no responde de que se filtre por un permiso mal puesto.">
+          <rect class="dbox" x="8" y="40" width="218" height="42" rx="8"></rect>
+          <text x="20" y="66" class="dtitle">Información y datos</text>
+          <rect class="dbox-allow" x="232" y="40" width="110" height="42" rx="8"></rect>
+          <text x="287" y="66" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-allow" x="348" y="40" width="110" height="42" rx="8"></rect>
+          <text x="403" y="66" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-allow" x="464" y="40" width="110" height="42" rx="8"></rect>
+          <text x="519" y="66" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-allow" x="580" y="40" width="110" height="42" rx="8"></rect>
+          <text x="635" y="66" class="dstep-cell" text-anchor="middle">Cliente</text>
+        </g>
+        <g class="dstep" data-label="Cuentas e identidades — On-prem: Cliente · IaaS: Cliente · PaaS: Cliente · SaaS: Cliente" data-explain="También es siempre tuya. Quién existe, con qué credencial entra y qué se le exige para entrar lo decides tú en los cuatro modelos.">
+          <rect class="dbox" x="8" y="92" width="218" height="42" rx="8"></rect>
+          <text x="20" y="118" class="dtitle">Cuentas e identidades</text>
+          <rect class="dbox-allow" x="232" y="92" width="110" height="42" rx="8"></rect>
+          <text x="287" y="118" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-allow" x="348" y="92" width="110" height="42" rx="8"></rect>
+          <text x="403" y="118" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-allow" x="464" y="92" width="110" height="42" rx="8"></rect>
+          <text x="519" y="118" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-allow" x="580" y="92" width="110" height="42" rx="8"></rect>
+          <text x="635" y="118" class="dstep-cell" text-anchor="middle">Cliente</text>
+        </g>
+        <g class="dstep" data-label="Infraestructura de identidad — On-prem: Cliente · IaaS: Compartida · PaaS: Compartida · SaaS: Compartida" data-explain="En local la levantas entera. En la nube el proveedor opera el directorio, pero su configuración —directivas, roles, federación— sigue siendo tuya.">
+          <rect class="dbox" x="8" y="144" width="218" height="42" rx="8"></rect>
+          <text x="20" y="170" class="dtitle">Infraestructura de identidad</text>
+          <rect class="dbox-allow" x="232" y="144" width="110" height="42" rx="8"></rect>
+          <text x="287" y="170" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-shared" x="348" y="144" width="110" height="42" rx="8"></rect>
+          <text x="403" y="170" class="dstep-cell" text-anchor="middle">Compartida</text>
+          <rect class="dbox-shared" x="464" y="144" width="110" height="42" rx="8"></rect>
+          <text x="519" y="170" class="dstep-cell" text-anchor="middle">Compartida</text>
+          <rect class="dbox-shared" x="580" y="144" width="110" height="42" rx="8"></rect>
+          <text x="635" y="170" class="dstep-cell" text-anchor="middle">Compartida</text>
+        </g>
+        <g class="dstep" data-label="Aplicaciones — On-prem: Cliente · IaaS: Cliente · PaaS: Compartida · SaaS: Proveedor" data-explain="En IaaS la aplicación es tuya de arriba abajo. En PaaS compartes: el proveedor pone la plataforma y tú el código y su configuración. En SaaS es del proveedor, y a ti te queda cómo la configuras.">
+          <rect class="dbox" x="8" y="196" width="218" height="42" rx="8"></rect>
+          <text x="20" y="222" class="dtitle">Aplicaciones</text>
+          <rect class="dbox-allow" x="232" y="196" width="110" height="42" rx="8"></rect>
+          <text x="287" y="222" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-allow" x="348" y="196" width="110" height="42" rx="8"></rect>
+          <text x="403" y="222" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-shared" x="464" y="196" width="110" height="42" rx="8"></rect>
+          <text x="519" y="222" class="dstep-cell" text-anchor="middle">Compartida</text>
+          <rect class="dbox" x="580" y="196" width="110" height="42" rx="8"></rect>
+          <text x="635" y="222" class="dstep-cell" text-anchor="middle">Proveedor</text>
+        </g>
+        <g class="dstep" data-label="Controles de red — On-prem: Cliente · IaaS: Cliente · PaaS: Compartida · SaaS: Proveedor" data-explain="El punto donde más se equivoca la gente en PaaS: el servicio trae red gestionada, pero abrir o cerrar el acceso público, el punto de conexión privado y las reglas siguen siendo decisión tuya.">
+          <rect class="dbox" x="8" y="248" width="218" height="42" rx="8"></rect>
+          <text x="20" y="274" class="dtitle">Controles de red</text>
+          <rect class="dbox-allow" x="232" y="248" width="110" height="42" rx="8"></rect>
+          <text x="287" y="274" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-allow" x="348" y="248" width="110" height="42" rx="8"></rect>
+          <text x="403" y="274" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-shared" x="464" y="248" width="110" height="42" rx="8"></rect>
+          <text x="519" y="274" class="dstep-cell" text-anchor="middle">Compartida</text>
+          <rect class="dbox" x="580" y="248" width="110" height="42" rx="8"></rect>
+          <text x="635" y="274" class="dstep-cell" text-anchor="middle">Proveedor</text>
+        </g>
+        <g class="dstep" data-label="Sistema operativo — On-prem: Cliente · IaaS: Cliente · PaaS: Proveedor · SaaS: Proveedor" data-explain="En IaaS lo parcheas y lo endureces tú. En PaaS y SaaS desaparece de tu vista, y con él desaparecen el parcheo y el agente.">
+          <rect class="dbox" x="8" y="300" width="218" height="42" rx="8"></rect>
+          <text x="20" y="326" class="dtitle">Sistema operativo</text>
+          <rect class="dbox-allow" x="232" y="300" width="110" height="42" rx="8"></rect>
+          <text x="287" y="326" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-allow" x="348" y="300" width="110" height="42" rx="8"></rect>
+          <text x="403" y="326" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox" x="464" y="300" width="110" height="42" rx="8"></rect>
+          <text x="519" y="326" class="dstep-cell" text-anchor="middle">Proveedor</text>
+          <rect class="dbox" x="580" y="300" width="110" height="42" rx="8"></rect>
+          <text x="635" y="326" class="dstep-cell" text-anchor="middle">Proveedor</text>
+        </g>
+        <g class="dstep" data-label="Hosts y centro de datos — On-prem: Cliente · IaaS: Proveedor · PaaS: Proveedor · SaaS: Proveedor" data-explain="Fuera de local, esto es del proveedor y lo acredita con certificaciones. Su certificación cubre su mitad: no dice nada de cómo has configurado tú la tuya.">
+          <rect class="dbox" x="8" y="352" width="218" height="42" rx="8"></rect>
+          <text x="20" y="378" class="dtitle">Hosts y centro de datos</text>
+          <rect class="dbox-allow" x="232" y="352" width="110" height="42" rx="8"></rect>
+          <text x="287" y="378" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox" x="348" y="352" width="110" height="42" rx="8"></rect>
+          <text x="403" y="378" class="dstep-cell" text-anchor="middle">Proveedor</text>
+          <rect class="dbox" x="464" y="352" width="110" height="42" rx="8"></rect>
+          <text x="519" y="378" class="dstep-cell" text-anchor="middle">Proveedor</text>
+          <rect class="dbox" x="580" y="352" width="110" height="42" rx="8"></rect>
+          <text x="635" y="378" class="dstep-cell" text-anchor="middle">Proveedor</text>
+        </g>
+      </svg>
+      <div class="dexplain">Las dos primeras filas no cambian de color en ninguna columna: identidad y datos son siempre tuyos, vaya donde vaya la carga de trabajo.</div>
+    </div>
 
     <h2 id="marcos">Los cinco marcos, sin confundirlos</h2>
     <p>

@@ -13,7 +13,7 @@
 <meta property="og:locale" content="es_ES">
 <meta name="twitter:card" content="summary">
 <title>Operaciones, identidad y cumplimiento — Microsoft Cybersecurity Architect (SC-100)</title>
-<link rel="stylesheet" href="../../../assets/css/style.css?v=9">
+<link rel="stylesheet" href="../../../assets/css/style.css?v=10">
 </head>
 <body>
 
@@ -185,6 +185,44 @@
       Con esto, la respuesta clásica —«bajar de nivel los logs voluminosos y promocionar solo lo que alimenta
       una regla»— deja de ser un truco memorizado y se deduce sola.
     </p>
+
+    <h3>Los tres planos del modelo de acceso empresarial</h3>
+    <div class="diagram">
+      <svg viewBox="0 0 700 346" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="ea-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#7c8aa0"></path>
+          </marker>
+        </defs>
+        <line class="dline" x1="350" y1="118" x2="350" y2="148" marker-end="url(#ea-arrow)"></line>
+        <line class="dline" x1="350" y1="226" x2="350" y2="256" marker-end="url(#ea-arrow)"></line>
+        <line class="dline" x1="160" y1="60" x2="230" y2="60" marker-end="url(#ea-arrow)"></line>
+        <g class="dstep" data-label="Estación de trabajo de acceso privilegiado" data-explain="Todo acceso privilegiado sale de un equipo endurecido, sin correo ni navegación general y gestionado aparte. Separar la cuenta administrativa no basta: si el portátil está comprometido, el atacante ya está dentro del equipo desde el que administras.">
+          <rect class="dbox-alt" x="8" y="34" width="152" height="52" rx="8"></rect>
+          <text x="22" y="58" class="dtitle">Estación de acceso</text>
+          <text x="22" y="76" class="dtitle">privilegiado (PAW)</text>
+        </g>
+        <g class="dstep" data-label="Plano de control" data-explain="Entra ID y la administración del inquilino, más los controladores de dominio si hay AD DS. Quien controla este plano controla todo lo demás, así que es donde van el acceso elegible con PIM, la MFA resistente a phishing y las cuentas de acceso de emergencia.">
+          <rect class="dbox-deny" x="230" y="34" width="440" height="84" rx="8"></rect>
+          <text x="250" y="60" class="dtitle">1. Plano de control — identidad y administración del inquilino</text>
+          <text x="250" y="80" class="dstep-cell">Entra ID · administradores globales · AD DS y krbtgt</text>
+          <text x="250" y="100" class="dstep-cell">Comprometerlo entrega los otros dos planos enteros</text>
+        </g>
+        <g class="dstep" data-label="Plano de gestión" data-explain="Resource Manager, los grupos de administración y las suscripciones: quién puede crear, mover, borrar y asignar roles sobre los recursos. El puente que hay que vigilar es la elevación del administrador global al ámbito raíz, que no caduca sola.">
+          <rect class="dbox-shared" x="230" y="148" width="440" height="78" rx="8"></rect>
+          <text x="250" y="174" class="dtitle">2. Plano de gestión — control de los recursos</text>
+          <text x="250" y="194" class="dstep-cell">Grupos de administración · suscripciones · asignación de roles</text>
+          <text x="250" y="214" class="dstep-cell">Azure Policy se hereda desde aquí hacia abajo</text>
+        </g>
+        <g class="dstep" data-label="Plano de datos y cargas de trabajo" data-explain="Donde vive el negocio: las máquinas, las bases de datos, los ficheros. Que un plano de arriba caiga se lleva este; que caiga este no debería llevarse los de arriba, y por eso una identidad de este plano nunca debe poder administrar los otros.">
+          <rect class="dbox" x="230" y="256" width="440" height="78" rx="8"></rect>
+          <text x="250" y="282" class="dtitle">3. Plano de datos y cargas de trabajo</text>
+          <text x="250" y="302" class="dstep-cell">Servidores · bases de datos · aplicaciones · almacenamiento</text>
+          <text x="250" y="322" class="dstep-cell">Radio de impacto acotado si los planos están separados</text>
+        </g>
+      </svg>
+      <div class="dexplain">Una misma cuenta que administre dos planos une lo que el modelo separa: el atacante que la robe se lleva los dos.</div>
+    </div>
 
     <h2 id="como-preguntan">Design, Evaluate, Specify: cómo pregunta este examen</h2>
     <p>

@@ -13,7 +13,7 @@
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary">
 <title>Security Operations, Identity &amp; Compliance — Microsoft Cybersecurity Architect (SC-100)</title>
-<link rel="stylesheet" href="../../../../assets/css/style.css?v=9">
+<link rel="stylesheet" href="../../../../assets/css/style.css?v=10">
 </head>
 <body>
 
@@ -186,6 +186,44 @@
       With that, the classic answer — "move the high-volume logs to a cheaper tier and promote only what feeds
       a rule" — stops being a memorised trick and derives itself.
     </p>
+
+    <h3>The three planes of the enterprise access model</h3>
+    <div class="diagram">
+      <svg viewBox="0 0 700 346" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="ea-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#7c8aa0"></path>
+          </marker>
+        </defs>
+        <line class="dline" x1="350" y1="118" x2="350" y2="148" marker-end="url(#ea-arrow)"></line>
+        <line class="dline" x1="350" y1="226" x2="350" y2="256" marker-end="url(#ea-arrow)"></line>
+        <line class="dline" x1="160" y1="60" x2="230" y2="60" marker-end="url(#ea-arrow)"></line>
+        <g class="dstep" data-label="Privileged access workstation" data-explain="All privileged access originates from a hardened machine, with no email or general browsing and managed separately. Separating the administrative account is not enough: if the laptop is compromised the attacker is already inside the machine you administer from.">
+          <rect class="dbox-alt" x="8" y="34" width="152" height="52" rx="8"></rect>
+          <text x="22" y="58" class="dtitle">Privileged access</text>
+          <text x="22" y="76" class="dtitle">workstation (PAW)</text>
+        </g>
+        <g class="dstep" data-label="Control plane" data-explain="Entra ID and tenant administration, plus the domain controllers where there is AD DS. Whoever controls this plane controls everything else, so this is where PIM-eligible access, phishing-resistant MFA and emergency access accounts belong.">
+          <rect class="dbox-deny" x="230" y="34" width="440" height="84" rx="8"></rect>
+          <text x="250" y="60" class="dtitle">1. Control plane — identity and tenant administration</text>
+          <text x="250" y="80" class="dstep-cell">Entra ID · Global Administrators · AD DS and krbtgt</text>
+          <text x="250" y="100" class="dstep-cell">Compromising it hands over both other planes entirely</text>
+        </g>
+        <g class="dstep" data-label="Management plane" data-explain="Resource Manager, the management groups and the subscriptions: who can create, move, delete and assign roles over resources. The bridge to watch is the Global Administrator&#x27;s elevation to root scope, which does not expire on its own.">
+          <rect class="dbox-shared" x="230" y="148" width="440" height="78" rx="8"></rect>
+          <text x="250" y="174" class="dtitle">2. Management plane — control over resources</text>
+          <text x="250" y="194" class="dstep-cell">Management groups · subscriptions · role assignment</text>
+          <text x="250" y="214" class="dstep-cell">Azure Policy inherits downward from here</text>
+        </g>
+        <g class="dstep" data-label="Data and workload plane" data-explain="Where the business lives: the machines, the databases, the files. If a plane above falls it takes this one with it; if this one falls it should not take the ones above, which is why an identity in this plane must never be able to administer the others.">
+          <rect class="dbox" x="230" y="256" width="440" height="78" rx="8"></rect>
+          <text x="250" y="282" class="dtitle">3. Data and workload plane</text>
+          <text x="250" y="302" class="dstep-cell">Servers · databases · applications · storage</text>
+          <text x="250" y="322" class="dstep-cell">Blast radius stays bounded when the planes are separate</text>
+        </g>
+      </svg>
+      <div class="dexplain">One account administering two planes merges what the model separates: an attacker who steals it gets both.</div>
+    </div>
 
     <h2 id="como-preguntan">Design, Evaluate, Specify: how this exam asks</h2>
     <p>

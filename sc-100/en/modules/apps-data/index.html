@@ -13,7 +13,7 @@
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary">
 <title>Applications &amp; Data — Microsoft Cybersecurity Architect (SC-100)</title>
-<link rel="stylesheet" href="../../../../assets/css/style.css?v=9">
+<link rel="stylesheet" href="../../../../assets/css/style.css?v=10">
 </head>
 <body>
 
@@ -141,6 +141,45 @@
       prefers it to any secret however well guarded, and why the detail of scoping the branch or the
       environment matters: without it, any branch in the repository deploys to production.
     </p>
+
+    <h3>Envelope encryption: why revoking the key cuts access</h3>
+    <div class="diagram">
+      <svg viewBox="0 0 700 312" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="ee-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#7c8aa0"></path>
+          </marker>
+        </defs>
+        <line class="dline" x1="200" y1="88" x2="200" y2="122" marker-end="url(#ee-arrow)"></line>
+        <line class="dline" x1="200" y1="192" x2="200" y2="226" marker-end="url(#ee-arrow)"></line>
+        <line class="dline" x1="424" y1="157" x2="330" y2="157" marker-end="url(#ee-arrow)"></line>
+        <line class="dline-deny" x1="530" y1="200" x2="530" y2="238"></line>
+        <g class="dstep" data-label="The plaintext data" data-explain="The blob, row or file exactly as the application writes it.">
+          <rect class="dbox" x="60" y="36" width="280" height="52" rx="8"></rect>
+          <text x="200" y="60" class="dtitle" text-anchor="middle">Data</text>
+        </g>
+        <g class="dstep" data-label="Data key" data-explain="The service encrypts the data with a data key, fast and single-purpose. This key travels nowhere: it is stored next to the data, but wrapped.">
+          <rect class="dbox-alt" x="60" y="122" width="280" height="70" rx="8"></rect>
+          <text x="200" y="146" class="dtitle" text-anchor="middle">Encrypted with the data key</text>
+          <text x="200" y="164" class="dstep-cell" text-anchor="middle">the key is stored wrapped</text>
+        </g>
+        <g class="dstep" data-label="Key encryption key, in your vault" data-explain="The key that wraps the data key lives in your key vault and is yours. The service does not hold it: it calls out every time it needs to unwrap. This is where a customer-managed key differs from a platform-managed one.">
+          <rect class="dbox-allow" x="424" y="122" width="236" height="70" rx="8"></rect>
+          <text x="542" y="146" class="dtitle" text-anchor="middle">Key encryption key</text>
+          <text x="542" y="164" class="dstep-cell" text-anchor="middle">in your key vault</text>
+        </g>
+        <g class="dstep" data-label="Data encrypted at rest" data-explain="What ends up stored is the encrypted data plus the wrapped data key. Without unwrapping that key there is no way to read anything.">
+          <rect class="dbox" x="60" y="226" width="280" height="62" rx="8"></rect>
+          <text x="200" y="250" class="dtitle" text-anchor="middle">Encrypted data + wrapped key</text>
+        </g>
+        <g class="dstep" data-label="Revoking the key" data-explain="Disabling your key encryption key stops the service being able to unwrap the data key and therefore to decrypt anything. It is immediate and rewrites not a single byte: which is why this design is what satisfies an obligation to ‘cut off access without depending on the provider’.">
+          <rect class="dbox-deny" x="424" y="238" width="236" height="62" rx="8"></rect>
+          <text x="542" y="262" class="dtitle" text-anchor="middle">Disabling it cuts access</text>
+          <text x="542" y="280" class="dstep-cell" text-anchor="middle">instantly, with no rewrite</text>
+        </g>
+      </svg>
+      <div class="dexplain">The data is never re-encrypted on revocation: what breaks is the chain that allows unwrapping the key that opens it.</div>
+    </div>
 
     <h2 id="hilo">The data, not the container: the thread of this domain</h2>
     <p>

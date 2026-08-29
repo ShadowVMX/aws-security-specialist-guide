@@ -13,7 +13,7 @@
 <meta property="og:locale" content="es_ES">
 <meta name="twitter:card" content="summary">
 <title>Soluciones de seguridad para infraestructura — Microsoft Cybersecurity Architect (SC-100)</title>
-<link rel="stylesheet" href="../../../assets/css/style.css?v=9">
+<link rel="stylesheet" href="../../../assets/css/style.css?v=10">
 </head>
 <body>
 
@@ -179,6 +179,53 @@
       Azure. Sin eso, un <em>kubeconfig</em> es una credencial fuera del directorio: no se revoca, no caduca y
       no deja rastro de quién es quién.
     </p>
+
+    <h3>Punto de conexión de servicio frente a punto de conexión privado</h3>
+    <div class="diagram">
+      <svg viewBox="0 0 700 306" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="pe-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#7c8aa0"></path>
+          </marker>
+        </defs>
+        <text x="172" y="22" class="dtitle" text-anchor="middle">Punto de conexión de servicio</text>
+        <text x="528" y="22" class="dtitle" text-anchor="middle">Punto de conexión privado</text>
+        <line class="dline" x1="172" y1="92" x2="172" y2="126" marker-end="url(#pe-arrow)"></line>
+        <line class="dline" x1="172" y1="196" x2="172" y2="230" marker-end="url(#pe-arrow)"></line>
+        <line class="dline" x1="528" y1="92" x2="528" y2="126" marker-end="url(#pe-arrow)"></line>
+        <line class="dline" x1="528" y1="196" x2="528" y2="230" marker-end="url(#pe-arrow)"></line>
+        <line class="dline" x1="350" y1="60" x2="350" y2="300" stroke-dasharray="4 4"></line>
+        <g class="dstep" data-label="Máquina en la subred (endpoint de servicio)" data-explain="La máquina sale con su propia dirección. Lo único que cambia respecto de internet es que Azure marca ese tráfico como procedente de tu subred.">
+          <rect class="dbox" x="40" y="40" width="264" height="52" rx="8"></rect>
+          <text x="172" y="64" class="dtitle" text-anchor="middle">Máquina en tu subred</text>
+        </g>
+        <g class="dstep" data-label="El recurso conserva su dirección pública" data-explain="Aquí está la clave: el endpoint de servicio NO da dirección privada al recurso. El almacenamiento sigue teniendo su nombre y su IP públicos; lo que cambia es desde dónde se le permite llegar. Si el requisito dice «que el dato no sea alcanzable desde internet», esto no lo cumple.">
+          <rect class="dbox-shared" x="40" y="126" width="264" height="70" rx="8"></rect>
+          <text x="172" y="150" class="dtitle" text-anchor="middle">Solo cambia el origen permitido</text>
+          <text x="172" y="168" class="dstep-cell" text-anchor="middle">el recurso sigue siendo público</text>
+        </g>
+        <g class="dstep" data-label="Almacenamiento con IP pública" data-explain="El nombre del servicio resuelve a una dirección pública para todo el mundo, dentro y fuera de tu red.">
+          <rect class="dbox-deny" x="40" y="230" width="264" height="62" rx="8"></rect>
+          <text x="172" y="254" class="dtitle" text-anchor="middle">Almacenamiento</text>
+          <text x="172" y="272" class="dstep-cell" text-anchor="middle">nombre e IP públicos</text>
+        </g>
+        <g class="dstep" data-label="Máquina en la subred (endpoint privado)" data-explain="La máquina sigue pidiendo el nombre público del servicio: la aplicación no cambia una línea. Lo que cambia es a qué dirección resuelve ese nombre.">
+          <rect class="dbox" x="396" y="40" width="264" height="52" rx="8"></rect>
+          <text x="528" y="64" class="dtitle" text-anchor="middle">Máquina en tu subred</text>
+        </g>
+        <g class="dstep" data-label="Interfaz de red con IP privada, y la zona DNS" data-explain="El endpoint privado crea una interfaz de red REAL en tu subred, con una IP privada tuya. Y la pieza que se olvida siempre: sin la zona DNS privada enlazada a la red virtual, el nombre sigue resolviendo a la dirección pública, el tráfico intenta salir a internet y —con el acceso público deshabilitado— falla.">
+          <rect class="dbox-alt" x="396" y="126" width="264" height="70" rx="8"></rect>
+          <text x="528" y="150" class="dtitle" text-anchor="middle">Interfaz de red + IP privada</text>
+          <text x="528" y="168" class="dstep-cell" text-anchor="middle">+ zona DNS privada enlazada</text>
+        </g>
+        <g class="dstep" data-label="Almacenamiento sin acceso público" data-explain="Con el acceso público deshabilitado, el recurso solo es alcanzable por la interfaz privada. Ese es el diseño que cumple un requisito de «no alcanzable desde internet».">
+          <rect class="dbox-allow" x="396" y="230" width="264" height="62" rx="8"></rect>
+          <text x="528" y="254" class="dtitle" text-anchor="middle">Almacenamiento</text>
+          <text x="528" y="272" class="dstep-cell" text-anchor="middle">acceso público deshabilitado</text>
+        </g>
+      </svg>
+      <div class="dexplain">El fallo más repetido: se crea el endpoint privado, se deshabilita el acceso público y nadie enlaza la zona DNS. Funciona desde el portal y falla desde la máquina.</div>
+    </div>
 
     <h2 id="mapa">El mapa de productos, que es lo que de verdad se pregunta</h2>
     <p>
