@@ -40,6 +40,7 @@
 
   <aside class="sidebar">
     <h4>Cómo leer este dominio</h4>
+    <a href="#base">Lo que se da por sabido</a>
     <a href="#marcos">Los cuatro marcos, sin confundirlos</a>
     <h4>1.1 Resiliencia</h4>
     <a href="#resiliencia">Del objetivo de negocio a la prioridad</a>
@@ -64,6 +65,61 @@
   </aside>
 
   <main class="content">
+
+    <h2 id="base">Lo que este examen da por sabido</h2>
+    <p>
+      Este dominio es de estrategia, pero se apoya en tres ideas que rara vez se explican y que deciden
+      preguntas enteras.
+    </p>
+
+    <h3>Responsabilidad compartida: quién responde de qué, según el modelo</h3>
+    <p>
+      Lo que tú tienes que proteger cambia con el modelo de servicio, y ese reparto está en el fondo de muchas
+      respuestas:
+    </p>
+    <table role="table">
+      <tr><th>Responsabilidad</th><th>On-premises</th><th>IaaS</th><th>PaaS</th><th>SaaS</th></tr>
+      <tr><td>Centro de datos, red física, hardware</td><td>Tuya</td><td>Del proveedor</td><td>Del proveedor</td><td>Del proveedor</td></tr>
+      <tr><td>Sistema operativo, parcheo, cifrado de disco</td><td>Tuya</td><td><strong>Tuya</strong></td><td>Del proveedor</td><td>Del proveedor</td></tr>
+      <tr><td>Configuración de red y de la aplicación</td><td>Tuya</td><td>Tuya</td><td><strong>Tuya</strong></td><td>Compartida</td></tr>
+      <tr><td>Identidades, accesos y <strong>datos</strong></td><td>Tuya</td><td>Tuya</td><td>Tuya</td><td><strong>Tuya</strong></td></tr>
+    </table>
+    <p>
+      La fila que nunca cambia es la última: <strong>identidad y dato son siempre tuyos</strong>, en cualquier
+      modelo. Por eso el examen insiste tanto en clasificación, etiquetas, acceso condicional y gobierno de
+      permisos, y por eso una opción que dice «lo protege el proveedor» hablando del dato es casi siempre la
+      incorrecta.
+    </p>
+
+    <h3>Defensa en profundidad, y qué queda de ella con Zero Trust</h3>
+    <p>
+      La idea clásica es apilar controles independientes —perímetro, red, host, aplicación, dato— para que el
+      fallo de uno no sea el fallo del sistema. Zero Trust <strong>no la sustituye</strong>: lo que niega es
+      una premisa concreta de esa arquitectura, la de que estar <em>dentro</em> del perímetro sea señal de
+      confianza. Las capas siguen; lo que desaparece es la zona segura.
+    </p>
+    <p>
+      Por eso el diseño moderno mantiene segmentación y cifrado —capas— y añade verificación en cada petición.
+      Una opción que proponga volver a confiar en la red interna es incorrecta; una que proponga quitar capas
+      «porque ya tenemos Zero Trust», también.
+    </p>
+
+    <h3>RPO y RTO: qué miden y qué diseño obliga cada uno</h3>
+    <p>
+      Son dos números que fija el negocio y que apuntan a mecanismos distintos, y confundirlos es el error
+      clásico de esta tarea.
+    </p>
+    <table role="table">
+      <tr><th></th><th>RPO — objetivo de punto de recuperación</th><th>RTO — objetivo de tiempo de recuperación</th></tr>
+      <tr><td>Qué mide</td><td>Cuánto <strong>dato</strong> aceptas perder, medido en tiempo hacia atrás.</td><td>Cuánto <strong>tiempo</strong> aceptas estar parado.</td></tr>
+      <tr><td>De qué depende</td><td>De la <em>frecuencia</em> con que copias o replicas.</td><td>De la <em>velocidad</em> a la que restauras y vuelves a operar.</td></tr>
+      <tr><td>Qué diseño obliga</td><td>RPO de horas: copias frecuentes. RPO de minutos: replicación continua.</td><td>RTO de días: restaurar de copia. RTO de minutos: entorno secundario ya levantado.</td></tr>
+    </table>
+    <p>
+      La consecuencia que se pregunta: <strong>un RPO exigente y un RTO exigente no se resuelven con la misma
+      pieza</strong>. Se puede tener replicación continua —RPO bajo— y tardar un día en levantar, si nadie
+      preparó ni probó el procedimiento. Por eso el examen separa «copia» de «plan de recuperación probado».
+    </p>
 
     <h2 id="marcos">Los cinco marcos, sin confundirlos</h2>
     <p>

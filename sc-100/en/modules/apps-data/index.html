@@ -40,6 +40,7 @@
 
   <aside class="sidebar">
     <h4>How to read this domain</h4>
+    <a href="#base">What is taken for granted</a>
     <a href="#hilo">The data, not the container</a>
     <h4>4.1 Microsoft 365</h4>
     <a href="#m365-postura">Measuring M365 posture</a>
@@ -71,6 +72,74 @@
   </aside>
 
   <main class="content">
+
+    <h2 id="base">What this exam takes for granted</h2>
+    <p>
+      Four mechanisms this domain uses constantly without explaining them, and on which several answers depend
+      that otherwise look arbitrary.
+    </p>
+
+    <h3>Envelope encryption: why revoking a key makes data unreadable instantly</h3>
+    <p>
+      No service encrypts terabytes with your key directly. Each block of data is encrypted with a
+      <strong>data key</strong> generated on the fly, and <em>that</em> key is in turn encrypted with a
+      <strong>key encryption key</strong> and stored alongside the data. This is called envelope encryption.
+    </p>
+    <p>
+      The key you control — the <strong>customer-managed</strong> one, in Key Vault — is the outer one, the
+      wrapper. That is why withdrawing the service's access to it leaves the data unreadable
+      <strong>immediately and without rewriting anything</strong>: the data keys are still there, but nobody
+      can unwrap them. And it is why rotating that key is cheap, while rotating the inner one would mean
+      re-encrypting everything.
+    </p>
+
+    <h3>How a label's protection travels outside your tenant</h3>
+    <p>
+      A sensitivity label with encryption does not mark the file: it <strong>encrypts</strong> it and embeds a
+      <strong>usage policy</strong> inside — who may open it and what they may do: read, edit, print, forward —
+      along with a reference to the service holding the key.
+    </p>
+    <p>
+      When somebody opens it, the application contacts that service, authenticates, and only then receives the
+      key and the rights it is entitled to. Hence the two consequences the exam asks about: the protection
+      <strong>stays alive outside your organisation</strong>, because the check happens at open time and not at
+      send time; and it <strong>can be revoked afterwards</strong>, because the file is useless if the service
+      stops handing over the key.
+    </p>
+    <div class="callout exam">
+      <b>And hence the difference from DLP too</b>
+      DLP is evaluated <em>in the channel</em> — the mail server, the SharePoint site, the endpoint agent — at
+      the moment the data tries to leave. A label is evaluated <em>in the file</em> every time it is opened.
+      That is why one prevents the exit and the other survives the exit, and why so many requirements need
+      both.
+    </div>
+
+    <h3>What a SAS actually is, and why one of them cannot be revoked</h3>
+    <p>
+      A shared access signature is a string carrying the permissions, the resource, the validity window and a
+      <strong>signature</strong>. Storage consults no database: it recomputes the signature with the key and,
+      if it matches, lets the request through. There is no list of issued SAS anywhere.
+    </p>
+    <p>
+      That explains the whole problem. A SAS signed with the <strong>account key</strong> is only invalidated
+      by changing that key, which takes down everything else using it. A <strong>user delegation SAS</strong>
+      is signed with a temporary key Entra ID hands to a specific identity: revoking that delegation — or that
+      identity's permissions — kills every SAS hanging off it, without touching the account.
+    </p>
+
+    <h3>Workload identity federation: the token exchange</h3>
+    <p>
+      When an external system — a pipeline, somebody else's cluster — needs into Azure, the alternative to a
+      secret is this: you register in Entra ID that you trust a specific <strong>issuer</strong> and a specific
+      <strong>subject</strong> within it — this organisation, this repository, this branch. The external system
+      obtains a token signed by its own issuer, presents it to Entra ID, and Entra ID checks the signature and
+      the match and <strong>exchanges</strong> it for one of its own.
+    </p>
+    <p>
+      Nothing is stored anywhere: the trust is in the relationship, not in a value. That is why the exam
+      prefers it to any secret however well guarded, and why the detail of scoping the branch or the
+      environment matters: without it, any branch in the repository deploys to production.
+    </p>
 
     <h2 id="hilo">The data, not the container: the thread of this domain</h2>
     <p>

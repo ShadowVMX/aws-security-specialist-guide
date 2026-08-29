@@ -40,6 +40,7 @@
 
   <aside class="sidebar">
     <h4>How to read this domain</h4>
+    <a href="#base">What is taken for granted</a>
     <a href="#marcos">The four frameworks, kept apart</a>
     <h4>1.1 Resiliency</h4>
     <a href="#resiliencia">From business goal to priority</a>
@@ -64,6 +65,61 @@
   </aside>
 
   <main class="content">
+
+    <h2 id="base">What this exam takes for granted</h2>
+    <p>
+      This domain is about strategy, but it rests on three ideas that are rarely spelled out and that decide
+      whole questions.
+    </p>
+
+    <h3>Shared responsibility: who answers for what, by service model</h3>
+    <p>
+      What you have to protect changes with the service model, and that split sits underneath many answers:
+    </p>
+    <table role="table">
+      <tr><th>Responsibility</th><th>On-premises</th><th>IaaS</th><th>PaaS</th><th>SaaS</th></tr>
+      <tr><td>Data centre, physical network, hardware</td><td>Yours</td><td>Provider's</td><td>Provider's</td><td>Provider's</td></tr>
+      <tr><td>Operating system, patching, disk encryption</td><td>Yours</td><td><strong>Yours</strong></td><td>Provider's</td><td>Provider's</td></tr>
+      <tr><td>Network and application configuration</td><td>Yours</td><td>Yours</td><td><strong>Yours</strong></td><td>Shared</td></tr>
+      <tr><td>Identities, access and <strong>data</strong></td><td>Yours</td><td>Yours</td><td>Yours</td><td><strong>Yours</strong></td></tr>
+    </table>
+    <p>
+      The row that never changes is the last one: <strong>identity and data are always yours</strong>, in every
+      model. That is why the exam insists so heavily on classification, labels, conditional access and
+      permission governance, and why an option saying "the provider protects that" about data is almost always
+      the wrong one.
+    </p>
+
+    <h3>Defence in depth, and what survives of it under Zero Trust</h3>
+    <p>
+      The classic idea is to stack independent controls — perimeter, network, host, application, data — so that
+      one failing is not the system failing. Zero Trust <strong>does not replace it</strong>: what it denies is
+      one specific premise of that architecture, that being <em>inside</em> the perimeter is a sign of trust.
+      The layers remain; what disappears is the safe zone.
+    </p>
+    <p>
+      That is why a modern design keeps segmentation and encryption — layers — and adds verification on every
+      request. An option proposing to trust the internal network again is wrong; so is one proposing to remove
+      layers "because we have Zero Trust now".
+    </p>
+
+    <h3>RPO and RTO: what each measures and what design each forces</h3>
+    <p>
+      Two numbers the business sets, pointing at different mechanisms, and confusing them is the classic error
+      of this task.
+    </p>
+    <table role="table">
+      <tr><th></th><th>RPO — recovery point objective</th><th>RTO — recovery time objective</th></tr>
+      <tr><td>What it measures</td><td>How much <strong>data</strong> you accept losing, measured backwards in time.</td><td>How much <strong>time</strong> you accept being down.</td></tr>
+      <tr><td>What it depends on</td><td>The <em>frequency</em> of backup or replication.</td><td>The <em>speed</em> of restoring and returning to service.</td></tr>
+      <tr><td>What design it forces</td><td>RPO in hours: frequent backups. RPO in minutes: continuous replication.</td><td>RTO in days: restore from backup. RTO in minutes: a secondary environment already standing.</td></tr>
+    </table>
+    <p>
+      The consequence that gets asked: <strong>a demanding RPO and a demanding RTO are not solved by the same
+      piece</strong>. You can have continuous replication — a low RPO — and still take a day to come back up if
+      nobody prepared and tested the procedure. That is why the exam separates "backup" from "tested recovery
+      plan".
+    </p>
 
     <h2 id="marcos">The five frameworks, kept apart</h2>
     <p>

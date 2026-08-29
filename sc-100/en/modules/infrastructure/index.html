@@ -40,6 +40,7 @@
 
   <aside class="sidebar">
     <h4>How to read this domain</h4>
+    <a href="#base">What is taken for granted</a>
     <a href="#mapa">The product map</a>
     <h4>3.1 Posture</h4>
     <a href="#defender-cloud">Defender for Cloud and the MCSB</a>
@@ -75,6 +76,107 @@
   </aside>
 
   <main class="content">
+
+    <h2 id="base">What this exam takes for granted</h2>
+    <p>
+      This is the domain that assumes the most platform mechanics. Without them, half a dozen answers look
+      like memorisation when they actually derive from how Azure is built.
+    </p>
+
+    <h3>Private endpoint versus service endpoint, under the hood</h3>
+    <p>
+      A PaaS service — a storage account, a database — is born with a public name resolving to a public
+      address. The two options the exam sets against each other do different things with that:
+    </p>
+    <ul>
+      <li>A <strong>service endpoint</strong> does not change the destination: the resource keeps its public
+        address. What changes is the <em>source</em>: traffic leaves over the Azure backbone and arrives
+        identified as coming from your subnet, so the resource's firewall can allow "this virtual network".
+        There is still a public door, just with a guest list.</li>
+      <li>A <strong>private endpoint</strong> creates a <strong>real network interface inside your
+        subnet</strong>, with a private IP address of yours, and a <strong>private DNS zone</strong> that makes
+        the resource's public name resolve to that private IP. The resource becomes reachable by private
+        address, and with public access disabled it stops existing for the internet.</li>
+    </ul>
+    <div class="callout exam">
+      <b>That is why the answer changes with the requirement</b>
+      "Traffic must not go out to the internet" is met by both. "The resource must only be reachable from the
+      virtual network" is met only by the private endpoint, because it is the only one that removes the public
+      door. And there is a detail the exam exploits: with a private endpoint you must sort out <b>DNS</b>,
+      because if the client keeps resolving to the public IP the private link is never used.
+    </div>
+
+    <h3>Why posture is agentless and workload protection is not</h3>
+    <p>
+      Every Azure resource sits behind a common control plane, <strong>Azure Resource Manager</strong>, which
+      knows how each one is configured. <strong>Posture</strong> simply reads that over the API: that is why
+      CSPM installs nothing, why it works the same over AWS and GCP by assuming a role in the account, and why
+      its answer is always about <em>configuration</em>.
+    </p>
+    <p>
+      <strong>Workload protection</strong> needs to see what <em>happens inside</em>: processes on a server,
+      queries against a database, content being uploaded. None of that is in the control plane, so a sensor is
+      required — Defender for Endpoint on the server, scanning at upload time, the cluster node sensor. Hence
+      the line separating the two products, and hence "without agents" being a constraint that always pushes
+      towards posture.
+    </p>
+
+    <h3>What Azure Arc actually does</h3>
+    <p>
+      Arc installs an agent on the machine that <strong>registers it as an Azure Resource Manager
+      resource</strong>, with its own identifier, resource group and managed identity. From that moment the
+      machine is, as far as Azure is concerned, just another resource: RBAC, tags, policies and management
+      groups apply to it. What gets added on top — Defender for Endpoint, the Azure Monitor agent, Machine
+      Configuration — are <strong>extensions</strong> Azure deploys through that agent.
+    </p>
+    <p>
+      This explains two exam answers at once: why Arc <em>enables</em> Azure Policy over outside servers —
+      Policy acts on ARM resources, and Arc turns them into one — and why Arc does <em>not</em> take logs to
+      the SIEM: that is a different extension, with its own data collection rule.
+    </p>
+
+    <h3>Network security groups, and why application ones are preferred</h3>
+    <p>
+      A network security group is a list of rules with a <strong>numeric priority</strong>: they are evaluated
+      lowest to highest and <strong>the first match decides</strong>, unlike conditional access. They carry
+      default rules allowing traffic within the virtual network and blocking inbound from the internet, and
+      those defaults sit at the highest priority numbers, so any rule of yours beats them.
+    </p>
+    <p>
+      An <strong>application security group</strong> is not a rule: it is a <em>label</em> applied to network
+      interfaces. Rules are then written between groups — "from <em>web</em> to <em>database</em>, port 1433" —
+      instead of between addresses. A new machine inherits its policy just by joining the group, and that is
+      the reason they are preferred: the rule stops going stale every time the topology changes.
+    </p>
+
+    <h3>Azure Policy inheritance, which is where "management group" comes from</h3>
+    <p>
+      Policy assignments are inherited downwards through the hierarchy — management group, subscription,
+      resource group, resource — and cannot be overridden from below. The effects matter in this order:
+      <code>Disabled</code> turns the rule off; <code>Deny</code> prevents creating or modifying the resource;
+      <code>Audit</code> only flags; and <code>DeployIfNotExists</code> and <code>Modify</code> remediate after
+      deployment, for which the assignment <strong>needs a managed identity</strong> with permissions — a
+      detail the exam uses as a distractor.
+    </p>
+    <p>
+      Since inheritance flows downwards and new subscriptions are born inside the hierarchy, an assignment at
+      the management group reaches what does not exist yet. That is the whole landing zone argument.
+    </p>
+
+    <h3>Who is in charge of a cluster: two different RBACs</h3>
+    <p>
+      Two permission systems coexist in AKS and confusing them is a classic. <strong>Azure RBAC</strong>
+      governs the cluster <em>resource</em> in Azure: who can read its configuration, scale it or download
+      credentials. <strong>Kubernetes RBAC</strong> governs what is <em>inside</em>: who can list pods or read
+      secrets in a namespace.
+    </p>
+    <p>
+      Entra ID integration joins the two worlds: the API server accepts an Entra ID token instead of a
+      certificate from the <em>kubeconfig</em> file, so MFA, conditional access and PIM apply to the person;
+      and <em>Azure RBAC for Kubernetes</em> additionally lets you assign the inside roles from Azure. Without
+      that, a <em>kubeconfig</em> is a credential outside the directory: it is not revoked, it does not expire
+      and it leaves no trace of who is who.
+    </p>
 
     <h2 id="mapa">The product map, which is what actually gets asked</h2>
     <p>

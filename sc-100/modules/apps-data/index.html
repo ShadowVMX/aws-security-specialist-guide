@@ -40,6 +40,7 @@
 
   <aside class="sidebar">
     <h4>Cómo leer este dominio</h4>
+    <a href="#base">Lo que se da por sabido</a>
     <a href="#hilo">El dato, no el contenedor</a>
     <h4>4.1 Microsoft 365</h4>
     <a href="#m365-postura">Medir la postura de M365</a>
@@ -71,6 +72,76 @@
   </aside>
 
   <main class="content">
+
+    <h2 id="base">Lo que este examen da por sabido</h2>
+    <p>
+      Cuatro mecanismos que este dominio usa constantemente sin explicarlos, y de los que dependen varias
+      respuestas que si no parecen arbitrarias.
+    </p>
+
+    <h3>Cifrado en sobre: por qué revocar una clave hace el dato ilegible al instante</h3>
+    <p>
+      Ningún servicio cifra terabytes con tu clave directamente. Cada bloque de datos se cifra con una
+      <strong>clave de datos</strong> generada al vuelo, y <em>esa</em> clave se cifra a su vez con una
+      <strong>clave de cifrado de claves</strong> y se guarda junto al dato. Es lo que se llama cifrado en
+      sobre.
+    </p>
+    <p>
+      La clave que tú controlas —la <strong>gestionada por el cliente</strong>, en Key Vault— es la de
+      arriba, la que envuelve. Por eso retirarle el acceso al servicio deja el dato ilegible
+      <strong>de inmediato y sin reescribir nada</strong>: las claves de datos siguen ahí, pero nadie puede
+      desenvolverlas. Y por eso rotar esa clave es barato, mientras que rotar la de abajo obligaría a
+      recifrarlo todo.
+    </p>
+
+    <h3>Cómo viaja la protección de una etiqueta fuera de tu tenant</h3>
+    <p>
+      Una etiqueta de confidencialidad con cifrado no marca el fichero: lo <strong>cifra</strong> e incrusta
+      dentro una <strong>política de uso</strong> —quién puede abrirlo y qué puede hacer: leer, editar,
+      imprimir, reenviar— junto con la referencia al servicio que guarda la clave.
+    </p>
+    <p>
+      Cuando alguien lo abre, la aplicación contacta con ese servicio, se autentica y solo entonces recibe la
+      clave y los derechos que le corresponden. De ahí las dos consecuencias que el examen pregunta: la
+      protección <strong>sigue viva fuera de tu organización</strong>, porque la comprobación es en el momento
+      de abrir y no en el de enviar; y <strong>se puede revocar después</strong>, porque el fichero no sirve
+      si el servicio deja de entregar la clave.
+    </p>
+    <div class="callout exam">
+      <b>Y de ahí también la diferencia con DLP</b>
+      La DLP se evalúa <em>en el canal</em> —el servidor de correo, el sitio de SharePoint, el agente del
+      endpoint— en el momento en que el dato intenta salir. La etiqueta se evalúa <em>en el fichero</em> cada
+      vez que se abre. Por eso una impide la salida y la otra sobrevive a la salida, y por eso tantos
+      requisitos necesitan las dos.
+    </div>
+
+    <h3>Qué es exactamente una SAS, y por qué una no se puede revocar</h3>
+    <p>
+      Una firma de acceso compartido es una cadena de texto que lleva los permisos, el recurso, la ventana de
+      validez y una <strong>firma</strong>. El almacenamiento no consulta ninguna base de datos: recalcula la
+      firma con la clave y, si cuadra, deja pasar. No hay lista de SAS emitidas en ninguna parte.
+    </p>
+    <p>
+      Eso explica el problema entero. Una SAS firmada con la <strong>clave de la cuenta</strong> solo se
+      invalida cambiando esa clave, lo que tumba a todo lo demás que la use. Una <strong>SAS de delegación de
+      usuario</strong> se firma con una clave temporal que Entra ID entrega a una identidad concreta: revocando
+      esa delegación —o los permisos de esa identidad— caen todas las SAS que colgaban de ella, sin tocar la
+      cuenta.
+    </p>
+
+    <h3>Federación de identidad de carga de trabajo: el intercambio de token</h3>
+    <p>
+      Cuando un sistema externo —un pipeline, un clúster ajeno— necesita entrar en Azure, la alternativa al
+      secreto es esta: registras en Entra ID que confías en un <strong>emisor</strong> concreto y en un
+      <strong>sujeto</strong> concreto dentro de él —esta organización, este repositorio, esta rama—. El
+      sistema externo obtiene un token firmado por su propio emisor, se lo presenta a Entra ID, y Entra ID
+      comprueba la firma y la correspondencia y lo <strong>cambia</strong> por un token suyo.
+    </p>
+    <p>
+      No hay nada guardado en ningún sitio: la confianza está en la relación, no en un valor. Por eso el examen
+      lo prefiere a cualquier secreto por bien custodiado que esté, y por eso el detalle de acotar la rama o el
+      entorno importa: sin eso, cualquier rama del repositorio despliega en producción.
+    </p>
 
     <h2 id="hilo">El dato, no el contenedor: el hilo del dominio</h2>
     <p>

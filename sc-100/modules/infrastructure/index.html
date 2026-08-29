@@ -40,6 +40,7 @@
 
   <aside class="sidebar">
     <h4>Cómo leer este dominio</h4>
+    <a href="#base">Lo que se da por sabido</a>
     <a href="#mapa">El mapa de productos</a>
     <h4>3.1 Postura</h4>
     <a href="#defender-cloud">Defender for Cloud y el MCSB</a>
@@ -75,6 +76,108 @@
   </aside>
 
   <main class="content">
+
+    <h2 id="base">Lo que este examen da por sabido</h2>
+    <p>
+      Este dominio es el que más mecánica de plataforma asume. Sin ella, media docena de respuestas parecen
+      cuestión de memoria cuando en realidad se deducen de cómo está construido Azure.
+    </p>
+
+    <h3>Endpoint privado frente a endpoint de servicio, por dentro</h3>
+    <p>
+      Un servicio PaaS —una cuenta de almacenamiento, una base de datos— nace con un nombre público que
+      resuelve a una dirección pública. Las dos opciones que el examen enfrenta hacen cosas distintas con eso:
+    </p>
+    <ul>
+      <li>El <strong>endpoint de servicio</strong> no cambia el destino: el recurso conserva su dirección
+        pública. Lo que cambia es el <em>origen</em>: el tráfico sale por la red troncal de Azure y llega
+        identificado como procedente de tu subred, de modo que el cortafuegos del recurso puede permitir
+        «esta red virtual». Sigue habiendo una puerta pública, solo que con una lista de invitados.</li>
+      <li>El <strong>endpoint privado</strong> crea una <strong>interfaz de red real dentro de tu subred</strong>,
+        con una dirección IP privada tuya, y una <strong>zona DNS privada</strong> que hace que el nombre
+        público del recurso resuelva a esa IP privada. El recurso pasa a ser alcanzable por dirección privada,
+        y con el acceso público deshabilitado deja de existir para internet.</li>
+    </ul>
+    <div class="callout exam">
+      <b>Por eso la respuesta cambia con el requisito</b>
+      «Que el tráfico no salga a internet» lo cumplen los dos. «Que el recurso solo sea accesible desde la red
+      virtual» solo lo cumple el endpoint privado, porque es el único que le quita la puerta pública. Y hay un
+      detalle que el examen aprovecha: al usar endpoint privado hay que resolver el <b>DNS</b>, porque si el
+      cliente sigue resolviendo a la IP pública el enlace privado no se usa.
+    </div>
+
+    <h3>Por qué la postura es sin agente y la protección de cargas no</h3>
+    <p>
+      Todo recurso de Azure vive detrás de un plano de control común, <strong>Azure Resource Manager</strong>,
+      que sabe cómo está configurado cada uno. La <strong>postura</strong> se limita a leer eso por API: por
+      eso el CSPM no necesita instalar nada, por eso funciona igual sobre AWS y GCP asumiendo un rol en la
+      cuenta, y por eso su respuesta es siempre sobre <em>configuración</em>.
+    </p>
+    <p>
+      La <strong>protección de cargas</strong> necesita ver lo que <em>ocurre dentro</em>: procesos en un
+      servidor, consultas contra una base de datos, contenido que se sube. Eso no está en el plano de control,
+      así que hace falta un sensor —Defender for Endpoint en el servidor, el análisis en el momento de la
+      subida, el sensor del nodo del clúster—. De ahí la línea que separa los dos productos y de ahí que
+      «sin agentes» sea una restricción que empuja siempre hacia postura.
+    </p>
+
+    <h3>Qué hace Azure Arc en realidad</h3>
+    <p>
+      Arc instala un agente en la máquina que la <strong>registra como recurso de Azure Resource Manager</strong>,
+      con su identificador, su grupo de recursos y su identidad administrada. A partir de ese momento la máquina
+      es, a ojos de Azure, un recurso más: le aplican RBAC, etiquetas, políticas y grupos de administración. Lo
+      que se le añade encima —Defender for Endpoint, el agente de Azure Monitor, Machine Configuration— son
+      <strong>extensiones</strong> que Azure despliega a través de ese agente.
+    </p>
+    <p>
+      Esto explica de golpe dos respuestas del examen: por qué Arc <em>habilita</em> Azure Policy sobre
+      servidores de fuera —Policy actúa sobre recursos ARM, y Arc los convierte en uno—, y por qué Arc
+      <em>no</em> lleva los logs al SIEM —eso es otra extensión, con su regla de recopilación—.
+    </p>
+
+    <h3>Los grupos de seguridad de red, y por qué se prefieren los de aplicación</h3>
+    <p>
+      Un grupo de seguridad de red es una lista de reglas con <strong>prioridad numérica</strong>: se evalúan
+      de menor a mayor y <strong>la primera que coincide decide</strong>, a diferencia del acceso condicional.
+      Llevan reglas por defecto que permiten el tráfico dentro de la red virtual y bloquean lo entrante de
+      internet, y esas reglas por defecto tienen la prioridad más alta, así que cualquier regla tuya las gana.
+    </p>
+    <p>
+      Un <strong>grupo de seguridad de aplicación</strong> no es una regla: es una <em>etiqueta</em> que se
+      pone a las interfaces de red. Luego las reglas se escriben entre grupos —«de <em>web</em> a
+      <em>base-de-datos</em>, puerto 1433»— en vez de entre direcciones. Una máquina nueva hereda su política
+      con solo entrar en el grupo, y ese es el motivo por el que se prefieren: la regla deja de caducar cada
+      vez que cambia la topología.
+    </p>
+
+    <h3>Herencia de Azure Policy, que es de donde sale «grupo de administración»</h3>
+    <p>
+      Las asignaciones de política se heredan hacia abajo por la jerarquía —grupo de administración,
+      suscripción, grupo de recursos, recurso— y no se pueden anular desde abajo. Los efectos importan en este
+      orden: <code>Disabled</code> apaga la regla; <code>Deny</code> impide crear o modificar el recurso;
+      <code>Audit</code> solo marca; y <code>DeployIfNotExists</code> y <code>Modify</code> corrigen después
+      del despliegue, para lo cual la asignación <strong>necesita una identidad administrada</strong> con
+      permisos, que es un detalle que el examen usa como distractor.
+    </p>
+    <p>
+      Como la herencia baja y las suscripciones nuevas nacen dentro de la jerarquía, una asignación en el grupo
+      de administración alcanza a lo que aún no existe. Ese es todo el argumento de la landing zone.
+    </p>
+
+    <h3>Quién manda en un clúster: dos RBAC distintos</h3>
+    <p>
+      En AKS conviven dos sistemas de permisos y confundirlos es un clásico. <strong>Azure RBAC</strong>
+      gobierna el <em>recurso</em> clúster en Azure: quién puede leer su configuración, escalarlo o descargar
+      credenciales. <strong>Kubernetes RBAC</strong> gobierna lo de <em>dentro</em>: quién puede listar pods o
+      leer secretos en un espacio de nombres.
+    </p>
+    <p>
+      La integración con Entra ID une los dos mundos: el servidor de API acepta un token de Entra ID en vez de
+      un certificado del fichero <em>kubeconfig</em>, con lo que a la persona le aplican MFA, acceso
+      condicional y PIM; y <em>Azure RBAC para Kubernetes</em> permite además asignar los roles de dentro desde
+      Azure. Sin eso, un <em>kubeconfig</em> es una credencial fuera del directorio: no se revoca, no caduca y
+      no deja rastro de quién es quién.
+    </p>
 
     <h2 id="mapa">El mapa de productos, que es lo que de verdad se pregunta</h2>
     <p>
