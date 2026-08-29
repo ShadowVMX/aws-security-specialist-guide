@@ -36,13 +36,13 @@ const DOMAINS = [
         skills: [
           {
             id: "1.1.1",
-            match: /resiliencia|resilienc|activos? crític|business-critical|priorizar amenaza/i,
+            match: /resiliencia|resilienc|activos? crític|business-critical|priorizar amenaza|procesos? crítico|critical business process|\bRPO\b|\bRTO\b|estrategia de seguridad|security strategy/i,
             text: "Design a security strategy to support business resiliency goals, including identifying and prioritizing threats to business-critical assets",
             textEs: "Diseñar una estrategia de seguridad que sostenga los objetivos de resiliencia del negocio, identificando y priorizando amenazas a los activos críticos",
           },
           {
             id: "1.1.2",
-            match: /\bbcdr\b|continuidad de negocio|business continuity|disaster recovery|copia de seguridad|backup/i,
+            match: /\bbcdr\b|continuidad de negocio|business continuity|disaster recovery|copias? de seguridad|backup|restaur|restore|inmutab|immutab|site recovery/i,
             text: "Design solutions for business continuity and disaster recovery (BCDR), including secure backup and restore for hybrid and multicloud environments",
             textEs: "Diseñar continuidad de negocio y recuperación ante desastres (BCDR), con copia y restauración seguras en entornos híbridos y multinube",
           },
@@ -102,7 +102,7 @@ const DOMAINS = [
         skills: [
           {
             id: "1.3.1",
-            match: /adopción segura de ia|secure ai adoption|estrategia de ia/i,
+            match: /adopción (segura )?de ia|secure ai adoption|estrategia de ia|ai adoption|copilot.{0,40}(plantilla|organización|workforce|organisation)|ia no aprobada|unapproved ai|shadow it/i,
             text: "Design a strategy for secure AI adoption",
             textEs: "Diseñar una estrategia de adopción segura de IA",
           },
@@ -576,7 +576,7 @@ const DOMAINS = [
           },
           {
             id: "4.2.2",
-            match: /modelado de amenazas|threat model/i,
+            match: /modelado de amenazas|threat model|\bSTRIDE\b|elevación de privilegio|elevation of privilege/i,
             text: "Evaluate threats to business-critical applications by using threat modeling",
             textEs: "Evaluar amenazas a aplicaciones críticas mediante modelado de amenazas",
           },
@@ -588,13 +588,13 @@ const DOMAINS = [
           },
           {
             id: "4.2.4",
-            match: /proceso de desarrollo|development process|\bsdl\b|devsecops/i,
+            match: /proceso de desarrollo|development process|\bsdl\b|devsecops|ramas? protegidas?|protected branch|federación de identidad de carga de trabajo|workload identity federation|pipeline/i,
             text: "Design and implement standards and practices for securing the application development process",
             textEs: "Diseñar estándares y prácticas que aseguren el proceso de desarrollo",
           },
           {
             id: "4.2.5",
-            match: /requisitos de seguridad de la aplicaci|application security requirement/i,
+            match: /requisitos? de seguridad de la aplicaci|application security requirement|external id|identidades? de cliente|customer identit|integración con la red virtual|virtual network integration/i,
             text: "Map technologies to application security requirements",
             textEs: "Asociar tecnologías concretas a los requisitos de seguridad de la aplicación",
           },
@@ -645,7 +645,7 @@ const DOMAINS = [
           },
           {
             id: "4.3.4",
-            match: /cargas de ia|ai workload|dato.{0,20}\bia\b/i,
+            match: /cargas? de ia|ai workload|dato.{0,20}\bia\b|corpus|asistente|assistant|\bprompt\b|ia generativa|generative ai/i,
             text: "Design security for data used in AI workloads",
             textEs: "Diseñar la seguridad del dato que consumen las cargas de IA",
           },

@@ -435,6 +435,12 @@
         endpoint keeps traffic on the Azure backbone but does not give the service a private IP.</li>
       <li><strong>Edge</strong> — WAF and DDoS in front of anything published.</li>
       <li><strong>No direct hop</strong> — no public IP and no published RDP: Bastion and just-in-time.</li>
+      <li><strong>Monitoring</strong> — the fourth technique alongside segmenting, filtering and posture,
+        and the one most often forgotten: <strong>virtual network flow logs</strong> to know who talks to
+        whom, <strong>Network Watcher</strong> with its <em>IP flow verify</em> and <em>next hop</em>
+        diagnostics to understand why a rule blocks, and <strong>connection monitor</strong> to watch
+        continuously that a critical path stays open. Without these, a network design can be neither
+        debugged nor audited.</li>
     </ul>
 
     <h2 id="internet-access">Entra Internet Access as a secure web gateway (3.4.2)</h2>

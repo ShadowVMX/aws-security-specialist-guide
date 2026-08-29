@@ -139,7 +139,9 @@ const examSrc = cert.examEngine
 const TOTAL = cert.examTotal || 0;
 if (cert.examEngine) DOMAINS.forEach((d) => {
   const m = examSrc.match(
-    new RegExp(`id:\\s*"${d.module}",\\s*weight:\\s*(\\d+),\\s*count:\\s*(\\d+)`)
+    // Microsoft publishes weights as ranges, so a guide's midpoint can carry a
+    // decimal (22.5). Matching only integers would silently skip the check.
+    new RegExp(`id:\\s*"${d.module}",\\s*weight:\\s*([\\d.]+),\\s*count:\\s*(\\d+)`)
   );
   if (!m) {
     errors.push(`el simulacro no reparte preguntas de ${d.module}`);

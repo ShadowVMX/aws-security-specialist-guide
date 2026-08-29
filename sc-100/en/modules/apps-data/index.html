@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="SC-100 domain 4: securing Microsoft 365 and Copilot, application and API security, and data protection and governance. Decision criteria, exam traps and scenario questions.">
+<link rel="icon" href="../../../../assets/img/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Applications &amp; Data — Microsoft Cybersecurity Architect (SC-100)">
+<meta property="og:description" content="SC-100 domain 4: securing Microsoft 365 and Copilot, application and API security, and data protection and governance.">
+<meta property="og:url" content="https://shadowvmx.github.io/sc-100/en/modules/apps-data/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+<title>Applications &amp; Data — Microsoft Cybersecurity Architect (SC-100)</title>
+<link rel="stylesheet" href="../../../../assets/css/style.css?v=9">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="dot">●</span> Microsoft SC-100</div>
+    <nav class="topnav">
+      <a href="../../index.html">← Domains</a>
+      <span class="lang-switch"><a href="../../../modules/apps-data/index.html">ES</a><span class="current">EN</span></span>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero" style="padding-top:40px;">
+    <span class="badge">SC-100 · Domain 4 · 20-25% of the exam</span>
+    <h1>Security solutions for applications and data</h1>
+    <p>The domain that closes the exam and the one most often underestimated. Three tasks with one thread running through them: <strong>data is not protected where it sits, but where it is used</strong>. In Microsoft 365 and Copilot, in your applications' code, and in the databases underneath them. This is where the exam puts its newest content: the Copilot controls and the security of the data AI consumes.</p>
+    <p class="module-reviewed">Written against the official skills outline, with the skills measured as of 28 July 2026.</p>
+  </section>
+</div>
+
+<div class="wrap module-layout">
+
+  <aside class="sidebar">
+    <h4>How to read this domain</h4>
+    <a href="#hilo">The data, not the container</a>
+    <h4>4.1 Microsoft 365</h4>
+    <a href="#m365-postura">Measuring M365 posture</a>
+    <a href="#office-cloudapps">Defender for Office 365 and Cloud Apps</a>
+    <a href="#intune">Intune in the design</a>
+    <a href="#purview-m365">Purview over Microsoft 365</a>
+    <a href="#copilot">Copilot for Microsoft 365</a>
+    <h4>4.2 Applications</h4>
+    <a href="#portafolio">Evaluating a portfolio</a>
+    <a href="#modelado">Threat modelling</a>
+    <a href="#ciclo-vida">The whole lifecycle</a>
+    <a href="#devsecops">Securing the development process</a>
+    <a href="#tecnologias">From requirement to technology</a>
+    <a href="#workload-id">Workload identities</a>
+    <a href="#apis">API management and security</a>
+    <a href="#waf">Azure Web Application Firewall</a>
+    <h4>4.3 Data</h4>
+    <a href="#descubrir">Discover and classify</a>
+    <a href="#priorizar">Prioritising threats to data</a>
+    <a href="#cifrado">Encryption and key custody</a>
+    <a href="#dato-ia">The data AI consumes</a>
+    <a href="#bases-datos">Azure SQL, Synapse and Cosmos DB</a>
+    <a href="#storage">Azure Storage</a>
+    <a href="#defender-datos">Defender for Storage and Databases</a>
+    <a href="#trampas">Common traps</a>
+    <a href="#temario">Official syllabus</a>
+    <h4>Practice</h4>
+    <a href="#quiz">Quiz (40 questions)</a>
+  </aside>
+
+  <main class="content">
+
+    <h2 id="hilo">The data, not the container: the thread of this domain</h2>
+    <p>
+      The earlier domains protected <em>places</em>: the machine, the network, the cluster. This one protects
+      <strong>data moving between places</strong>, which is why its answers are almost never an
+      infrastructure control. A stem describing an email leaving with a payroll spreadsheet is not solved
+      with a firewall, and one describing Copilot showing a document the user should not see is not solved
+      with conditional access.
+    </p>
+    <table role="table">
+      <tr><th>What the stem says</th><th>Where the answer lives</th></tr>
+      <tr><td>"we don't know where the regulated data is"</td><td>Purview discovery and <strong>classification</strong></td></tr>
+      <tr><td>"the data must not leave by email, endpoint or SaaS"</td><td><strong>Data loss prevention</strong></td></tr>
+      <tr><td>"the protection has to travel with the file"</td><td><strong>Sensitivity labels</strong> with encryption</td></tr>
+      <tr><td>"Copilot shows things it shouldn't"</td><td>Source permissions and labels, not a Copilot policy</td></tr>
+      <tr><td>"we must prove who accessed the data"</td><td><strong>Purview Audit</strong></td></tr>
+      <tr><td>"the application stores a credential"</td><td><strong>Workload identity</strong></td></tr>
+    </table>
+    <div class="callout exam">
+      <b>The reflex for this domain</b>
+      Always ask <em>which verb</em> the stem is asking for: <strong>discover</strong>, <strong>label</strong>,
+      <strong>stop it leaving</strong>, <strong>retain</strong>, <strong>prove</strong> or
+      <strong>encrypt</strong>. Each verb has its capability, and the two-answer questions usually combine
+      exactly two of them.
+    </div>
+
+    <h2 id="m365-postura">Measuring the posture of the productivity workloads (4.1.1)</h2>
+    <p>
+      The metric is <strong>Microsoft Secure Score</strong> in the Defender portal, and here it is the right
+      one: it measures tenant configuration — Exchange, SharePoint, Teams, Entra ID, managed devices — with
+      improvement actions prioritised by impact and effort. Watch for the confusion that already came up in
+      domain 3: it is <em>not</em> the Defender for Cloud secure score, which measures cloud resources, and
+      it is <em>not</em> a compliance report.
+    </p>
+    <div class="callout warn">
+      <b>What the exam wants you to say about Secure Score</b>
+      That it is for <strong>prioritising and tracking progress</strong>, and that comparison with similar
+      organisations is context, not a goal. Chasing 100% is the wrong answer: some actions do not apply to
+      your environment and are documented as such.
+    </div>
+
+    <h2 id="office-cloudapps">Defender for Office 365 and Defender for Cloud Apps (4.1.2)</h2>
+    <table role="table">
+      <tr><th></th><th>Defender for Office 365</th><th>Defender for Cloud Apps</th></tr>
+      <tr><td>What it protects</td><td><strong>Email and collaboration</strong>: Exchange, SharePoint, OneDrive, Teams.</td><td><strong>SaaS applications</strong>, your own and third-party.</td></tr>
+      <tr><td>Against what</td><td>Phishing, impersonation, malicious attachments and links, mailbox account compromise.</td><td>Shadow IT, risky sessions, exfiltration from an application, application posture.</td></tr>
+      <tr><td>Pieces they ask about</td><td><strong>Safe Links</strong> and <strong>Safe Attachments</strong>, anti-impersonation policies, attack simulation training.</td><td><strong>Conditional access app control</strong> with session policies, app discovery, SaaS security posture management.</td></tr>
+    </table>
+    <div class="callout exam">
+      <b>The session scenario</b>
+      "The user can reach the application from an unmanaged machine, but cannot download": that is a
+      <strong>session policy</strong> in Defender for Cloud Apps through conditional access app control.
+      Blocking access entirely is the answer that did not read the constraint.
+    </div>
+
+    <h2 id="intune">Intune inside the design (4.1.3)</h2>
+    <p>
+      Intune already appeared in domain 3 as endpoint management; here it comes in as the <strong>provider of
+      the signal</strong> the Microsoft 365 data access decisions depend on. What gets specified:
+      <strong>configuration</strong> policies, <strong>compliance</strong> policies, and <strong>app
+      protection</strong> policies for what is unmanaged. And the piece that ties it together:
+      <strong>app context</strong> — conditional access requires a compliant device, and only then does the
+      application hand over the data.
+    </p>
+
+    <h2 id="purview-m365">Microsoft Purview over Microsoft 365 (4.1.4)</h2>
+    <table role="table">
+      <tr><th>Capability</th><th>The verb it answers</th></tr>
+      <tr><td><strong>Classifiers and sensitive information types</strong></td><td>Discover where the regulated data lives.</td></tr>
+      <tr><td><strong>Sensitivity labels</strong></td><td>Label and, if needed, <em>encrypt</em>: the protection travels with the file outside the tenant.</td></tr>
+      <tr><td><strong>Data loss prevention</strong></td><td>Stop it leaving by email, Teams, endpoint or SaaS.</td></tr>
+      <tr><td><strong>Data lifecycle management and retention</strong></td><td>Keep what the regulation requires kept and delete what it requires deleted.</td></tr>
+      <tr><td><strong>Insider risk management</strong></td><td>Detect the behaviour of the employee leaving with the data.</td></tr>
+      <tr><td><strong>Information barriers</strong></td><td>Separate communication between groups that must not talk.</td></tr>
+      <tr><td><strong>Purview Audit</strong></td><td>Prove who did what.</td></tr>
+    </table>
+    <div class="callout warn">
+      <b>Label or DLP</b>
+      They get confused because they sound alike. The <strong>label</strong> travels with the file and keeps
+      protecting it once it has left; <strong>DLP</strong> watches the channel and stops it leaving. A
+      requirement that "whoever receives it by mistake cannot open it" is a label with encryption; one that
+      "it cannot be sent outside" is DLP. Many scenarios need both.
+    </div>
+
+    <h2 id="copilot">Security and compliance controls in Copilot for Microsoft 365 (4.1.5)</h2>
+    <p>
+      New syllabus content and highly askable, because the misconception is nearly universal. Copilot
+      <strong>creates no new permissions</strong>: it answers with what the user could already open. If it
+      shows something it should not, the problem is not Copilot — it is that this user <em>already</em> had
+      access and nobody had noticed.
+    </p>
+    <table role="table">
+      <tr><th>Concern</th><th>Control</th></tr>
+      <tr><td>"Copilot summarises documents the user shouldn't see"</td><td>Fix the <strong>oversharing</strong> in SharePoint and OneDrive: site access reviews, scoped "anyone" links, SharePoint Advanced Management.</td></tr>
+      <tr><td>"I never want certain content to enter a response"</td><td><strong>Sensitivity labels</strong>: Copilot honours the label and its usage rights, and the content it generates inherits the label.</td></tr>
+      <tr><td>"We must be able to audit what was asked and answered"</td><td>The interaction lands in <strong>Purview Audit</strong>, and can be put under retention and eDiscovery.</td></tr>
+      <tr><td>"The data must not go off to train a model"</td><td>It is the service's commitment: tenant data does not train the base models. Worth being able to say, because stems sometimes raise it as a risk.</td></tr>
+      <tr><td>"Risk of someone exfiltrating with Copilot's help"</td><td><strong>Insider risk management</strong> and DLP, as with any other channel.</td></tr>
+    </table>
+    <div class="callout exam">
+      <b>The answer the exam expects</b>
+      "Before deploying Copilot, fix the permissions." The prerequisite work is <strong>data
+      governance</strong> — classify, label and reduce oversharing — not configuring the assistant. An option
+      proposing "a policy stopping Copilot reading X" is usually the distractor: the control lives at the
+      source, not in the assistant.
+    </div>
+
+    <h2 id="portafolio">Evaluating the posture of an application portfolio (4.2.1)</h2>
+    <p>
+      You do not audit application by application: you <strong>inventory and classify</strong>. Which
+      applications exist, who maintains them, what data they touch, whether they are business critical — and
+      from that comes where to invest. Pieces the platform gives you: <strong>Defender for Cloud Apps</strong>
+      discovery for what is used without permission, the <strong>Entra ID</strong> application inventory for
+      what is registered, and <strong>Defender for APIs</strong> for what is published.
+    </p>
+
+    <h2 id="modelado">Threat modelling business-critical applications (4.2.2)</h2>
+    <p>
+      The exam expects you to know that modelling is a <strong>design activity</strong>, not a test: it is
+      done on the diagram, before code is written, and it produces security requirements. The framework
+      Microsoft uses is <strong>STRIDE</strong>:
+    </p>
+    <table role="table">
+      <tr><th>Threat</th><th>What breaks</th><th>Typical mitigation</th></tr>
+      <tr><td><strong>S</strong>poofing</td><td>Authentication</td><td>Entra ID, MFA, managed identities</td></tr>
+      <tr><td><strong>T</strong>ampering</td><td>Integrity</td><td>Signing, TLS, scoped write permissions</td></tr>
+      <tr><td><strong>R</strong>epudiation</td><td>Non-repudiation</td><td>Immutable audit logging</td></tr>
+      <tr><td><strong>I</strong>nformation disclosure</td><td>Confidentiality</td><td>Encryption, classification, least privilege</td></tr>
+      <tr><td><strong>D</strong>enial of service</td><td>Availability</td><td>Rate limiting, DDoS Protection, scaling</td></tr>
+      <tr><td><strong>E</strong>levation of privilege</td><td>Authorization</td><td>RBAC, input validation, isolation</td></tr>
+    </table>
+
+    <h2 id="ciclo-vida">A strategy for the whole lifecycle (4.2.3)</h2>
+    <p>
+      The idea being tested: the control belongs in the <em>earliest</em> phase where it can act, because the
+      later a problem is found the more it costs to fix.
+    </p>
+    <table role="table">
+      <tr><th>Phase</th><th>Control</th></tr>
+      <tr><td>Design</td><td>Threat modelling and written security requirements.</td></tr>
+      <tr><td>Code</td><td>Static and secret scanning <em>in the IDE and in the pull request</em>.</td></tr>
+      <tr><td>Dependencies</td><td>Composition analysis and automated updates of vulnerable ones.</td></tr>
+      <tr><td>Build</td><td>Signed artefacts, verifiable provenance, private registry.</td></tr>
+      <tr><td>Deploy</td><td>Scanned infrastructure as code, policy rejecting what is non-compliant.</td></tr>
+      <tr><td>Runtime</td><td>WAF, Defender for App Service and for APIs, vulnerability management.</td></tr>
+    </table>
+
+    <h2 id="devsecops">Standards and practices for the development process (4.2.4)</h2>
+    <p>
+      Here what is protected is not the application but <strong>the chain that builds it</strong>, which is a
+      target in its own right. What gets specified: identity and least privilege for the pipeline, with
+      <strong>federated workload identity</strong> instead of credentials stored in the CI system; protected
+      branches with mandatory review; environments with approval for production; secrets kept out of the
+      repository and detected if they appear; and ephemeral build agents.
+    </p>
+    <div class="callout warn">
+      <b>The pipeline's credential</b>
+      An application secret held in the CI system to deploy into Azure is the pattern the exam wants
+      replaced: <strong>workload identity federation</strong>, where the pipeline presents a token from its
+      own provider and Azure exchanges it for access, with no secret to rotate or steal.
+    </div>
+
+    <h2 id="tecnologias">From security requirement to technology (4.2.5)</h2>
+    <table role="table">
+      <tr><th>Requirement</th><th>Technology</th></tr>
+      <tr><td>Authenticate the application's users</td><td><strong>Entra ID</strong>; <strong>Entra External ID</strong> if they are customers or consumers</td></tr>
+      <tr><td>Fine-grained authorization inside the application</td><td>App roles and claims in Entra ID, or your own authorization over that data</td></tr>
+      <tr><td>The application storing no secrets</td><td><strong>Managed identities</strong>; Key Vault for what cannot be avoided</td></tr>
+      <tr><td>Publish outward with filtering</td><td><strong>Front Door or Application Gateway with WAF</strong></td></tr>
+      <tr><td>Publish inward without a VPN</td><td><strong>Entra Private Access</strong></td></tr>
+      <tr><td>Govern and secure the APIs</td><td><strong>API Management</strong> with <strong>Defender for APIs</strong></td></tr>
+      <tr><td>Reach PaaS without going out to the internet</td><td><strong>Private endpoints</strong></td></tr>
+    </table>
+
+    <h2 id="workload-id">Workload identities (4.2.6)</h2>
+    <p>
+      A workload identity belongs to a service, not to a person, and the design turns on two decisions:
+      <strong>that it holds no secret</strong> and <strong>that it is governed</strong>.
+    </p>
+    <ul>
+      <li><strong>Managed identity</strong> — system or user assigned — for any Azure resource consuming
+        another Azure service. There is no credential: the platform handles it.</li>
+      <li><strong>Workload identity federation</strong> for what lives outside Azure — a GitHub pipeline,
+        somebody else's Kubernetes cluster: it presents a token from its issuer and Azure accepts it, with no
+        stored secret.</li>
+      <li><strong>App registration with a secret or certificate</strong> only when there is no alternative,
+        with rotation and the secret in Key Vault.</li>
+      <li><strong>Governance</strong>: workload identities get reviewed too — owner, granted permissions,
+        actual use — and conditional access can be applied to them.</li>
+    </ul>
+
+    <h2 id="apis">API management and security (4.2.7)</h2>
+    <table role="table">
+      <tr><th>Risk</th><th>Control in the design</th></tr>
+      <tr><td>A published API nobody inventoried</td><td>Everything goes through <strong>API Management</strong>; <strong>Defender for APIs</strong> inventories and assesses what is published</td></tr>
+      <tr><td>Weak or absent authentication</td><td>Entra ID token validation at the gateway, not in every backend</td></tr>
+      <tr><td>Abuse and resource exhaustion</td><td><strong>Rate limiting and quota</strong> policies per subscriber</td></tr>
+      <tr><td>Over-exposing data in the response</td><td>Response transformation at the gateway, and a review of the contract</td></tr>
+      <tr><td>The backend reachable without the gateway</td><td>Backend in a virtual network with a <strong>private endpoint</strong>, reachable only from the gateway</td></tr>
+    </table>
+
+    <h2 id="waf">Azure Web Application Firewall (4.2.8)</h2>
+    <p>
+      The WAF lives on <strong>Front Door</strong> (global) or on <strong>Application Gateway</strong>
+      (regional), and what the exam asks is not how to turn it on but how to roll it out without breaking the
+      application: you start in <strong>detection mode</strong> with the managed rule set, review the false
+      positives and tune with exclusions and custom rules, and only then move to <strong>prevention
+      mode</strong>. It is the same <em>measure, tune, enforce</em> pattern as in Azure Policy.
+    </p>
+    <div class="callout warn">
+      <b>A WAF that can be bypassed protects nothing</b>
+      If the origin still accepts direct requests, the attacker skips the edge. The design always includes
+      locking the origin down so it only accepts traffic from the edge service.
+    </div>
+
+    <h2 id="descubrir">Discovering and classifying the data (4.3.1)</h2>
+    <p>
+      You cannot protect what you do not know exists, and this is the first piece of any data design in this
+      exam. <strong>Microsoft Purview</strong> covers both halves: the <em>data map</em> scans and catalogues
+      sources — Azure Storage, databases, other clouds, on-premises — and <strong>classification</strong>
+      recognises the content with sensitive information types, trainable classifiers and exact data match
+      where precision matters.
+    </p>
+
+    <h2 id="priorizar">Prioritising the mitigation of threats to data (4.3.2)</h2>
+    <p>
+      Prioritisation comes from crossing two axes: the data's <strong>sensitivity</strong> — what
+      classification says — and its <strong>exposure</strong> — who can reach it. A store with regulated data
+      and public access comes first; one with internal data and restricted access can wait. Defender for
+      Cloud supports this with <em>sensitive data</em> discovery across resources and with the attack paths
+      that end at them.
+    </p>
+    <div class="callout exam">
+      <b>Sensitivity by exposure</b>
+      If a stem hands you a list of findings and asks where to start, the criterion is not technical
+      severity: it is <em>where sensitive data is within reach of somebody who should not have it</em>.
+    </div>
+
+    <h2 id="cifrado">Encrypting the data and holding the keys (4.3.3)</h2>
+    <table role="table">
+      <tr><th>Requirement</th><th>Answer</th></tr>
+      <tr><td>Encryption at rest, no special requirements</td><td>Platform-managed keys: it is already on and there is nothing to decide</td></tr>
+      <tr><td>"The key has to be ours and we must be able to revoke it"</td><td><strong>Customer-managed keys</strong> in Key Vault, with rotation and a usage log</td></tr>
+      <tr><td>Exclusive control of the module, single tenant, FIPS 140-3 Level 3</td><td><strong>Key Vault Managed HSM</strong></td></tr>
+      <tr><td>"Double layer of encryption at rest"</td><td><strong>Infrastructure encryption</strong>, adding a second layer beneath the first</td></tr>
+      <tr><td>Encryption in transit</td><td>TLS enforced and a minimum version pinned on the service</td></tr>
+      <tr><td>The cloud operator must not see the data in use</td><td><strong>Confidential computing</strong>: data is decrypted only inside an enclave</td></tr>
+    </table>
+    <div class="callout warn">
+      <b>At rest, in transit and in use</b>
+      The exam distinguishes all three states and the third is the forgotten one. If the stem says "not even
+      Microsoft should be able to read it while it is processed", no customer-managed key solves it: that is
+      confidential computing.
+    </div>
+
+    <h2 id="dato-ia">Securing the data AI workloads consume (4.3.4)</h2>
+    <p>
+      New content, and the angle differs from domain 3: there you protected <em>the AI service</em>, here
+      <strong>the data going into and out of it</strong>. The four design questions:
+    </p>
+    <ul>
+      <li><strong>What data feeds the model</strong> — the grounding corpus is classified and labelled first,
+        and it inherits the source's permissions. A model querying an overshared store spreads that
+        oversharing faster.</li>
+      <li><strong>What leaves in the prompt</strong> — the request travels to a service; classification and DLP
+        must cover that channel too.</li>
+      <li><strong>What gets stored</strong> — traces, logs and conversations are data: retention, residency and
+        who can read them are explicit decisions.</li>
+      <li><strong>What the output inherits</strong> — content generated from labelled material carries the
+        label forward, so the protection is not lost by rewriting it.</li>
+    </ul>
+
+    <h2 id="bases-datos">Securing data in Azure SQL, Synapse and Cosmos DB (4.3.5)</h2>
+    <table role="table">
+      <tr><th>Layer</th><th>Control</th></tr>
+      <tr><td>Who gets in</td><td><strong>Entra ID</strong> authentication instead of database users, with managed identities for the applications</td></tr>
+      <tr><td>From where</td><td><strong>Private endpoint</strong> and public access disabled; network rules only if there is no alternative</td></tr>
+      <tr><td>What each person sees</td><td><strong>Row-level security</strong> and <strong>dynamic data masking</strong> so the full value never reaches whoever does not need it</td></tr>
+      <tr><td>Data at rest</td><td><strong>Transparent data encryption</strong>, with a customer-managed key where the regulation demands it</td></tr>
+      <tr><td>The most sensitive data</td><td><strong>Always Encrypted</strong>: encrypted on the client so the engine never sees the value in clear</td></tr>
+      <tr><td>What was done</td><td>Database auditing to a centralised destination</td></tr>
+    </table>
+    <div class="callout exam">
+      <b>Masking is not encryption</b>
+      <strong>Dynamic data masking</strong> hides the value in the response, but the data stays in clear in
+      the database and whoever holds direct query permission sees it. If the requirement is that <em>not even
+      the database administrator</em> can see it, that is <strong>Always Encrypted</strong>.
+    </div>
+
+    <h2 id="storage">Securing data in Azure Storage (4.3.6)</h2>
+    <ul>
+      <li><strong>No account keys</strong>: access with Entra ID and data roles; if delegated access is
+        needed, a <strong>user delegation SAS</strong>, which expires and can be revoked, rather than a SAS
+        signed with the account key.</li>
+      <li><strong>No public access</strong> on the container, and a <strong>private endpoint</strong> for the
+        account.</li>
+      <li><strong>Encryption</strong> with a customer key where the regulation asks, and infrastructure
+        encryption if a double layer is required.</li>
+      <li><strong>Immutability</strong> with legal hold or time-based retention policies where the data cannot
+        be modified or deleted.</li>
+      <li><strong>Soft delete and versioning</strong> to survive accidental or malicious deletion.</li>
+    </ul>
+
+    <h2 id="defender-datos">Defender for Storage and Defender for Databases (4.3.7)</h2>
+    <p>
+      These are the <strong>detection</strong> layer on top of everything above, and the exam asks for them
+      when the stem talks about activity rather than configuration:
+    </p>
+    <table role="table">
+      <tr><th>Plan</th><th>What it detects</th></tr>
+      <tr><td><strong>Defender for Storage</strong></td><td>Malware on upload, access from anomalous locations or identities, mass exfiltration, and <em>sensitive data</em> discovery to help prioritise.</td></tr>
+      <tr><td><strong>Defender for Databases</strong><br><span class="skill-id">Defender for SQL · Cosmos DB · open source</span></td><td>It is an umbrella plan: <strong>Defender for SQL</strong> covers Azure SQL, SQL on a virtual machine and Synapse; sibling plans cover Cosmos DB and the open-source relational databases. It detects SQL injection, anomalous access patterns and brute force against the server, and adds vulnerability assessment of the database configuration.</td></tr>
+    </table>
+
+    <h2 id="trampas">Common traps in this domain</h2>
+    <div class="callout warn">
+      <b>Configuring Copilot instead of fixing permissions</b>
+      Copilot creates no access: it exposes what was already there. The prerequisite work is reducing oversharing and labelling the content.
+    </div>
+    <div class="callout warn">
+      <b>Confusing labels with DLP</b>
+      The label protects the file wherever it goes; DLP stops it leaving. Many requirements need both.
+    </div>
+    <div class="callout warn">
+      <b>Dynamic masking treated as encryption</b>
+      It hides the value in the response, not in the database. For the administrator not to see it either, Always Encrypted.
+    </div>
+    <div class="callout warn">
+      <b>A SAS signed with the account key</b>
+      It cannot be revoked without rotating the key and taking everyone down. The answer is a user delegation SAS.
+    </div>
+    <div class="callout warn">
+      <b>A secret in the continuous integration system</b>
+      The design the exam expects is workload identity federation: no secret to rotate or steal.
+    </div>
+    <div class="callout warn">
+      <b>WAF in prevention from day one</b>
+      Same as with Azure Policy: detection first to measure the false positives, prevention afterwards.
+    </div>
+
+    <!-- temario:inicio -->
+    <h2 id="temario">Official exam content covered</h2>
+    <p class="lede">The tasks and skills Microsoft publishes for domain 4 in the exam guide. 20-25% of the exam's questions come from here.</p>
+    <div class="syllabus">
+      <h4>Task 4.1 — Evaluate solutions for securing Microsoft 365</h4>
+      <ul class="skills">
+        <li><span class="skill-id">4.1.1</span> <span>Evaluate security posture for productivity and collaboration workloads by using metrics, including Microsoft Secure Score</span></li>
+        <li><span class="skill-id">4.1.2</span> <span>Evaluate solutions that include Microsoft Defender for Office 365 and Microsoft Defender for Cloud Apps</span></li>
+        <li><span class="skill-id">4.1.3</span> <span>Evaluate device management solutions that include Microsoft Intune</span></li>
+        <li><span class="skill-id">4.1.4</span> <span>Evaluate solutions for securing data in Microsoft 365 by using Microsoft Purview</span></li>
+        <li><span class="skill-id">4.1.5</span> <span>Evaluate data security and compliance controls in Microsoft Copilot for Microsoft 365 services <span class="skill-new" title="Content Microsoft added in the 28 July 2026 revision">new in 2026</span></span></li>
+      </ul>
+      <h4>Task 4.2 — Design solutions for securing applications</h4>
+      <ul class="skills">
+        <li><span class="skill-id">4.2.1</span> <span>Evaluate the security posture of existing application portfolios</span></li>
+        <li><span class="skill-id">4.2.2</span> <span>Evaluate threats to business-critical applications by using threat modeling</span></li>
+        <li><span class="skill-id">4.2.3</span> <span>Design and implement a full lifecycle strategy for application security</span></li>
+        <li><span class="skill-id">4.2.4</span> <span>Design and implement standards and practices for securing the application development process</span></li>
+        <li><span class="skill-id">4.2.5</span> <span>Map technologies to application security requirements</span></li>
+        <li><span class="skill-id">4.2.6</span> <span>Design a solution for workload identities to authenticate and access Azure resources</span></li>
+        <li><span class="skill-id">4.2.7</span> <span>Design a solution for API management and security</span></li>
+        <li><span class="skill-id">4.2.8</span> <span>Design solutions that secure applications by using Azure Web Application Firewall (WAF)</span></li>
+      </ul>
+      <h4>Task 4.3 — Design solutions for securing an organization's data</h4>
+      <ul class="skills">
+        <li><span class="skill-id">4.3.1</span> <span>Evaluate solutions for data discovery and classification</span></li>
+        <li><span class="skill-id">4.3.2</span> <span>Specify priorities for mitigating threats to data</span></li>
+        <li><span class="skill-id">4.3.3</span> <span>Evaluate solutions for encryption of data at rest and in transit, including Azure Key Vault and infrastructure encryption</span></li>
+        <li><span class="skill-id">4.3.4</span> <span>Design security for data used in AI workloads <span class="skill-new" title="Content Microsoft added in the 28 July 2026 revision">new in 2026</span></span></li>
+        <li><span class="skill-id">4.3.5</span> <span>Design a security solution for data in Azure workloads, including Azure SQL, Azure Synapse Analytics, and Azure Cosmos DB</span></li>
+        <li><span class="skill-id">4.3.6</span> <span>Design a security solution for data in Azure Storage</span></li>
+        <li><span class="skill-id">4.3.7</span> <span>Design a security solution that includes Microsoft Defender for Storage and Microsoft Defender for Databases</span></li>
+      </ul>
+      <p class="syllabus-note">Wording as published by Microsoft in the exam guide. SC-100 (official skills outline, skills measured as of 28 Jul 2026).</p>
+    </div>
+<!-- temario:fin -->
+
+    <h2 id="quiz">Practice quiz — Applications and data</h2>
+    <p class="lede">40 scenario questions. Pick an option to see whether it is right and why.</p>
+    <div id="quiz-root"></div>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">Independent study guide, not affiliated with Microsoft. Reviewed as of August 2026.</div>
+</footer>
+
+<script src="quiz-data.js"></script>
+<script src="../../../../assets/js/quiz.js?v=9"></script>
+<script src="../../../../assets/js/app.js?v=9"></script>
+
+</body>
+</html>

@@ -1,0 +1,394 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Dominio 1 de SC-100: resiliencia frente a ransomware, BCDR, MCRA y MCSB, Zero Trust, Cloud Adoption Framework, landing zones y adopción segura de IA. Criterios de decisión, trampas de examen y preguntas de escenario.">
+<link rel="icon" href="../../../assets/img/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Buenas prácticas y prioridades — Microsoft Cybersecurity Architect (SC-100)">
+<meta property="og:description" content="Dominio 1 de SC-100: resiliencia frente a ransomware, BCDR, MCRA y MCSB, Zero Trust, Cloud Adoption Framework, landing zones y adopción segura de IA.">
+<meta property="og:url" content="https://shadowvmx.github.io/sc-100/modules/best-practices/">
+<meta property="og:locale" content="es_ES">
+<meta name="twitter:card" content="summary">
+<title>Buenas prácticas y prioridades — Microsoft Cybersecurity Architect (SC-100)</title>
+<link rel="stylesheet" href="../../../assets/css/style.css?v=9">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="dot">●</span> Microsoft SC-100</div>
+    <nav class="topnav">
+      <a href="../../index.html">← Dominios</a>
+      <span class="lang-switch"><span class="current">ES</span><a href="../../en/modules/best-practices/index.html">EN</a></span>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero" style="padding-top:40px;">
+    <span class="badge">SC-100 · Dominio 1 · 20-25% del examen</span>
+    <h1>Diseño alineado con buenas prácticas y prioridades</h1>
+    <p>El dominio menos técnico y el que más gente falla, justo porque sus preguntas no se responden sabiendo un producto. Aquí se pregunta por <strong>estrategia</strong>: qué se protege primero, qué marco se aplica, cómo se recupera un negocio, y cómo se adopta la IA sin abrir un frente nuevo. Las opciones incorrectas suelen ser tecnológicamente impecables y estratégicamente inútiles.</p>
+    <p class="module-reviewed">Escrito contra el <em>skills outline</em> oficial con los skills medidos a 28 de julio de 2026.</p>
+  </section>
+</div>
+
+<div class="wrap module-layout">
+
+  <aside class="sidebar">
+    <h4>Cómo leer este dominio</h4>
+    <a href="#marcos">Los cuatro marcos, sin confundirlos</a>
+    <h4>1.1 Resiliencia</h4>
+    <a href="#resiliencia">Del objetivo de negocio a la prioridad</a>
+    <a href="#bcdr">BCDR y copias seguras</a>
+    <a href="#ransomware">Mitigación de ransomware</a>
+    <a href="#parches">Actualizaciones de seguridad</a>
+    <h4>1.2 MCRA y MCSB</h4>
+    <a href="#mcra">Arquitecturas de referencia</a>
+    <a href="#amenazas">Interna, externa y cadena de suministro</a>
+    <a href="#ia-mcsb">IA alineada con el MCSB</a>
+    <a href="#zero-trust">El marco de adopción de Zero Trust</a>
+    <h4>1.3 CAF y Well-Architected</h4>
+    <a href="#adopcion-ia">Adopción segura de IA</a>
+    <a href="#caf-waf">CAF y Well-Architected</a>
+    <a href="#recomendar">Recomendar sobre esos marcos</a>
+    <a href="#landing-zones">Azure landing zones</a>
+    <a href="#devsecops">DevSecOps según el CAF</a>
+    <a href="#trampas">Trampas típicas</a>
+    <a href="#temario">Temario oficial</a>
+    <h4>Práctica</h4>
+    <a href="#quiz">Quiz (26 preguntas)</a>
+  </aside>
+
+  <main class="content">
+
+    <h2 id="marcos">Los cinco marcos, sin confundirlos</h2>
+    <p>
+      Este dominio nombra cinco marcos de Microsoft y el examen los enfrenta constantemente. Saber a qué
+      pregunta responde cada uno resuelve la mitad de las preguntas por sí solo.
+    </p>
+    <table role="table">
+      <tr><th>Marco</th><th>Qué te da</th><th>Cuándo es la respuesta</th></tr>
+      <tr><td><strong>MCRA</strong><br>Arquitecturas de referencia de ciberseguridad</td><td>El <em>mapa</em>: qué capacidades de seguridad existen, cómo encajan entre sí y qué producto de Microsoft cubre cada una.</td><td>«¿Qué nos falta por cubrir?» «¿Cómo encajan estas piezas?»</td></tr>
+      <tr><td><strong>MCSB</strong><br>Microsoft Cloud Security Benchmark</td><td>Los <em>controles</em> concretos y medibles, mapeados a CIS y NIST, evaluados solos por Defender for Cloud.</td><td>«¿Está bien configurado esto?» «Dame una línea base.»</td></tr>
+      <tr><td><strong>CAF</strong><br>Cloud Adoption Framework</td><td>El <em>recorrido</em> de adopción: estrategia, plan, preparación, adopción, gobierno y gestión, con la seguridad integrada.</td><td>«¿Cómo organizamos la adopción?» «¿Cómo gobernamos esto a escala?»</td></tr>
+      <tr><td><strong>WAF</strong><br>Well-Architected Framework</td><td>Los <em>compromisos</em> de una carga concreta entre seguridad, fiabilidad, coste, operación y rendimiento.</td><td>«Revisa el diseño de esta carga.» «¿Qué estamos sacrificando?»</td></tr>
+      <tr><td><strong>SAF</strong><br>Security Adoption Framework</td><td>El <em>programa</em> de transformación de seguridad: por dónde se empieza, en qué orden, quién hace qué y cómo se mide el avance, repartido en disciplinas —acceso, operaciones, protección de activos, gobierno e innovación—.</td><td>«¿Cómo llevamos esto de la estrategia a un plan con dueños y plazos?»</td></tr>
+    </table>
+    <p>
+      La confusión que hay que evitar con el último: el <strong>SAF</strong> no compite con el CAF, lo
+      complementa. El CAF ordena la <em>adopción de la nube</em> entera; el SAF ordena la
+      <strong>modernización de la seguridad</strong> como programa propio, con la vista puesta en llevar a
+      la organización desde donde está hasta un modelo Zero Trust. Cuando el enunciado habla de un
+      <em>programa de seguridad</em> con fases, patrocinio de dirección y responsables por disciplina, es SAF.
+    </p>
+    <div class="callout warn">
+      <b>Antipatrones: el examen también los pregunta por su nombre</b>
+      Microsoft no solo publica buenas prácticas, publica lo que ve fallar. Los que más aparecen:
+      seguridad como <em>puerta al final</em> en vez de repartida por el ciclo; confiar en la red interna
+      como zona segura; tratar la seguridad como un proyecto que termina en vez de un programa; comprar
+      herramientas sin cubrir capacidades —el hueco que enseña el MCRA—; y perseguir una puntuación en
+      lugar de reducir riesgo. Reconocer el antipatrón suele ser lo que descarta dos opciones de golpe.
+    </div>
+    <div class="callout exam">
+      <b>La distinción que más cae</b>
+      <strong>CAF</strong> mira la <em>organización</em> y su adopción de la nube; <strong>Well-Architected</strong>
+      mira una <em>carga de trabajo</em> concreta. Un enunciado sobre grupos de administración, suscripciones y
+      gobierno es CAF; uno que pide revisar si una aplicación está bien diseñada es Well-Architected.
+    </div>
+
+    <h2 id="resiliencia">Del objetivo de negocio a la prioridad de seguridad (1.1.1)</h2>
+    <p>
+      La primera tarea del examen es también la que marca su tono: la estrategia de seguridad no sale del
+      catálogo de amenazas, sale de <strong>qué necesita el negocio que siga funcionando</strong>. El
+      recorrido que espera:
+    </p>
+    <ol>
+      <li>Identificar los <strong>procesos críticos</strong> y los activos de los que dependen.</li>
+      <li>Fijar con el negocio lo que está dispuesto a perder: <strong>RPO</strong> —cuánto dato— y
+        <strong>RTO</strong> —cuánto tiempo—.</li>
+      <li>Identificar las amenazas que ponen en riesgo <em>esos</em> activos, no todas las que existen.</li>
+      <li>Priorizar los controles por <strong>impacto en el negocio</strong>, no por severidad técnica.</li>
+      <li>Medir y revisar, porque tanto el negocio como las amenazas cambian.</li>
+    </ol>
+    <div class="callout warn">
+      <b>RPO y RTO no los pone seguridad</b>
+      Los pone el <strong>negocio</strong>, y de ahí sale el diseño técnico: una copia diaria no cumple un RPO
+      de una hora, por bien hecha que esté. Un enunciado que da un RPO o un RTO te está dando la restricción
+      que descarta la mitad de las opciones.
+    </div>
+
+    <h2 id="bcdr">Continuidad de negocio y recuperación ante desastres (1.1.2)</h2>
+    <table role="table">
+      <tr><th>Necesidad</th><th>Pieza</th></tr>
+      <tr><td>Copia de máquinas, bases de datos y ficheros, en Azure, on-premises y otras nubes</td><td><strong>Azure Backup</strong>, con el agente correspondiente para lo que está fuera</td></tr>
+      <tr><td>Réplica continua para volver a levantar en otra región</td><td><strong>Azure Site Recovery</strong>, con su plan de recuperación probado</td></tr>
+      <tr><td>Que un atacante con permisos no pueda borrar las copias</td><td><strong>Copias inmutables</strong>, <strong>borrado temporal</strong> y <strong>eliminación con MFA</strong> en el almacén</td></tr>
+      <tr><td>Que quien administra la carga no administre su copia</td><td><strong>Separación de roles</strong> entre operación y respaldo</td></tr>
+      <tr><td>Saber que funciona</td><td><strong>Restauraciones de prueba</strong> periódicas y simulacros, no solo copias verdes</td></tr>
+    </table>
+    <div class="callout exam">
+      <b>Una copia que se puede borrar no es una copia</b>
+      Es el punto que el examen persigue en cualquier escenario de ransomware: el atacante que consigue
+      credenciales de administrador va <em>primero</em> a por las copias. Sin inmutabilidad, borrado temporal
+      y credenciales separadas, el plan de recuperación es papel.
+    </div>
+
+    <h2 id="ransomware">Mitigación de ransomware (1.1.3)</h2>
+    <p>
+      Microsoft ordena esta defensa en tres fases y el examen espera que sepas <strong>en qué orden</strong>
+      se abordan, porque el orden es la respuesta:
+    </p>
+    <table role="table">
+      <tr><th>Fase</th><th>Objetivo</th><th>Piezas</th></tr>
+      <tr><td><strong>1. Prepararse para recuperar</strong></td><td>Que pagar nunca sea la única salida.</td><td>Copias inmutables y aisladas, restauración probada, plan de recuperación de bosque de AD.</td></tr>
+      <tr><td><strong>2. Limitar el alcance del daño</strong></td><td>Que un equipo comprometido no abra la organización.</td><td>Acceso privilegiado —PIM, estaciones dedicadas, LAPS, modelo por niveles—, segmentación, mínimo privilegio.</td></tr>
+      <tr><td><strong>3. Dificultar la entrada</strong></td><td>Cerrar los caminos habituales.</td><td>MFA resistente a phishing, parches, protección del correo, reducción de superficie, EDR.</td></tr>
+    </table>
+    <div class="callout warn">
+      <b>El orden es contraintuitivo y por eso lo preguntan</b>
+      La tentación es empezar por prevenir. Microsoft pone <strong>recuperación</strong> primero porque es lo
+      único que garantiza que el negocio sobrevive aunque la prevención falle, y <strong>acceso
+      privilegiado</strong> segundo porque es lo que convierte un incidente en una catástrofe. Si un enunciado
+      pide «lo más urgente» ante ransomware, mira ahí antes que al antivirus.
+    </div>
+
+    <h2 id="parches">Evaluar soluciones de actualizaciones de seguridad (1.1.4)</h2>
+    <table role="table">
+      <tr><th>Qué hay que actualizar</th><th>Con qué</th></tr>
+      <tr><td>Servidores en Azure, en Arc o en otra nube</td><td><strong>Azure Update Manager</strong>, con evaluación periódica y ventanas de mantenimiento</td></tr>
+      <tr><td>Clientes Windows y aplicaciones gestionadas</td><td><strong>Intune</strong>, con directivas de actualización y anillos de despliegue</td></tr>
+      <tr><td>Saber qué falta y qué riesgo tiene</td><td><strong>Gestión de vulnerabilidades de Defender</strong>, que prioriza por explotabilidad y exposición</td></tr>
+      <tr><td>Lo que no se puede parchear</td><td>Mitigación compensatoria documentada: aislamiento, virtual patching, retirada planificada</td></tr>
+    </table>
+    <p>
+      El diseño que espera el examen no es «parchear todo cuanto antes», sino <strong>anillos de
+      despliegue</strong> —un grupo piloto, luego producción por fases—, ventanas acordadas con el negocio y
+      una vía rápida documentada para las vulnerabilidades explotadas activamente.
+    </p>
+
+    <h2 id="mcra">Diseñar con las arquitecturas de referencia (1.2.1)</h2>
+    <p>
+      El <strong>MCRA</strong> es el mapa de capacidades: identidad, operaciones de seguridad, protección de
+      endpoints, seguridad de infraestructura, de aplicaciones, del dato, de OT y de IA, con lo que Microsoft
+      ofrece en cada casilla y cómo se conecta con lo demás. Se usa de dos maneras en el examen: para
+      <strong>encontrar el hueco</strong> —qué capacidad no tiene nadie asignada— y para <strong>justificar
+      una elección</strong> —por qué esta pieza y no otra, dado lo que ya hay—.
+    </p>
+
+    <h2 id="amenazas">Amenaza interna, externa y de cadena de suministro (1.2.2)</h2>
+    <table role="table">
+      <tr><th>Tipo</th><th>Qué la caracteriza</th><th>Controles</th></tr>
+      <tr><td><strong>Externa</strong></td><td>Alguien sin acceso legítimo intenta conseguirlo.</td><td>Identidad fuerte, superficie reducida, detección y respuesta.</td></tr>
+      <tr><td><strong>Interna</strong></td><td>El acceso es legítimo; el uso no.</td><td><strong>Gestión de riesgo interno</strong>, DLP, mínimo privilegio, separación de funciones, barreras de información.</td></tr>
+      <tr><td><strong>Cadena de suministro</strong></td><td>Entra a través de algo en lo que ya confías: una dependencia, un proveedor, una herramienta.</td><td>Análisis de composición, procedencia y firma de artefactos, gobierno del acceso de terceros, evaluación de proveedores.</td></tr>
+    </table>
+    <div class="callout exam">
+      <b>Por qué la interna es distinta</b>
+      Ningún control de acceso la detiene, porque el acceso <em>es correcto</em>. Lo que la aborda es mirar
+      <strong>comportamiento</strong> y no permisos, y ahí entra la gestión de riesgo interno. Una opción que
+      responda a un escenario de empleado que se va con la cartera de clientes con «reforzar la MFA» está
+      contestando a otra amenaza.
+    </div>
+
+    <h2 id="ia-mcsb">Soluciones de IA alineadas con el MCSB (1.2.3)</h2>
+    <p>
+      Contenido nuevo. La idea que se pregunta es que una carga de IA <strong>no es una categoría aparte</strong>:
+      le aplican los mismos controles del benchmark que a cualquier otra —identidad, red, protección del dato,
+      registro, postura, respuesta— y encima los suyos propios. El error de diseño típico es tratarla como un
+      experimento fuera del gobierno normal.
+    </p>
+    <table role="table">
+      <tr><th>Control del MCSB</th><th>Cómo se aplica a la carga de IA</th></tr>
+      <tr><td>Identidad y acceso</td><td>Entra ID e identidades administradas; sin claves locales; RBAC por servicio.</td></tr>
+      <tr><td>Seguridad de red</td><td>Endpoint privado y acceso público deshabilitado.</td></tr>
+      <tr><td>Protección del dato</td><td>Clasificación del corpus, claves gestionadas por el cliente, control de lo que se registra.</td></tr>
+      <tr><td>Registro y detección</td><td>Trazas hacia el SIEM y el plan de Defender for Cloud para servicios de IA.</td></tr>
+      <tr><td>Postura y gestión de vulnerabilidades</td><td>La carga entra en Defender for Cloud como cualquier otra.</td></tr>
+      <tr><td>Específico de IA</td><td>Filtros de contenido y escudos frente a la inyección de instrucciones.</td></tr>
+    </table>
+
+    <h2 id="zero-trust">El marco de adopción de Zero Trust (1.2.4)</h2>
+    <p>
+      Tres principios, seis pilares, y un examen que pregunta por los dos. Los <strong>principios</strong>
+      son con lo que se valida un diseño:
+    </p>
+    <ul>
+      <li><strong>Verificar explícitamente</strong> — cada petición se evalúa con todas las señales
+        disponibles, no se confía en una autenticación previa.</li>
+      <li><strong>Usar acceso con mínimo privilegio</strong> — just-in-time, suficiente para la tarea,
+        protección adaptativa.</li>
+      <li><strong>Asumir la brecha</strong> — segmentar, cifrar, verificar de extremo a extremo y diseñar la
+        detección dando por hecho que alguien ya está dentro.</li>
+    </ul>
+    <p>
+      Los <strong>pilares</strong> son por dónde se despliega: identidades, endpoints, aplicaciones, datos,
+      infraestructura y redes, todos gobernados por visibilidad, automatización y orquestación.
+    </p>
+    <div class="callout warn">
+      <b>Zero Trust no es un producto ni un proyecto que termina</b>
+      Si una opción propone «implantar Zero Trust» comprando una herramienta, es la incorrecta. Es un
+      <em>modelo</em> que se adopta por pilares, y el marco de adopción existe justamente para dar el orden y
+      los hitos.
+    </div>
+
+    <h2 id="adopcion-ia">Una estrategia de adopción segura de IA (1.3.1)</h2>
+    <p>
+      El otro punto nuevo del temario, y el que más se parece a una conversación real con un cliente. La
+      estrategia no va de elegir modelo, va de <strong>poner límites antes de que la organización empiece
+      sola</strong>:
+    </p>
+    <ul>
+      <li><strong>Gobierno y casos de uso</strong> — quién aprueba qué se puede hacer con IA, con qué dato y
+        con qué nivel de revisión humana.</li>
+      <li><strong>Preparar el dato primero</strong> — clasificar, etiquetar y corregir el sobrecompartido
+        antes de conectar nada, porque un asistente reparte lo que ya estaba mal compartido.</li>
+      <li><strong>Identidad para lo que actúa</strong> — los agentes tienen su propia identidad, con
+        propietario, mínimo privilegio y gobierno.</li>
+      <li><strong>Descubrir la IA no aprobada</strong> — la que los equipos ya usan por su cuenta se
+        descubre con Defender for Cloud Apps y se sanciona o se sustituye.</li>
+      <li><strong>Riesgos propios</strong> — inyección de instrucciones, salida no fiable, fuga en el
+        <em>prompt</em>: se abordan con filtros, revisión humana donde el impacto lo exija y DLP sobre ese canal.</li>
+    </ul>
+    <div class="callout exam">
+      <b>El orden que espera el examen</b>
+      Gobierno y dato <em>antes</em> que despliegue. Un enunciado que pregunta «qué hacemos antes de dar
+      Copilot a toda la organización» se responde con clasificar y arreglar permisos, no con configurar el
+      asistente ni con formar a los usuarios.
+    </div>
+
+    <h2 id="caf-waf">CAF y Well-Architected: qué mira cada uno (1.3.2)</h2>
+    <table role="table">
+      <tr><th></th><th>Cloud Adoption Framework</th><th>Well-Architected Framework</th></tr>
+      <tr><td>Alcance</td><td>La <strong>organización</strong> y su recorrido en la nube.</td><td>Una <strong>carga de trabajo</strong> concreta.</td></tr>
+      <tr><td>Preguntas que responde</td><td>¿Cómo organizamos suscripciones y grupos de administración? ¿Cómo gobernamos a escala? ¿Quién es responsable de qué?</td><td>¿Este diseño es seguro, fiable, eficiente y sostenible en coste y operación?</td></tr>
+      <tr><td>Salida típica</td><td>Landing zones, modelo de gobierno, plan de adopción.</td><td>Una revisión con hallazgos y compromisos explícitos.</td></tr>
+    </table>
+    <p>
+      La pieza que el examen quiere que nombres del Well-Architected es el <strong>compromiso</strong>:
+      reforzar la seguridad casi siempre cuesta coste, rendimiento o comodidad operativa, y el diseño maduro
+      es el que <em>lo dice</em> en vez de fingir que no existe.
+    </p>
+
+    <h2 id="recomendar">Recomendar soluciones sobre esos marcos (1.3.3)</h2>
+    <p>
+      Aquí el examen se pone concreto: dado un hueco, qué recomienda el marco. Los emparejamientos que se
+      repiten:
+    </p>
+    <table role="table">
+      <tr><th>Hueco</th><th>Recomendación</th></tr>
+      <tr><td>Cada equipo despliega a su aire, sin barandillas</td><td>Grupos de administración con <strong>Azure Policy</strong> e iniciativas, y landing zones</td></tr>
+      <tr><td>No se sabe quién responde de la seguridad de cada carga</td><td>Modelo de responsabilidades del CAF: propietario por carga, funciones de seguridad definidas</td></tr>
+      <tr><td>La seguridad llega al final de cada proyecto</td><td><strong>DevSecOps</strong>: controles en el ciclo, no en una puerta al final</td></tr>
+      <tr><td>El coste de seguridad no está justificado ante dirección</td><td>Vincular controles a riesgos de negocio priorizados, con métricas de progreso</td></tr>
+    </table>
+
+    <h2 id="landing-zones">Azure landing zones (1.3.4)</h2>
+    <p>
+      Una landing zone es un entorno <strong>preparado de antemano</strong> para que lo que se despliegue
+      dentro nazca conforme, en vez de auditarlo después. Lo que trae de fábrica y el examen quiere que
+      reconozcas:
+    </p>
+    <ul>
+      <li><strong>Jerarquía de grupos de administración</strong> con las políticas asignadas arriba, de modo
+        que alcanzan a las suscripciones futuras.</li>
+      <li><strong>Suscripciones de plataforma separadas</strong> —identidad, gestión, conectividad— de las de
+        carga de trabajo.</li>
+      <li><strong>Red</strong> con hub y radios, conectividad híbrida y salida controlada.</li>
+      <li><strong>Identidad y RBAC</strong> definidos, con acceso privilegiado desde el principio.</li>
+      <li><strong>Registro centralizado</strong> y planes de Defender activados por política.</li>
+      <li><strong>Todo como código</strong>, para que crear una nueva sea repetible.</li>
+    </ul>
+    <div class="callout exam">
+      <b>Por qué el ámbito es el grupo de administración</b>
+      Es la respuesta a «que aplique también a las suscripciones que aún no existen». Asignar por suscripción
+      obliga a acordarse cada vez que alguien crea una, y ese olvido es exactamente lo que la landing zone
+      elimina.
+    </div>
+
+    <h2 id="devsecops">Un proceso DevSecOps alineado con el CAF (1.3.5)</h2>
+    <p>
+      La idea de fondo: la seguridad deja de ser una <strong>puerta al final</strong> y se reparte por el
+      ciclo, con controles automáticos que no dependen de que nadie se acuerde. En el examen se reconoce por
+      dónde coloca cada control —modelado en diseño, análisis en el código y en la pull request, dependencias
+      en la compilación, política en el despliegue, detección en ejecución— y por dos decisiones de gobierno:
+      que el <strong>pipeline tenga identidad federada</strong> en vez de secretos, y que el fallo de un
+      control <strong>rompa la construcción</strong> en vez de generar un aviso que nadie lee.
+    </p>
+
+    <h2 id="trampas">Trampas típicas de este dominio</h2>
+    <div class="callout warn">
+      <b>Confundir CAF con Well-Architected</b>
+      CAF gobierna la organización y su adopción; Well-Architected revisa una carga concreta y sus compromisos.
+    </div>
+    <div class="callout warn">
+      <b>Empezar el plan de ransomware por la prevención</b>
+      El orden de Microsoft es recuperación, acceso privilegiado y después entrada. Lo urgente es que el negocio sobreviva al fallo.
+    </div>
+    <div class="callout warn">
+      <b>Copias que el atacante puede borrar</b>
+      Sin inmutabilidad, borrado temporal y credenciales separadas, el plan de recuperación no existe.
+    </div>
+    <div class="callout warn">
+      <b>Tratar Zero Trust como un producto</b>
+      Es un modelo que se adopta por pilares y se valida con tres principios, no algo que se compra.
+    </div>
+    <div class="callout warn">
+      <b>Responder a la amenaza interna con más autenticación</b>
+      El acceso ya es legítimo. Lo que aplica es mirar comportamiento: gestión de riesgo interno y DLP.
+    </div>
+    <div class="callout warn">
+      <b>Desplegar IA antes de arreglar el dato</b>
+      Un asistente hereda los permisos del origen. Clasificar y corregir el sobrecompartido va primero.
+    </div>
+
+    <!-- temario:inicio -->
+    <h2 id="temario">Temario oficial cubierto</h2>
+    <p class="lede">Las tareas y skills que Microsoft publica para el dominio 1 en la guía del examen. El 20-25% de las preguntas del examen sale de aquí.</p>
+    <div class="syllabus">
+      <h4>Tarea 1.1 — Diseñar una estrategia de resiliencia frente a ransomware y otros ataques</h4>
+      <ul class="skills">
+        <li><span class="skill-id">1.1.1</span> <span>Diseñar una estrategia de seguridad que sostenga los objetivos de resiliencia del negocio, identificando y priorizando amenazas a los activos críticos</span></li>
+        <li><span class="skill-id">1.1.2</span> <span>Diseñar continuidad de negocio y recuperación ante desastres (BCDR), con copia y restauración seguras en entornos híbridos y multinube</span></li>
+        <li><span class="skill-id">1.1.3</span> <span>Diseñar la mitigación de ransomware, priorizando BCDR y el acceso privilegiado</span></li>
+        <li><span class="skill-id">1.1.4</span> <span>Evaluar soluciones de actualizaciones de seguridad</span></li>
+      </ul>
+      <h4>Tarea 1.2 — Diseñar alineado con las arquitecturas de referencia (MCRA) y el benchmark de seguridad en la nube (MCSB)</h4>
+      <ul class="skills">
+        <li><span class="skill-id">1.2.1</span> <span>Diseñar soluciones alineadas con las buenas prácticas de capacidades y controles de ciberseguridad</span></li>
+        <li><span class="skill-id">1.2.2</span> <span>Diseñar protección frente a amenaza interna, externa y de cadena de suministro</span></li>
+        <li><span class="skill-id">1.2.3</span> <span>Diseñar soluciones de IA alineadas con el Microsoft Cloud Security Benchmark <span class="skill-new" title="Contenido que Microsoft añadió en la revisión del 28 de julio de 2026">nuevo en 2026</span></span></li>
+        <li><span class="skill-id">1.2.4</span> <span>Diseñar soluciones alineadas con el marco de adopción de Zero Trust</span></li>
+      </ul>
+      <h4>Tarea 1.3 — Diseñar alineado con el Cloud Adoption Framework (CAF) y el Well-Architected Framework</h4>
+      <ul class="skills">
+        <li><span class="skill-id">1.3.1</span> <span>Diseñar una estrategia de adopción segura de IA <span class="skill-new" title="Contenido que Microsoft añadió en la revisión del 28 de julio de 2026">nuevo en 2026</span></span></li>
+        <li><span class="skill-id">1.3.2</span> <span>Diseñar o evaluar una estrategia de seguridad y gobierno basada en CAF y en el Well-Architected Framework</span></li>
+        <li><span class="skill-id">1.3.3</span> <span>Recomendar soluciones de seguridad y gobierno basadas en CAF y Well-Architected</span></li>
+        <li><span class="skill-id">1.3.4</span> <span>Diseñar la implantación y el gobierno de la seguridad con Azure landing zones</span></li>
+        <li><span class="skill-id">1.3.5</span> <span>Diseñar un proceso DevSecOps alineado con las buenas prácticas del CAF</span></li>
+      </ul>
+      <p class="syllabus-note">Redacción adaptada al español; la versión normativa es la de la guía oficial de Microsoft. SC-100 (guía oficial, skills medidos a 28 jul. 2026).</p>
+    </div>
+<!-- temario:fin -->
+
+    <h2 id="quiz">Quiz de práctica — Buenas prácticas y prioridades</h2>
+    <p class="lede">26 preguntas de escenario. Elige una opción para ver si es correcta y por qué.</p>
+    <div id="quiz-root"></div>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">Guía independiente, sin relación con Microsoft. Revisada en agosto de 2026.</div>
+</footer>
+
+<script src="quiz-data.js"></script>
+<script src="../../../assets/js/quiz.js?v=9"></script>
+<script src="../../../assets/js/app.js?v=9"></script>
+
+</body>
+</html>
