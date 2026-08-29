@@ -575,6 +575,78 @@ var QUIZ_DATA = [
     correct: 1,
     explain: "<b>AWS User Notifications</b> is the delivery layer: you configure rules over EventBridge events and pick destinations — the console Notifications Center, email, chat or mobile push — with a consolidated view across the organization and no code. An SNS topic per account works, but has to be created and maintained in every one. Lambda is the code the question rules out. And Scheduler fires on a timetable, not on an event. <a href=\"https://docs.aws.amazon.com/notifications/latest/userguide/what-is-service.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
+  {
+    tag: "What to monitor before how",
+    q: "A team is about to instrument a new workload and starts by enabling every available metric and log, so as not to fall short. What do you correct?",
+    options: [
+      "Nothing: in monitoring it is always better to over-collect and filter later with queries",
+      "That metrics should come first and logs be left to a second phase, for cost reasons",
+      "That requirements come from what the workload must prove and detect",
+      "That only what the applicable compliance standard demands should be enabled",
+    ],
+    correct: 2,
+    explain: "Analysing the workload to determine <b>what</b> to monitor is a design step, not an option. You start from the questions you must be able to answer — who accessed this data, did this service degrade, did somebody change this configuration — and from those come the sources, the retention and the alarms. Enabling everything does two kinds of damage: the ingestion bill grows without bound and the useful signal is buried under events nobody reads. Leaving logs for later gets the priorities wrong, and sticking to the standard covers the audit but not the operation. <a href=\"https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
+  {
+    tag: "The alarm nobody acts on",
+    q: "A team has 400 CloudWatch alarms and admits they ignore most notifications. They want to cut the noise without losing coverage.",
+    options: [
+      "Review each alarm against a concrete action and retire any that leads nowhere",
+      "Raise every alarm's threshold by 20% so they fire less often",
+      "Group every notification into a single SNS topic with a daily digest",
+      "Increase the number of evaluation periods on every alarm before it fires",
+    ],
+    correct: 0,
+    explain: "An alarm exists to trigger an <b>action</b>. If nobody knows what to do when it fires, it is not an alarm: it is a metric, and its place is a dashboard. That is the pruning criterion, not the threshold: for each alarm, who receives it and what they do. Raising thresholds blindly also silences the ones that mattered. A daily digest turns a real-time signal into a report. And lengthening evaluation periods delays detection without fixing that the alarm leads nowhere. <a href=\"https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
+  {
+    tag: "Fixed threshold or behaviour",
+    q: "A function's invocation count varies widely between weekdays and weekends. A fixed threshold either fires false alarms on Saturday or detects nothing on Tuesday. What do you use?",
+    options: [
+      "Two separate alarms, one for weekdays and one for weekends, each with its own threshold",
+      "An alarm on the seven-day moving average, which smooths out the weekday-weekend difference",
+      "A composite alarm combining invocations with errors, to reduce false positives",
+      "CloudWatch anomaly detection, which learns the expected band and alerts on departures",
+    ],
+    correct: 3,
+    explain: "Anomaly detection builds a model of the metric's <b>expected</b> behaviour by hour and day, and the alarm is defined against that band rather than a fixed number. This is exactly the case of a metric with known seasonality. Two alarms with their own thresholds work until a public holiday arrives or the pattern shifts, and they have to be maintained. A moving average hides precisely the spike you want to see. And a composite alarm reduces false positives by combining signals, but does not fix an inadequate base threshold. <a href=\"https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch-anomaly-detection.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
+  {
+    tag: "Which logs and with what retention",
+    q: "An obligation requires reconstructing, up to five years later, who read a specific S3 object. The team has CloudTrail enabled with default configuration and 90-day retention.",
+    options: [
+      "Extending the trail's retention to five years is enough: object reads are already recorded by default",
+      "Both are missing: enable S3 data events and deliver the trail to S3 for five years",
+      "Enabling the bucket's server access logs is enough, as they record every read in sufficient detail",
+      "Enabling Macie on the bucket is enough, as it inventories access to sensitive content",
+    ],
+    correct: 1,
+    explain: "Identifying log sources from the requirement means looking at two things: <b>what</b> is recorded and <b>how long</b> it is kept. CloudTrail records only <b>management events</b> by default — the control plane: creating the bucket, changing its policy. Who downloaded a specific object is a <b>data event</b>, off by default, and it has to be enabled. And the 90-day event history retention does not cover five years: the trail has to deliver to S3, with its lifecycle. Server access logs are best-effort and do not serve as an audit record. And Macie classifies data; it does not record access. <a href=\"https://docs.aws.amazon.com/whitepapers/latest/aws-security-incident-response-guide/logging-and-events.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
+  {
+    tag: "Where the logs land",
+    q: "You are designing log ingestion for an organization with forty accounts. Where do you deliver the trails, and why?",
+    options: [
+      "One bucket per account, so each team retains ownership of its own audit records",
+      "In the management account's bucket, which already concentrates billing and organization policies",
+      "In a dedicated, isolated logging account, so compromising production does not grant access to the records",
+      "In a bucket replicated across all forty accounts, so anyone can query the full history",
+    ],
+    correct: 2,
+    explain: "A log is the evidence of what the attacker did, so the design assumes the attacker will reach the account being attacked: if the records live there, they delete them. That is why they are delivered to a <b>dedicated logging account</b>, with no workloads, tightly restricted access and ideally object lock. One bucket per account puts the evidence within reach of whoever generated it. The management account is the organization's highest-value target and should host no workloads. And replicating to all forty multiplies the deletion opportunities by forty. <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/logging-with-S3.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
+  {
+    tag: "One inbox for every account",
+    q: "A platform team wants to see, in one place, the operational and security notifications AWS emits for the organization's forty accounts, without building an integration per service.",
+    options: [
+      "AWS User Notifications at organization level, centralising notifications from all",
+      "One EventBridge rule per account forwarding all events to a shared SNS topic",
+      "Manually subscribing to each service's bulletins from each of the forty accounts' consoles",
+      "A CloudWatch dashboard in the management account with widgets for every service across the forty accounts",
+    ],
+    correct: 0,
+    explain: "<b>User Notifications</b> is the service built for this: it aggregates the notifications AWS emits — health events, findings, maintenance reminders — into a unified inbox, with organization-level configurations so they need not be repeated account by account, and forwards them to the channels you choose. Forty EventBridge rules approximate this at the cost of building and maintaining it. Subscribing by hand in the console does not scale and breaks with each new account. And a CloudWatch dashboard shows metrics, not notifications. <a href=\"https://docs.aws.amazon.com/notifications/latest/userguide/what-is-service.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
 ];
 
 // Registrado para el simulacro de examen, que carga los seis bancos a la vez.

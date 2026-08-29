@@ -264,6 +264,31 @@
       "it cannot be sent outside" is DLP. Many scenarios need both.
     </div>
 
+    <p class="code-label">A sensitivity label with encryption: the protection travels inside the file</p>
+    <pre><code># Lo que la hace distinta de DLP: el archivo lleva incorporada la directiva de
+# uso y consulta al servicio de claves al abrirse, esté donde esté.
+New-Label -Name &quot;Confidencial-Finanzas&quot; `
+  -DisplayName &quot;Confidencial · Finanzas&quot; `
+  -Tooltip &quot;Datos financieros. No sale de la organización.&quot; `
+  -EncryptionEnabled $true `
+  -EncryptionProtectionType &quot;Template&quot; `
+  -EncryptionRightsDefinitions &quot;finanzas@contoso.com:VIEW,EDIT,PRINT&quot; `
+  -EncryptionOfflineAccessDays 7 `
+  -ContentMarkingFooterEnabled $true</code></pre>
+
+    <p class="code-label">DLP does not live in the file: it is evaluated in the channel, on the movement</p>
+    <pre><code># Sin DLP, un archivo etiquetado sale igualmente. Sin etiqueta, lo que salió
+# no queda protegido en destino. Por eso van los dos.
+New-DlpCompliancePolicy -Name &quot;Salida-Finanzas&quot; `
+  -ExchangeLocation All -SharePointLocation All -OneDriveLocation All
+
+New-DlpComplianceRule -Name &quot;Bloquear-envio-externo&quot; `
+  -Policy &quot;Salida-Finanzas&quot; `
+  -ContentContainsSensitiveInformation @{Name=&quot;Credit Card Number&quot;; minCount=&quot;1&quot;} `
+  -AccessScope NotInOrganization `
+  -BlockAccess $true `
+  -NotifyUser Owner -GenerateIncidentReport SiteAdmin</code></pre>
+
     <h2 id="copilot">Security and compliance controls in Copilot for Microsoft 365 (4.1.5)</h2>
     <p>
       New syllabus content and highly askable, because the misconception is nearly universal. Copilot
@@ -371,6 +396,26 @@
         actual use — and conditional access can be applied to them.</li>
     </ul>
 
+    <p class="code-label">Workload identity federation: the pipeline stores no credential at all</p>
+    <pre><code># Se declara en qué emisor se confía y qué sujeto se acepta. La canalización
+# presenta el token que su propio proveedor le da y lo intercambia por uno de Entra ID.
+az ad app federated-credential create --id &lt;app-id&gt; --parameters &#x27;{
+  &quot;name&quot;: &quot;github-produccion&quot;,
+  &quot;issuer&quot;: &quot;https://token.actions.githubusercontent.com&quot;,
+  &quot;subject&quot;: &quot;repo:ShadowVMX/mi-repo:environment:produccion&quot;,
+  &quot;audiences&quot;: [&quot;api://AzureADTokenExchange&quot;]
+}&#x27;</code></pre>
+
+    <p class="code-label">The subject is the design part: scope it, or anyone who opens a branch deploys</p>
+    <pre><code># MAL — vale cualquier flujo del repositorio, venga de donde venga:
+&quot;subject&quot;: &quot;repo:ShadowVMX/mi-repo:ref:refs/heads/*&quot;
+
+# MAL — cualquiera que abra una pull request:
+&quot;subject&quot;: &quot;repo:ShadowVMX/mi-repo:pull_request&quot;
+
+# BIEN — solo el entorno protegido, que ya exige aprobación:
+&quot;subject&quot;: &quot;repo:ShadowVMX/mi-repo:environment:produccion&quot;</code></pre>
+
     <h2 id="apis">API management and security (4.2.7)</h2>
     <table role="table">
       <tr><th>Risk</th><th>Control in the design</th></tr>
@@ -380,6 +425,30 @@
       <tr><td>Over-exposing data in the response</td><td>Response transformation at the gateway, and a review of the contract</td></tr>
       <tr><td>The backend reachable without the gateway</td><td>Backend in a virtual network with a <strong>private endpoint</strong>, reachable only from the gateway</td></tr>
     </table>
+
+    <p class="code-label">Validating the token at the edge once, instead of in twelve microservices</p>
+    <pre><code>&lt;!-- Doce implementaciones divergen; basta con que una acepte lo que las
+     demás rechazan. Esto es un único punto que mantener y auditar. --&gt;
+&lt;validate-jwt header-name=&quot;Authorization&quot; failed-validation-httpcode=&quot;401&quot;
+              failed-validation-error-message=&quot;No autorizado&quot;&gt;
+  &lt;openid-config url=&quot;https://login.microsoftonline.com/&lt;tenant&gt;/v2.0/.well-known/openid-configuration&quot; /&gt;
+  &lt;audiences&gt;
+    &lt;audience&gt;api://facturacion&lt;/audience&gt;
+  &lt;/audiences&gt;
+  &lt;required-claims&gt;
+    &lt;claim name=&quot;roles&quot; match=&quot;any&quot;&gt;
+      &lt;value&gt;Facturacion.Lectura&lt;/value&gt;
+    &lt;/claim&gt;
+  &lt;/required-claims&gt;
+&lt;/validate-jwt&gt;</code></pre>
+
+    <p class="code-label">Quota per identified client, not per IP address</p>
+    <pre><code>&lt;!-- El WAF y el firewall limitan por IP, que no identifica al cliente: varios
+     clientes tras la misma salida comparten castigo y uno repartido lo esquiva. --&gt;
+&lt;rate-limit-by-key calls=&quot;1000&quot; renewal-period=&quot;60&quot;
+                   counter-key=&quot;@(context.Subscription.Id)&quot; /&gt;
+&lt;quota-by-key calls=&quot;1000000&quot; renewal-period=&quot;2629800&quot;
+              counter-key=&quot;@(context.Subscription.Id)&quot; /&gt;</code></pre>
 
     <h2 id="waf">Azure Web Application Firewall (4.2.8)</h2>
     <p>
@@ -395,6 +464,26 @@
       locking the origin down so it only accepts traffic from the edge service.
     </div>
 
+    <p class="code-label">Deploy in detection, measure, and only then move to prevention</p>
+    <pre><code>az network front-door waf-policy create -g rg-web -n wafprod \
+  --mode Detection --sku Premium_AzureFrontDoor
+
+# Los falsos positivos que aparecerían si estuviera bloqueando:
+# AzureDiagnostics | where Category == &quot;FrontDoorWebApplicationFirewallLog&quot;
+#   | where action_s == &quot;Log&quot; | summarize count() by ruleName_s, requestUri_s
+
+az network front-door waf-policy update -g rg-web -n wafprod --mode Prevention</code></pre>
+
+    <p class="code-label">A false positive is trimmed to the minimum: exclusion by parameter and path</p>
+    <pre><code># Volver todo a detección desprotege el sitio entero por un parámetro.
+# Deshabilitar la regla la apaga para TODAS las rutas.
+az network front-door waf-policy managed-rules exclusion add \
+  --policy-name wafprod -g rg-web \
+  --type Microsoft_DefaultRuleSet --version 2.1 \
+  --rule-group-id SQLI --rule-id 942100 \
+  --match-variable RequestBodyPostArgNames \
+  --operator Equals --value &quot;consulta_avanzada&quot;</code></pre>
+
     <h2 id="descubrir">Discovering and classifying the data (4.3.1)</h2>
     <p>
       You cannot protect what you do not know exists, and this is the first piece of any data design in this
@@ -403,6 +492,16 @@
       recognises the content with sensitive information types, trainable classifiers and exact data match
       where precision matters.
     </p>
+
+    <p class="code-label">When the pattern is not enough: exact match against the real list</p>
+    <pre><code># Un patrón acierta por FORMA, así que cualquier número con esa forma dispara
+# la alerta. Esto solo detecta lo que está de verdad en la tabla del cliente.
+New-DataClassification -Name &quot;Numero-de-poliza&quot; -ClassificationRuleCollectionIdentity ...
+
+# El dato original nunca se sube: se indexa con un resumen criptográfico.
+.\EdmUploadAgent.exe /CreateHash /DataFile .\polizas.csv `
+  /HashLocation .\hash /Schema .\esquema-polizas.xml /AllowedBadLinesPercentage 5
+.\EdmUploadAgent.exe /UploadHash /DataStoreName polizas /HashFile .\hash\polizas.EdmHash</code></pre>
 
     <h2 id="priorizar">Prioritising the mitigation of threats to data (4.3.2)</h2>
     <p>
@@ -434,6 +533,19 @@
       Microsoft should be able to read it while it is processed", no customer-managed key solves it: that is
       confidential computing.
     </div>
+
+    <p class="code-label">Customer-managed key: disabling it cuts access instantly</p>
+    <pre><code># Cifrado de sobre: el dato se cifra con una clave de datos, y esa clave se
+# guarda ENVUELTA por esta. Sin poder desenvolverla no se descifra nada.
+az storage account update -n stprod -g rg-datos \
+  --encryption-key-source Microsoft.Keyvault \
+  --encryption-key-vault &quot;https://kv-claves-prod.vault.azure.net&quot; \
+  --encryption-key-name clave-storage-prod \
+  --encryption-key-version &quot;&quot;    # cadena vacía = rotación automática
+
+# El corte, sin reescribir un solo byte y sin intervención del proveedor:
+az keyvault key set-attributes --vault-name kv-claves-prod \
+  --name clave-storage-prod --enabled false</code></pre>
 
     <h2 id="dato-ia">Securing the data AI workloads consume (4.3.4)</h2>
     <p>
@@ -469,6 +581,39 @@
       the database administrator</em> can see it, that is <strong>Always Encrypted</strong>.
     </div>
 
+    <p class="code-label">Row-level security: the engine applies the filter, not the query</p>
+    <pre><code>-- Si depende de que cada consulta lleve la cláusula correcta, un olvido o una
+-- inyección devuelven filas de otro inquilino. Aquí no hay consulta que lo evite.
+CREATE FUNCTION seguridad.fn_filtro_inquilino(@InquilinoId int)
+    RETURNS TABLE WITH SCHEMABINDING
+AS
+    RETURN SELECT 1 AS acceso
+    WHERE @InquilinoId = CAST(SESSION_CONTEXT(N&#x27;InquilinoId&#x27;) AS int);
+GO
+
+CREATE SECURITY POLICY seguridad.PoliticaInquilino
+    ADD FILTER PREDICATE seguridad.fn_filtro_inquilino(InquilinoId) ON dbo.Pedidos,
+    ADD BLOCK PREDICATE  seguridad.fn_filtro_inquilino(InquilinoId) ON dbo.Pedidos AFTER INSERT
+    WITH (STATE = ON);</code></pre>
+
+    <p class="code-label">Always Encrypted: the engine stores and returns a value it cannot interpret</p>
+    <pre><code>-- El cifrado transparente cifra los ficheros en disco, pero el motor descifra
+-- para servir la consulta: no protege del administrador. Esto sí.
+CREATE COLUMN MASTER KEY CMK_Tarjetas
+WITH (
+    KEY_STORE_PROVIDER_NAME = &#x27;AZURE_KEY_VAULT&#x27;,
+    KEY_PATH = &#x27;https://kv-claves-prod.vault.azure.net/keys/cmk-tarjetas/&lt;version&gt;&#x27;
+);
+GO
+
+ALTER TABLE dbo.Pagos
+ALTER COLUMN NumeroTarjeta char(16) COLLATE Latin1_General_BIN2
+ENCRYPTED WITH (
+    COLUMN_ENCRYPTION_KEY = CEK_Tarjetas,
+    ENCRYPTION_TYPE = DETERMINISTIC,          -- permite igualdad; RANDOMIZED es más fuerte
+    ALGORITHM = &#x27;AEAD_AES_256_CBC_HMAC_SHA_256&#x27;
+) NOT NULL;</code></pre>
+
     <h2 id="storage">Securing data in Azure Storage (4.3.6)</h2>
     <ul>
       <li><strong>No account keys</strong>: access with Entra ID and data roles; if delegated access is
@@ -482,6 +627,26 @@
         be modified or deleted.</li>
       <li><strong>Soft delete and versioning</strong> to survive accidental or malicious deletion.</li>
     </ul>
+
+    <p class="code-label">User delegation SAS: the only kind that can genuinely be revoked</p>
+    <pre><code># Firmada con la clave de cuenta no hay lista de emitidas ni nada que borrar:
+# la única forma de invalidarla es rotar la clave, y eso tumba todas las demás.
+az storage blob generate-sas --account-name stprod \
+  --container-name informes --name auditoria-2026.pdf \
+  --permissions r --expiry 2026-09-05T00:00Z \
+  --auth-mode login --as-user --full-uri
+
+# Revocar TODAS las de delegación emitidas para esa identidad, de golpe:
+az storage account revoke-delegation-keys -n stprod -g rg-datos</code></pre>
+
+    <p class="code-label">Locked immutable retention: not even the subscription administrator shortens it</p>
+    <pre><code># La eliminación temporal permite recuperar lo borrado, pero admite que se
+# borre y que se acorte la ventana. Esto no: solo se puede AMPLIAR.
+az storage container immutability-policy create \
+  --account-name stevidencia --container-name operaciones --period 2555
+az storage container immutability-policy lock \
+  --account-name stevidencia --container-name operaciones \
+  --if-match &#x27;&quot;&lt;etag&gt;&quot;&#x27;</code></pre>
 
     <h2 id="defender-datos">Defender for Storage and Defender for Databases (4.3.7)</h2>
     <p>

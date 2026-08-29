@@ -354,6 +354,24 @@
       extension and its data collection rule. A stem asking for both needs both pieces in the answer.
     </div>
 
+    <p class="code-label">Registering a server from outside Azure: from here it is a Resource Manager resource</p>
+    <pre><code># Esto es TODO lo que hace Arc: proyectar la máquina. No envía registros,
+# no protege nada y no toca la red. Es el requisito de lo demás, no el resultado.
+azcmagent connect \
+  --resource-group rg-arc-servidores \
+  --tenant-id &lt;tenant&gt; --subscription-id &lt;suscripcion&gt; \
+  --location westeurope \
+  --tags &quot;Entorno=Produccion,Propietario=plataforma&quot;</code></pre>
+
+    <p class="code-label">And now: the same policy definition over Azure, AWS and the data centre</p>
+    <pre><code># Registrada la maquina, entra en el ambito de Azure Policy como cualquier
+# recurso de Azure. Un solo plano de gobierno para las tres ubicaciones.
+az policy assignment create \
+  --name cifrado-disco-todas-las-maquinas \
+  --scope /providers/Microsoft.Management/managementGroups/mg-raiz \
+  --policy &lt;id-definicion-cifrado&gt; \
+  --enforcement-mode Default</code></pre>
+
     <h2 id="easm">Defender External Attack Surface Management (3.1.6)</h2>
     <p>
       EASM looks at your organisation <strong>from the outside</strong>, the way an attacker would. From a
@@ -465,6 +483,19 @@
       scope, remediate what exists, and only then enforce, so you do not break what already works.
     </p>
 
+    <p class="code-label">Machine configuration: evaluating settings INSIDE the operating system</p>
+    <pre><code># Azure Policy por sí sola ve el recurso en Resource Manager: su SKU, sus
+# etiquetas. No ve dentro. Configuración de máquina es la extensión que sí entra.
+az policy assignment create \
+  --name linea-base-windows \
+  --scope $(az group show -n rg-produccion --query id -o tsv) \
+  --policy-set-definition &quot;/providers/Microsoft.Authorization/policySetDefinitions/12794019-7a00-42cf-95c2-882eed337cc8&quot; \
+  --mi-system-assigned --location westeurope
+
+# La identidad administrada hace falta porque la corrección escribe en la máquina.
+az policy assignment identity assign --system-assigned \
+  --name linea-base-windows --scope $(az group show -n rg-produccion --query id -o tsv)</code></pre>
+
     <h2 id="laps">Windows LAPS (3.2.6)</h2>
     <p>
       One local administrator password repeated across the whole estate is the classic lateral-movement
@@ -479,6 +510,27 @@
       group policy is still shared — and visible in the policy itself. And disabling the local account
       strands the machine the day it loses connectivity to the domain.
     </div>
+
+    <p class="code-label">Windows LAPS: a distinct password per machine, vaulted in Entra ID</p>
+    <pre><code># El movimiento lateral funcionaba porque la MISMA credencial local valía en
+# ochenta máquinas. Con esto, el hash robado en un portátil no sirve en ningún otro.
+# Directiva de Intune (extracto del perfil de LAPS):
+{
+  &quot;backupDirectory&quot;: &quot;azureActiveDirectory&quot;,
+  &quot;passwordAgeDays&quot;: 30,
+  &quot;passwordLength&quot;: 20,
+  &quot;passwordComplexity&quot;: &quot;alphanumericAndSpecial&quot;,
+  &quot;postAuthenticationActions&quot;: &quot;resetPasswordAndLogoff&quot;,
+  &quot;postAuthenticationResetDelayHours&quot;: 8
+}</code></pre>
+
+    <p class="code-label">Reading that password is a privileged permission: scoped, audited and rotated afterwards</p>
+    <pre><code># Dar lectura universal a soporte de primer nivel los convierte en
+# administradores locales de todo el estado.
+Get-LapsAADPassword -DeviceIds &quot;&lt;id-del-dispositivo&gt;&quot; -IncludePasswords -AsPlainText
+
+# Forzar la rotación en cuanto se ha usado, para que el conocimiento caduque:
+Reset-LapsPassword -DeviceIds &quot;&lt;id-del-dispositivo&gt;&quot;</code></pre>
 
     <h2 id="baselines-servicios">Baselines for SaaS, PaaS and IaaS (3.3.1)</h2>
     <p>
@@ -549,6 +601,26 @@
       <tr><td>The nodes</td><td>Automatic operating system and Kubernetes version upgrades</td></tr>
     </table>
 
+    <p class="code-label">Azure Policy for Kubernetes: reject the manifest at admission, not alert afterwards</p>
+    <pre><code># Una regla de Sentinel avisa cuando el contenedor privilegiado YA corre.
+# Esto lo rechaza antes de aceptarlo, y en todos los clústeres a la vez.
+az policy assignment create \
+  --name prohibir-contenedor-privilegiado \
+  --scope /providers/Microsoft.Management/managementGroups/mg-produccion \
+  --policy &quot;95edb821-ddaf-4404-9732-666045e056b4&quot; \
+  --enforcement-mode Default \
+  --params &#x27;{&quot;effect&quot;:{&quot;value&quot;:&quot;deny&quot;},&quot;excludedNamespaces&quot;:{&quot;value&quot;:[&quot;kube-system&quot;,&quot;gatekeeper-system&quot;]}}&#x27;</code></pre>
+
+    <p class="code-label">The two AKS RBACs: being Contributor in Azure grants nothing inside</p>
+    <pre><code># El rol de Azure gobierna el RECURSO clúster: crearlo, escalarlo, pedir credenciales.
+az role assignment create --assignee &lt;usuario&gt; \
+  --role &quot;Azure Kubernetes Service Cluster User Role&quot; \
+  --scope $(az aks show -n aks-prod -g rg-aks --query id -o tsv)
+
+# Lo que se puede hacer DENTRO lo decide el RBAC de Kubernetes, por espacio de nombres.
+kubectl create rolebinding lectura-equipo-pagos \
+  --clusterrole=view --group=&lt;id-del-grupo-de-entra&gt; --namespace=pagos</code></pre>
+
     <h2 id="ia">Securing the Azure AI services (3.3.6)</h2>
     <p>
       New syllabus content and highly askable, because it combines things you already know with two risks
@@ -568,6 +640,21 @@
       answered with the service's own filters and shields, and by bounding what the model can do with the
       identity it is given.
     </div>
+
+    <p class="code-label">An AI service is protected like any other platform service</p>
+    <pre><code># Punto de conexión privado, acceso público cerrado y sin clave que filtrar:
+# identidad administrada en su lugar.
+az cognitiveservices account update -n ai-copiloto-interno -g rg-ia \
+  --custom-domain ai-copiloto-interno \
+  --api-properties publicNetworkAccess=Disabled
+
+az cognitiveservices account update -n ai-copiloto-interno -g rg-ia \
+  --set properties.disableLocalAuth=true
+
+az role assignment create \
+  --assignee $(az webapp identity show -n app-interna -g rg-apps --query principalId -o tsv) \
+  --role &quot;Cognitive Services OpenAI User&quot; \
+  --scope $(az cognitiveservices account show -n ai-copiloto-interno -g rg-ia --query id -o tsv)</code></pre>
 
     <h2 id="red">Evaluating a network design (3.4.1)</h2>
     <p>
@@ -592,6 +679,51 @@
         continuously that a critical path stays open. Without these, a network design can be neither
         debugged nor audited.</li>
     </ul>
+
+    <p class="code-label">Numeric priority, first match wins: the opposite of Conditional Access</p>
+    <pre><code># La regla 200 NO se evalúa nunca: la 100 ya permitió ese tráfico.
+az network nsg rule create -g rg-red --nsg-name nsg-app \
+  --name permitir-https --priority 100 \
+  --access Allow --protocol Tcp --direction Inbound \
+  --source-address-prefixes &#x27;*&#x27; --destination-port-ranges 443
+
+az network nsg rule create -g rg-red --nsg-name nsg-app \
+  --name denegar-subred-invitados --priority 200 \
+  --access Deny --protocol Tcp --direction Inbound \
+  --source-address-prefixes 10.20.30.0/24 --destination-port-ranges 443
+
+# El arreglo es dar a la denegación un número MENOR que el del permiso.
+az network nsg rule update -g rg-red --nsg-name nsg-app \
+  --name denegar-subred-invitados --priority 90</code></pre>
+
+    <p class="code-label">Application security groups: labels instead of ranges you have to maintain</p>
+    <pre><code>az network asg create -g rg-red -n asg-web
+az network asg create -g rg-red -n asg-bd
+
+# La regla habla de roles, no de direcciones. Una máquina nueva entra en el
+# grupo y hereda la regla sin tocar el NSG.
+az network nsg rule create -g rg-red --nsg-name nsg-bd \
+  --name web-hacia-bd --priority 120 --access Allow --protocol Tcp \
+  --source-asgs asg-web --destination-asgs asg-bd --destination-port-ranges 1433</code></pre>
+
+    <p class="code-label">Private endpoint — and the DNS zone, which is what is almost always missing</p>
+    <pre><code>az network private-endpoint create -g rg-red \
+  --name pe-storage --vnet-name vnet-prod --subnet snet-datos \
+  --private-connection-resource-id $(az storage account show -n stprod -g rg-datos --query id -o tsv) \
+  --group-id blob --connection-name conn-storage
+
+# SIN ESTO el nombre sigue resolviendo a la dirección pública, el tráfico
+# intenta salir a internet y —con el acceso público deshabilitado— falla.
+az network private-dns zone create -g rg-red -n &quot;privatelink.blob.core.windows.net&quot;
+az network private-dns link vnet create -g rg-red \
+  --zone-name &quot;privatelink.blob.core.windows.net&quot; \
+  --name link-vnet-prod --virtual-network vnet-prod --registration-enabled false
+az network private-endpoint dns-zone-group create -g rg-red \
+  --endpoint-name pe-storage --name zg-blob \
+  --private-dns-zone &quot;privatelink.blob.core.windows.net&quot; --zone-name blob
+
+# Y cerrar la puerta pública:
+az storage account update -n stprod -g rg-datos --public-network-access Disabled</code></pre>
 
     <h2 id="internet-access">Entra Internet Access as a secure web gateway (3.4.2)</h2>
     <p>

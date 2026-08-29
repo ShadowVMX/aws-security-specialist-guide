@@ -491,6 +491,18 @@ var QUIZ_DATA = [
     correct: 1,
     explain: "La delegación es <b>por servicio</b>: se registra una cuenta como administrador delegado de GuardDuty, otra —o la misma— de Security Hub, y así con cada servicio integrado con Organizations. Lo habitual es concentrarlos en una cuenta de seguridad, pero es una decisión, no una obligación. La cuenta de gestión es justo la que conviene dejar fuera, para reducir lo que puede pasar si se compromete. Y ser administrador delegado de un servicio de seguridad no otorga ningún permiso sobre los recursos de las cuentas miembro. <a href=\"https://docs.aws.amazon.com/organizations/latest/userguide/orgs_integrate_services.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
+  {
+    tag: "La evidencia que aporta AWS",
+    q: "Un auditor pide las certificaciones e informes de cumplimiento de la infraestructura sobre la que corre la carga del cliente. ¿De dónde salen y qué cubren?",
+    options: [
+      "De Security Hub, cuyo panel de estándares genera el informe de cumplimiento que el auditor necesita",
+      "De AWS Artifact: cubren la mitad del proveedor, no la configuración del cliente",
+      "De AWS Audit Manager, que produce las certificaciones de AWS junto con las evidencias de la cuenta",
+      "De AWS Config, cuyo historial de conformidad sirve como acreditación ante el auditor externo",
+    ],
+    correct: 1,
+    explain: "<b>Artifact</b> es el portal donde AWS publica sus informes de auditoría y certificaciones —SOC, ISO, PCI— y los acuerdos que a veces hay que aceptar. Lo importante para el examen es el <b>alcance</b>: acreditan la mitad de AWS en la responsabilidad compartida, y no dicen nada de cómo está configurada tu cuenta. Esa otra mitad la cubren Security Hub y Config evaluando tus recursos, y Audit Manager recogiendo la evidencia de tu configuración, pero ninguno de los tres emite las certificaciones del proveedor. <a href=\"https://docs.aws.amazon.com/artifact/latest/ug/what-is-aws-artifact.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
 ];
 
 // Registrado para el simulacro de examen, que carga los seis bancos a la vez.

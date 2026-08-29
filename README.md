@@ -5,7 +5,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/examen-SCS--C03-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white" alt="SCS-C03">
   <img src="https://img.shields.io/badge/examen-SC--100-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white" alt="SC-100">
-  <img src="https://img.shields.io/badge/preguntas-610-B892FF?style=for-the-badge" alt="610 preguntas">
+  <img src="https://img.shields.io/badge/preguntas-621-B892FF?style=for-the-badge" alt="621 preguntas">
   <img src="https://img.shields.io/badge/skills-151%2F151-3ECF8E?style=for-the-badge" alt="151 de 151 skills cubiertos">
   <img src="https://img.shields.io/badge/idiomas-ES%20%7C%20EN-0b1220?style=for-the-badge" alt="Español e inglés">
 </p>
@@ -34,7 +34,7 @@ Guías de estudio interactivas para certificaciones de seguridad en la nube, cad
 
 | Guía | Examen | Dominios | Skills | Preguntas | Simulacro |
 |---|---|---|---|---|---|
-| [AWS Certified Security — Specialty](https://shadowvmx.github.io/aws-scs-c03/) | SCS-C03 | 6 | 70 | 286 | 65 preguntas · 170 min |
+| [AWS Certified Security — Specialty](https://shadowvmx.github.io/aws-scs-c03/) | SCS-C03 | 6 | 70 | 297 | 65 preguntas · 170 min |
 | [Microsoft Cybersecurity Architect](https://shadowvmx.github.io/sc-100/) | SC-100 | 4 | 81 | 324 | 48 preguntas · 100 min |
 
 Cada módulo combina teoría estructurada, las trampas más frecuentes del examen y un quiz con
@@ -115,14 +115,15 @@ Cada módulo de las dos guías incluye:
 - Teoría organizada por los *task statements* oficiales, con su numeración
 - El temario oficial del dominio impreso al final, para ir tachando contra la guía
 - Diagramas SVG interactivos, navegables también con teclado
+- Ejemplos de código listos para leer y adaptar: AWS CLI y políticas JSON en la guía de AWS;
+  KQL, Azure Policy, Azure CLI, PowerShell y T-SQL en la del SC-100
 - Una sección con las trampas más frecuentes del examen
 - Una sección de fuentes oficiales con la documentación en la que se apoya
 - Un quiz con explicación razonada en cada respuesta
 
 Y además, según la guía:
 
-- **SCS-C03**: ejemplos de AWS CLI y de políticas JSON listos para leer y adaptar, y comparativas
-  con Azure donde el mapeo es fiable
+- **SCS-C03**: comparativas con Azure donde el mapeo es fiable
 - **SC-100**: una sección de apertura con la mecánica que el examen da por sabida y que espera
   aprendida de AZ-500, SC-200 o SC-300
 
@@ -130,7 +131,7 @@ Y además, según la guía:
 
 ### Quiz por dominio
 
-610 preguntas por idioma entre las dos guías —286 de AWS y 324 del SC-100—, con al menos cuatro
+621 preguntas por idioma entre las dos guías —297 de AWS y 324 del SC-100—, con al menos cuatro
 por cada skill oficial. Las de **respuesta múltiple** (`choose TWO`) se puntúan todo-o-nada, igual
 que en el examen real.
 

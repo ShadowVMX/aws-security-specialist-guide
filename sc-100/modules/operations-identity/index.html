@@ -293,6 +293,22 @@
       largo plazo, y solo se promociona lo que alimenta una regla.
     </p>
 
+    <p class="code-label">Antes de escribir una regla, comprobar que el origen está ingiriendo de verdad</p>
+    <pre><code>// Una regla sobre una tabla que no recibe datos no falla: se queda en silencio
+// para siempre. Esta consulta dice qué llega, cuánto y cuándo llegó lo último.
+union withsource=Tabla *
+| where TimeGenerated &gt; ago(24h)
+| summarize Eventos = count(), Ultimo = max(TimeGenerated) by Tabla
+| order by Eventos desc</code></pre>
+
+    <p class="code-label">Qué se recoge de cada máquina: la regla de recopilación decide, no el agente</p>
+    <pre><code># El agente de Azure Monitor no recoge nada por sí solo. Sin una regla de
+# recopilación asociada, la máquina tiene agente y no envía un solo evento.
+az monitor data-collection rule association create \
+  --name dcra-servidores-seguridad \
+  --rule-id $(az monitor data-collection rule show -n dcr-eventos-seguridad -g rg-monitor --query id -o tsv) \
+  --resource $(az vm show -n vm-dc-01 -g rg-identidad --query id -o tsv)</code></pre>
+
     <h2 id="hibrido">Monitorización de entornos híbridos y multinube (2.1.3)</h2>
     <p>
       La pregunta casi siempre es «tenemos servidores fuera de Azure y/o cargas en AWS o GCP». El patrón:
@@ -346,6 +362,35 @@
       describe <strong>caza</strong>, no detección. Añadir más reglas de análisis no lo resuelve: lo que
       necesita es acceso a los datos históricos y consultas, no otra alerta.
     </div>
+
+    <p class="code-label">Regla de análisis: viaje imposible seguido de acceso a un recurso sensible</p>
+    <pre><code>// Correlaciona dos señales que por separado son ruido y juntas son un incidente.
+let ventana = 1h;
+let riesgo = SigninLogs
+| where TimeGenerated &gt; ago(24h)
+| where RiskEventTypes has &quot;impossibleTravel&quot;
+| project TiempoRiesgo = TimeGenerated, UserPrincipalName, IPAddress;
+riesgo
+| join kind=inner (
+    AzureActivity
+    | where TimeGenerated &gt; ago(24h)
+    | where OperationNameValue has &quot;MICROSOFT.KEYVAULT&quot;
+    | project TiempoAcceso = TimeGenerated, UserPrincipalName = Caller, ResourceId
+) on UserPrincipalName
+| where TiempoAcceso between (TiempoRiesgo .. TiempoRiesgo + ventana)
+| project TiempoRiesgo, TiempoAcceso, UserPrincipalName, IPAddress, ResourceId</code></pre>
+
+    <p class="code-label">Caza: una identidad de carga de trabajo actuando fuera de su patrón</p>
+    <pre><code>// La caza no espera a que salte una alerta: parte de una hipótesis. Aquí,
+// que una entidad de servicio se use desde una IP o a una hora que no son suyas.
+let linea_base = AADServicePrincipalSignInLogs
+| where TimeGenerated between (ago(30d) .. ago(1d))
+| summarize IPsHabituales = make_set(IPAddress, 100) by ServicePrincipalId;
+AADServicePrincipalSignInLogs
+| where TimeGenerated &gt; ago(1d)
+| join kind=inner linea_base on ServicePrincipalId
+| where IPAddress !in (IPsHabituales)
+| project TimeGenerated, ServicePrincipalName, IPAddress, ResourceDisplayName</code></pre>
 
     <h2 id="mitre">Evaluar la cobertura de detección con MITRE ATT&amp;CK (2.1.6)</h2>
     <p>
@@ -444,6 +489,23 @@
       una regla mal escrita puede dejar fuera a todos los administradores a la vez.
     </div>
 
+    <p class="code-label">Directiva de acceso condicional en modo solo informe, antes de aplicarla</p>
+    <pre><code>{
+  &quot;displayName&quot;: &quot;Administradores: MFA resistente a phishing&quot;,
+  &quot;state&quot;: &quot;enabledForReportingButNotEnforced&quot;,
+  &quot;conditions&quot;: {
+    &quot;users&quot;: {
+      &quot;includeRoles&quot;: [ &quot;62e90394-69f5-4237-9190-012177145e10&quot; ],
+      &quot;excludeUsers&quot;: [ &quot;&lt;id-cuenta-emergencia-1&gt;&quot;, &quot;&lt;id-cuenta-emergencia-2&gt;&quot; ]
+    },
+    &quot;applications&quot;: { &quot;includeApplications&quot;: [ &quot;All&quot; ] }
+  },
+  &quot;grantControls&quot;: {
+    &quot;operator&quot;: &quot;AND&quot;,
+    &quot;authenticationStrength&quot;: { &quot;id&quot;: &quot;00000000-0000-0000-0000-000000000004&quot; }
+  }
+}</code></pre>
+
     <h2 id="adds-hardening">Especificar el endurecimiento de AD DS (2.2.7)</h2>
     <p>
       AD DS sigue estando debajo de casi toda empresa, y el examen lo trata como lo que es: el objetivo real
@@ -458,6 +520,26 @@
       <li><strong>Defender for Identity</strong> sobre los controladores de dominio, que es lo que detecta
         DCSync, Golden Ticket, kerberoasting y enumeración con reconocimiento.</li>
     </ul>
+
+    <p class="code-label">Cuentas de servicio con SPN y contraseña vieja: la superficie del kerberoasting</p>
+    <pre><code># Cualquier usuario autenticado puede pedir un vale para estos SPN y romperlo
+# fuera de línea. Lo único que decide si lo consigue es la contraseña.
+Get-ADUser -Filter { ServicePrincipalName -like &quot;*&quot; } `
+  -Properties ServicePrincipalName, PasswordLastSet, msDS-SupportedEncryptionTypes |
+  Where-Object { $_.PasswordLastSet -lt (Get-Date).AddDays(-180) } |
+  Select-Object Name, PasswordLastSet, ServicePrincipalName |
+  Sort-Object PasswordLastSet</code></pre>
+
+    <p class="code-label">Sustituir esa cuenta por una gMSA: la contraseña la genera y la rota el dominio</p>
+    <pre><code># 120 caracteres aleatorios, rotados solos cada 30 dias. Sigue habiendo vale
+# de servicio, pero ya no hay nada que romper fuera de linea.
+New-ADServiceAccount -Name gmsa-app-facturacion `
+  -DNSHostName gmsa-app-facturacion.contoso.local `
+  -PrincipalsAllowedToRetrieveManagedPassword &quot;GRP-Servidores-Facturacion&quot; `
+  -ServicePrincipalNames &quot;HTTP/app-facturacion.contoso.local&quot;
+
+# Y en el servidor que la usa:
+Install-ADServiceAccount -Identity gmsa-app-facturacion</code></pre>
 
     <h2 id="secretos">Gestionar secretos, claves y certificados (2.2.8)</h2>
     <table role="table">
@@ -496,6 +578,19 @@
       sigue siendo un problema de gobierno.
     </div>
 
+    <p class="code-label">Elegible no aparece en el token, pero cuenta para el auditor</p>
+    <pre><code># Exportar solo las asignaciones ACTIVAS deja fuera a quien puede activarse el
+# rol cuando quiera. El universo de administradores es la suma de las dos.
+$rol = Get-MgRoleManagementDirectoryRoleDefinition -Filter &quot;displayName eq &#x27;Security Administrator&#x27;&quot;
+
+Get-MgRoleManagementDirectoryRoleEligibilityScheduleInstance `
+  -Filter &quot;roleDefinitionId eq &#x27;$($rol.Id)&#x27;&quot; -ExpandProperty Principal |
+  Select-Object @{n=&#x27;Estado&#x27;;e={&#x27;Elegible&#x27;}}, @{n=&#x27;Quien&#x27;;e={$_.Principal.AdditionalProperties.displayName}}
+
+Get-MgRoleManagementDirectoryRoleAssignmentScheduleInstance `
+  -Filter &quot;roleDefinitionId eq &#x27;$($rol.Id)&#x27;&quot; -ExpandProperty Principal |
+  Select-Object @{n=&#x27;Estado&#x27;;e={&#x27;Activo&#x27;}}, @{n=&#x27;Quien&#x27;;e={$_.Principal.AdditionalProperties.displayName}}</code></pre>
+
     <h2 id="adds-gobierno">Evaluar el gobierno y la resistencia de AD DS (2.3.3)</h2>
     <p>
       Aquí el examen quiere que reconozcas los ataques por su nombre y sepas qué los frena:
@@ -517,6 +612,18 @@
       las cargas. En escenarios SaaS y multinube, la misma disciplina se extiende a la consola de cada
       proveedor.
     </p>
+
+    <p class="code-label">El puente que nadie recuerda: la elevación del administrador global al ámbito raíz</p>
+    <pre><code># No caduca sola. Mientras exista, esa cuenta controla la asignación de roles
+# de TODO el estado de Azure, heredada hacia abajo.
+az role assignment list \
+  --role &quot;User Access Administrator&quot; \
+  --scope &quot;/&quot; --query &quot;[].{quien:principalName, ambito:scope}&quot; -o table
+
+# Revertirla en cuanto se ha usado:
+az rest --method post \
+  --url &quot;https://management.azure.com/providers/Microsoft.Authorization/elevateAccess?api-version=2016-07-01&quot;
+az role assignment delete --role &quot;User Access Administrator&quot; --scope &quot;/&quot; --assignee &lt;id&gt;</code></pre>
 
     <h2 id="ciem">CIEM: permisos de infraestructura en la nube (2.3.5)</h2>
     <p>
@@ -613,6 +720,40 @@
       <em>Audit primero para medir, remediación para lo existente, Deny después para que no vuelva</em>.
     </div>
 
+    <p class="code-label">Deny no toca lo que ya está desplegado: hace falta Modify o DeployIfNotExists con corrección</p>
+    <pre><code>{
+  &quot;if&quot;: {
+    &quot;allOf&quot;: [
+      { &quot;field&quot;: &quot;type&quot;, &quot;equals&quot;: &quot;Microsoft.Storage/storageAccounts&quot; },
+      { &quot;field&quot;: &quot;Microsoft.Storage/storageAccounts/allowBlobPublicAccess&quot;, &quot;notEquals&quot;: &quot;false&quot; }
+    ]
+  },
+  &quot;then&quot;: {
+    &quot;effect&quot;: &quot;modify&quot;,
+    &quot;details&quot;: {
+      &quot;roleDefinitionIds&quot;: [
+        &quot;/providers/Microsoft.Authorization/roleDefinitions/17d1049b-9a84-46fb-8f53-869881c3d3ab&quot;
+      ],
+      &quot;operations&quot;: [
+        {
+          &quot;operation&quot;: &quot;addOrReplace&quot;,
+          &quot;field&quot;: &quot;Microsoft.Storage/storageAccounts/allowBlobPublicAccess&quot;,
+          &quot;value&quot;: &quot;false&quot;
+        }
+      ]
+    }
+  }
+}</code></pre>
+
+    <p class="code-label">La tarea de corrección, que es lo que actúa sobre lo existente</p>
+    <pre><code># Sin esto, Modify y DeployIfNotExists solo se aplican a lo que se cree o
+# modifique a partir de ahora. Lo antiguo se queda marcado como no conforme.
+az policy remediation create \
+  --name corregir-acceso-publico \
+  --policy-assignment exigir-storage-privado \
+  --resource-discovery-mode ReEvaluateCompliance \
+  --management-group mg-produccion</code></pre>
+
     <h2 id="defender-compliance">Defender for Cloud para validar la normativa (2.4.4)</h2>
     <p>
       El panel de <strong>cumplimiento normativo</strong> de Defender for Cloud mapea tus recursos contra
@@ -621,6 +762,16 @@
       la herramienta de la que sale la evidencia continua; el <strong>Secure Score</strong>, en cambio, es
       una métrica de mejora relativa, no un informe de cumplimiento.
     </p>
+
+    <p class="code-label">El mismo estándar sobre las tres nubes, para que la comparación signifique algo</p>
+    <pre><code># Defender for Cloud no es solo para Azure: los conectores nativos incorporan
+# las cuentas de AWS y los proyectos de GCP y los evalúan con el mismo criterio.
+az security regulatory-compliance-standards list -o table
+
+az policy assignment create \
+  --name iso-27001-multinube \
+  --scope /providers/Microsoft.Management/managementGroups/mg-raiz \
+  --policy-set-definition &lt;id-de-la-iniciativa-de-cumplimiento&gt;</code></pre>
 
     <h2 id="ia-responsable">Gobierno, riesgo y cumplimiento de la IA (2.4.1 / 2.4.2)</h2>
     <p>

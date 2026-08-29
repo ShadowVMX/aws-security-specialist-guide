@@ -587,6 +587,42 @@ var QUIZ_DATA = [
     correct: 1,
     explain: "Las políticas de IoT admiten <b>variables de política</b> como <code>${iot:Connection.Thing.ThingName}</code> o <code>${iot:ClientId}</code>, de modo que una sola política sirve para toda la flota y cada dispositivo queda acotado a su propio topic. Un security group no distingue dispositivos dentro de una conexión MQTT autenticada por certificado. Un rol compartido con permiso sobre el topic permite a cualquiera publicar como cualquiera. Y filtrar en una regla es detección después del hecho, no autorización. <a href=\"https://docs.aws.amazon.com/iot/latest/developerguide/iot-policies.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
+  {
+    tag: "Una identidad por dispositivo",
+    q: "Un fabricante va a desplegar 50.000 sensores que publican en AWS IoT Core. Propone grabar el mismo certificado en toda la serie, para simplificar la fabricación.",
+    options: [
+      "Es aceptable si el certificado se rota con una actualización de firmware una vez al año",
+      "Un certificado por dispositivo: con uno compartido no se puede revocar uno solo",
+      "Es aceptable si además se aplica una política de IoT que limite los temas a los que puede publicar",
+      "Es aceptable siempre que el certificado tenga una caducidad corta, inferior a noventa días",
+    ],
+    correct: 1,
+    explain: "El dispositivo está físicamente en manos de cualquiera, así que hay que asumir que alguien extraerá su credencial. Con un certificado <b>por dispositivo</b>, ese compromiso se resuelve revocando uno y solo uno. Con un certificado compartido no hay nada que revocar sin tirar la flota entera, y por eso el aprovisionamiento de IoT Core se apoya en identidad única, provisionada de fábrica o mediante el servicio de aprovisionamiento. La política de IoT acota qué puede hacer el dispositivo, que es necesario pero distinto; y rotar por firmware asume una capacidad de actualización que muchos embebidos no tienen. <a href=\"https://docs.aws.amazon.com/iot/latest/developerguide/iot-security-identity.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
+  {
+    tag: "Dónde entra el análisis del código",
+    q: "Un equipo quiere detectar en su propio código patrones de inyección, secretos incrustados y uso incorrecto de las APIs de cifrado, antes de desplegar. ¿Qué servicio corresponde?",
+    options: [
+      "Amazon Inspector, que analiza vulnerabilidades conocidas en el código de la aplicación",
+      "Amazon Macie, que identifica datos sensibles incrustados en los repositorios del equipo",
+      "AWS Config con reglas personalizadas que evalúen el contenido de cada confirmación",
+      "Amazon CodeGuru Security, que hace análisis estático del código y señala esos patrones",
+    ],
+    correct: 3,
+    explain: "<b>CodeGuru Security</b> es el análisis estático de AWS: recorre el código propio buscando defectos de seguridad —inyección, secretos incrustados, uso inseguro de criptografía, fugas de recursos— y devuelve el hallazgo con su ubicación y una sugerencia. Amazon Inspector analiza vulnerabilidades conocidas en dependencias, imágenes y funciones, que es lo de terceros, no lo tuyo. Macie clasifica datos en S3. Y AWS Config evalúa la configuración de recursos desplegados, no el contenido de un repositorio. <a href=\"https://docs.aws.amazon.com/codeguru/latest/security-ug/what-is-codeguru-security.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
+  {
+    tag: "El asistente y el código propio",
+    q: "Seguridad pregunta qué controles hay que fijar antes de habilitar Amazon Q Developer para los equipos de desarrollo.",
+    options: [
+      "Decidir el nivel de suscripción y revisar las sugerencias como código de terceros",
+      "Ninguno: el asistente solo sugiere código y no accede a datos de la organización",
+      "Basta con restringirlo a los repositorios privados mediante una política de IAM sobre el servicio",
+      "Basta con activar el registro de las interacciones en CloudTrail y revisarlo mensualmente",
+    ],
+    correct: 0,
+    explain: "Un asistente de código plantea dos preguntas de gobierno. La primera es de <b>dato</b>: qué se envía al servicio y si se usa para mejorarlo, que depende del nivel de suscripción y se configura, no se presume. La segunda es de <b>procedencia</b>: el código sugerido entra en tu base como cualquier aportación externa, así que pasa por la misma revisión, el mismo análisis y las mismas comprobaciones de licencia. Decir que no accede a nada es falso, restringir por IAM no responde a ninguna de las dos, y auditar después llega tarde. <a href=\"https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/security.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
 ];
 
 // Registrado para el simulacro de examen, que carga los seis bancos a la vez.
