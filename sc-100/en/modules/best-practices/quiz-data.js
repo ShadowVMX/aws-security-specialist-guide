@@ -144,7 +144,7 @@ var QUIZ_DATA = [
       "Increasing the frequency of vulnerability scanning on the machines where they run",
     ],
     correct: 0,
-    explain: "The supply chain comes in through something you <b>already trust</b>, so the defence sits in the build: <b>composition analysis</b> to know what gets pulled in, <b>provenance and signing</b> to know the artefact is the one that was built, and governance of vendor and tooling access. Banning open source is not realistic, and the WAF and machine scanning act once the component is already inside. <a href=\"https://learn.microsoft.com/en-us/azure/security/develop/secure-supply-chain\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "The supply chain comes in through something you <b>already trust</b>, so the defence sits in the build: <b>composition analysis</b> to know what gets pulled in, <b>provenance and signing</b> to know the artefact is the one that was built, and governance of vendor and tooling access. Banning open source is not realistic, and the WAF and machine scanning act once the component is already inside. <a href=\"https://learn.microsoft.com/en-us/security/zero-trust/sfi/protect-software-supply-chain\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "AI is not an exception",

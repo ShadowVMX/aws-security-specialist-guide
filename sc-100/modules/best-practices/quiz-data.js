@@ -144,7 +144,7 @@ var QUIZ_DATA = [
       "Aumentar la frecuencia del análisis de vulnerabilidades sobre las máquinas donde se ejecutan",
     ],
     correct: 0,
-    explain: "La cadena de suministro entra por algo en lo que <b>ya confías</b>, así que la defensa va en la construcción: <b>análisis de composición</b> para saber qué se incorpora, <b>procedencia y firma</b> para saber que el artefacto es el que se compiló, y gobierno del acceso de proveedores y herramientas. Prohibir el código abierto no es realista, y el WAF y el análisis de máquinas actúan cuando el componente ya está dentro. <a href=\"https://learn.microsoft.com/en-us/azure/security/develop/secure-supply-chain\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "La cadena de suministro entra por algo en lo que <b>ya confías</b>, así que la defensa va en la construcción: <b>análisis de composición</b> para saber qué se incorpora, <b>procedencia y firma</b> para saber que el artefacto es el que se compiló, y gobierno del acceso de proveedores y herramientas. Prohibir el código abierto no es realista, y el WAF y el análisis de máquinas actúan cuando el componente ya está dentro. <a href=\"https://learn.microsoft.com/en-us/security/zero-trust/sfi/protect-software-supply-chain\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "La IA no es una excepción",

@@ -348,7 +348,7 @@ var QUIZ_DATA = [
       "By owning team, splitting the total evenly so everyone makes progress at once",
     ],
     correct: 1,
-    explain: "Prioritisation in this domain comes from crossing two axes: <b>sensitivity</b> — what classification says — and <b>exposure</b> — who can reach it. A store with regulated data reachable publicly comes before a critical on an empty test resource. Defender for Cloud supports this with sensitive data discovery and the attack paths ending at it. Severity, age and even splits order the list, not the risk. <a href=\"https://learn.microsoft.com/en-us/azure/defender-for-cloud/data-security-posture-prepare\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Prioritisation in this domain comes from crossing two axes: <b>sensitivity</b> — what classification says — and <b>exposure</b> — who can reach it. A store with regulated data reachable publicly comes before a critical on an empty test resource. Defender for Cloud supports this with sensitive data discovery and the attack paths ending at it. Severity, age and even splits order the list, not the risk. <a href=\"https://learn.microsoft.com/en-us/azure/defender-for-cloud/concept-data-security-posture\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "The threat to the data",
@@ -444,7 +444,7 @@ var QUIZ_DATA = [
       "That it should be reached over a private endpoint, which makes the SAS unnecessary",
     ],
     correct: 1,
-    explain: "The problem with a SAS signed with the account key is <b>revocation</b>: cutting it short means rotating the key and taking down everything else that uses it. A <b>user delegation SAS</b> is signed with an Entra ID credential, inherits its permissions and is revoked by revoking that delegation, without touching the account. Handing over the key is worse. And a private endpoint decides how it is reached, not who may. <a href=\"https://learn.microsoft.com/en-us/rest/api/storageservices/create-a-user-delegation-sas\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "The problem with a SAS signed with the account key is <b>revocation</b>: cutting it short means rotating the key and taking down everything else that uses it. A <b>user delegation SAS</b> is signed with an Entra ID credential, inherits its permissions and is revoked by revoking that delegation, without touching the account. Handing over the key is worse. And a private endpoint decides how it is reached, not who may. <a href=\"https://learn.microsoft.com/en-us/azure/storage/common/storage-sas-overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Making it undeletable",

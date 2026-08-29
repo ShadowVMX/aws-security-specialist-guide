@@ -348,7 +348,7 @@ var QUIZ_DATA = [
       "Por equipo propietario, repartiendo el total en partes iguales para que todos avancen a la vez",
     ],
     correct: 1,
-    explain: "La priorización de este dominio sale de cruzar dos ejes: <b>sensibilidad</b> —lo que dice la clasificación— y <b>exposición</b> —quién puede llegar—. Un almacén con dato regulado accesible públicamente va antes que una crítica sobre un recurso de pruebas vacío. Defender for Cloud lo apoya con el descubrimiento de dato sensible y las rutas de ataque que terminan en él. Severidad, antigüedad y reparto ordenan la lista, no el riesgo. <a href=\"https://learn.microsoft.com/en-us/azure/defender-for-cloud/data-security-posture-prepare\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "La priorización de este dominio sale de cruzar dos ejes: <b>sensibilidad</b> —lo que dice la clasificación— y <b>exposición</b> —quién puede llegar—. Un almacén con dato regulado accesible públicamente va antes que una crítica sobre un recurso de pruebas vacío. Defender for Cloud lo apoya con el descubrimiento de dato sensible y las rutas de ataque que terminan en él. Severidad, antigüedad y reparto ordenan la lista, no el riesgo. <a href=\"https://learn.microsoft.com/en-us/azure/defender-for-cloud/concept-data-security-posture\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "La amenaza sobre el dato",
@@ -444,7 +444,7 @@ var QUIZ_DATA = [
       "Que debe accederse por endpoint privado, con lo que la SAS deja de ser necesaria",
     ],
     correct: 1,
-    explain: "El problema de una SAS firmada con la clave de la cuenta es la <b>revocación</b>: si hay que cortarla antes de tiempo, hay que rotar la clave y tumbar a todo lo demás que la use. La <b>SAS de delegación de usuario</b> se firma con una credencial de Entra ID, hereda sus permisos y se revoca revocando esa delegación, sin tocar la cuenta. Entregar la clave es peor. Y el endpoint privado resuelve por dónde se llega, no quién puede. <a href=\"https://learn.microsoft.com/en-us/rest/api/storageservices/create-a-user-delegation-sas\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "El problema de una SAS firmada con la clave de la cuenta es la <b>revocación</b>: si hay que cortarla antes de tiempo, hay que rotar la clave y tumbar a todo lo demás que la use. La <b>SAS de delegación de usuario</b> se firma con una credencial de Entra ID, hereda sus permisos y se revoca revocando esa delegación, sin tocar la cuenta. Entregar la clave es peor. Y el endpoint privado resuelve por dónde se llega, no quién puede. <a href=\"https://learn.microsoft.com/en-us/azure/storage/common/storage-sas-overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Que no se pueda borrar",
