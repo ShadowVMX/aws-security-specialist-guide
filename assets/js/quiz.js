@@ -104,9 +104,35 @@
   }
 
   const MOD = moduleId();
-  const ANSWER_KEY = `scs-c03:quiz:${LANG}:${MOD}`;
-  const PREFS_KEY = `scs-c03:quizprefs:${LANG}:${MOD}`;
-  const SUMMARY_KEY = `scs-c03:summary:${LANG}:${MOD}`;
+
+  // The engine serves more than one certification, so the storage namespace
+  // comes from the page. Without this every guide would write into the same
+  // scs-c03: prefix, and the hub's "erase all progress" would miss the rest.
+  const CERT = window.GUIDE_CERT || "scs-c03";
+  const ANSWER_KEY = `${CERT}:quiz:${LANG}:${MOD}`;
+  const PREFS_KEY = `${CERT}:quizprefs:${LANG}:${MOD}`;
+  const SUMMARY_KEY = `${CERT}:summary:${LANG}:${MOD}`;
+
+  // Answers saved before the namespace existed live under the scs-c03 prefix
+  // whatever guide wrote them. Move them across once so a reader mid-way
+  // through a module doesn't find their progress gone.
+  if (CERT !== "scs-c03") {
+    try {
+      [
+        [`scs-c03:quiz:${LANG}:${MOD}`, ANSWER_KEY],
+        [`scs-c03:quizprefs:${LANG}:${MOD}`, PREFS_KEY],
+        [`scs-c03:summary:${LANG}:${MOD}`, SUMMARY_KEY],
+      ].forEach(([from, to]) => {
+        const v = localStorage.getItem(from);
+        if (v !== null && localStorage.getItem(to) === null) {
+          localStorage.setItem(to, v);
+        }
+        if (v !== null) localStorage.removeItem(from);
+      });
+    } catch (e) {
+      /* storage unavailable — nothing to migrate */
+    }
+  }
 
   // Answers are stored against a hash of the question rather than its index,
   // so adding or reordering questions later doesn't silently shift every saved

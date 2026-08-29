@@ -58,6 +58,15 @@ let grandTotal = 0;
 const positionCounts = {};
 let longestIsCorrect = 0;
 let longestComparable = 0;
+// El banco en inglés se auditaba solo por paridad de recuento, así que un
+// sesgo de longitud introducido al traducir pasaba inadvertido. Se mide igual.
+let enLongestIsCorrect = 0;
+let enLongestComparable = 0;
+// Umbral duro: la correcta nunca debe superar a todas las demás por diez
+// caracteres o más, que es la distancia a partir de la cual se ve al leer.
+const marginOffenders = [];
+// El agregado del repo diluye un módulo sesgado, así que se mide por archivo.
+const perModule = [];
 const multiPairs = [];
 
 for (const cert of CERTS) {
@@ -81,6 +90,10 @@ for (const cert of CERTS) {
   }
 
   const seen = new Map();
+  const modBuckets = {
+    es: { comparable: 0, isCorrect: 0 },
+    en: { comparable: 0, isCorrect: 0 },
+  };
 
   es.forEach((q, i) => {
     const where = `${mod}[${i}]`;
@@ -167,19 +180,41 @@ for (const cert of CERTS) {
     }
 
     /* ---- "longest option is the answer" tell ---- */
-    const lens = q.options.map((o) => o.length);
-    const max = Math.max(...lens);
-    const uniqueMax = lens.filter((l) => l === max).length === 1;
-    if (uniqueMax) {
-      longestComparable++;
-      if (correct.includes(lens.indexOf(max))) longestIsCorrect++;
-    }
+    const tell = (opts, bucket, lang) => {
+      if (!Array.isArray(opts) || opts.length !== q.options.length) return;
+      const lens = opts.map((o) => o.length);
+      const max = Math.max(...lens);
+      if (lens.filter((l) => l === max).length === 1) {
+        bucket.comparable++;
+        if (correct.includes(lens.indexOf(max))) bucket.isCorrect++;
+      }
+      // Margen: sólo tiene sentido con una única respuesta correcta.
+      if (!multi) {
+        const others = lens.filter((_, j) => j !== q.correct);
+        const margin = lens[q.correct] - Math.max(...others);
+        if (margin >= 10) marginOffenders.push(`${where} (${lang}): +${margin}`);
+      }
+    };
+    const esBucket = modBuckets.es;
+    const enBucket = modBuckets.en;
+    tell(q.options, esBucket, "es");
+    tell(en[i] && en[i].options, enBucket, "en");
 
     /* ---- explanation should actually explain ---- */
     if (q.explain && q.explain.length < 80) {
       warn(`${where}: explicación muy corta (${q.explain.length} caracteres)`);
     }
   });
+
+  for (const lang of ["es", "en"]) {
+    const b = modBuckets[lang];
+    if (!b.comparable) continue;
+    perModule.push({ mod: `${cert.id}/${mod}`, lang, ...b });
+  }
+  longestComparable += modBuckets.es.comparable;
+  longestIsCorrect += modBuckets.es.isCorrect;
+  enLongestComparable += modBuckets.en.comparable;
+  enLongestIsCorrect += modBuckets.en.isCorrect;
  }
 }
 
@@ -216,17 +251,45 @@ if (skew > 1.5) {
   console.log("  -> reparto equilibrado\n");
 }
 
+const enLongestPct = enLongestComparable
+  ? Math.round((enLongestIsCorrect / enLongestComparable) * 100)
+  : 0;
+
 console.log("Señal de la opción más larga:");
 console.log(
-  `  la opción más larga es la correcta en ${longestIsCorrect} de ${longestComparable} (${longestPct}%)`
+  `  español: la más larga es la correcta en ${longestIsCorrect} de ${longestComparable} (${longestPct}%)`
 );
-if (longestPct > 45) {
-  warn(
-    `la opción más larga acierta el ${longestPct}% de las veces: se puede aprobar el quiz por longitud`
-  );
-} else {
-  console.log("  -> sin señal explotable\n");
+console.log(
+  `  inglés:  la más larga es la correcta en ${enLongestIsCorrect} de ${enLongestComparable} (${enLongestPct}%)`
+);
+for (const [lang, pct] of [["español", longestPct], ["inglés", enLongestPct]]) {
+  if (pct > 45) {
+    warn(
+      `en ${lang} la opción más larga acierta el ${pct}% de las veces: se puede aprobar el quiz por longitud`
+    );
+  }
 }
+if (longestPct <= 45 && enLongestPct <= 45) {
+  console.log("  -> sin señal explotable en ninguno de los dos idiomas");
+}
+for (const m of perModule) {
+  const pct = Math.round((m.isCorrect / m.comparable) * 100);
+  if (pct > 45) {
+    warn(
+      `${m.mod} (${m.lang}): la más larga es la correcta el ${pct}% de las veces, por encima del umbral`
+    );
+  }
+}
+console.log(
+  `  la correcta supera a todas las demás por diez caracteres o más en ${marginOffenders.length} preguntas`
+);
+if (marginOffenders.length) {
+  marginOffenders.slice(0, 20).forEach((m) => warn(`margen de longitud delator — ${m}`));
+  if (marginOffenders.length > 20) {
+    warn(`y ${marginOffenders.length - 20} preguntas más con el mismo margen`);
+  }
+}
+console.log("");
 
 if (multiPairs.length > 1) {
   const spread = {};

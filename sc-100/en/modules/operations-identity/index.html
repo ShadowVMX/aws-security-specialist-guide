@@ -13,7 +13,7 @@
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary">
 <title>Security Operations, Identity &amp; Compliance — Microsoft Cybersecurity Architect (SC-100)</title>
-<link rel="stylesheet" href="../../../../assets/css/style.css?v=9">
+<link rel="stylesheet" href="../../../../assets/css/style.css?v=10">
 </head>
 <body>
 
@@ -40,6 +40,7 @@
 
   <aside class="sidebar">
     <h4>How to read this exam</h4>
+    <a href="#base">What is taken for granted</a>
     <a href="#como-preguntan">Design, Evaluate, Specify</a>
     <h4>2.1 Security operations</h4>
     <a href="#xdr-siem">XDR and SIEM: who does what</a>
@@ -69,13 +70,160 @@
     <a href="#azure-policy">Azure Policy</a>
     <a href="#defender-compliance">Defender for Cloud: regulatory</a>
     <a href="#ia-responsable">AI governance and compliance</a>
+    <a href="#fuentes">Official sources</a>
     <a href="#trampas">Common traps</a>
     <a href="#temario">Official syllabus</a>
     <h4>Practice</h4>
-    <a href="#quiz">Quiz (48 questions)</a>
+    <a href="#quiz">Quiz (100 questions)</a>
   </aside>
 
   <main class="content">
+
+    <h2 id="base">What this exam takes for granted</h2>
+    <p>
+      SC-100 assumes you arrive with administrator-level knowledge: it takes for granted that you know
+      <em>how</em> the pieces work and only asks you <em>which</em> one you pick. This section is that base,
+      because without it half a dozen design decisions in this domain look arbitrary when they are actually
+      derivable.
+    </p>
+
+    <h3>What a token is, and why that forces CAE</h3>
+    <p>
+      When somebody authenticates, Entra ID does not hand them "access": it hands them an <strong>access
+      token</strong>, a signed document carrying <em>claims</em> — who you are, for which application, with
+      which permissions, until when. The application validates it by checking the signature,
+      <strong>without asking Entra ID again</strong>. That is what makes the cloud fast and scalable, and it
+      is also its problem: the token is good until it expires, typically around an hour, even if you disable
+      the account, change the password or the user's risk spikes in the meantime.
+    </p>
+    <p>
+      Alongside it travels a <strong>refresh token</strong>, much longer lived, used to obtain new access
+      tokens without reauthenticating. That is why "revoking the session" is not instant by default: you wait
+      for the access token to expire and for the refresh token to be rejected.
+    </p>
+    <div class="callout exam">
+      <b>With that, CAE stops being a name and becomes obvious</b>
+      <strong>Continuous access evaluation</strong> establishes a channel between Entra ID and the
+      applications that support it — Exchange, SharePoint, Teams, Graph — so that a critical event — account
+      disabled, password changed, risk elevated, leaving the compliant network — makes the application
+      <em>reject a token that had not yet expired</em>. That is the whole idea, and it explains why the exam
+      asks for it whenever the stem says "must lose access immediately".
+    </div>
+
+    <h3>How conditional access evaluates, precisely</h3>
+    <p>
+      A policy has two halves. The <strong>assignments</strong> decide <em>what it applies to</em>: users and
+      groups, applications or actions, and conditions — user risk, sign-in risk, device platform, location,
+      client app, device state. The <strong>controls</strong> decide <em>what happens</em>: grant while
+      requiring something (MFA, compliant device, protected app, authentication strength) or block; plus
+      <strong>session</strong> controls, which limit what can be done once inside.
+    </p>
+    <ul>
+      <li><strong>Every applicable policy is evaluated and all of them must be satisfied.</strong> There is no
+        "first match wins". If two policies require different things, both are enforced.</li>
+      <li><strong>Block always beats</strong> any grant.</li>
+      <li><strong>Exclusions beat inclusions.</strong> Hence protecting the emergency account by excluding it,
+        and hence a mistake in an exclusion being so dangerous.</li>
+      <li>Within <em>one</em> policy, several grant controls can be required <strong>all</strong> or
+        <strong>any</strong>. That is the system's only either/or.</li>
+      <li>Whatever <strong>no</strong> policy covers, goes through. That is why you validate a design by
+        hunting for the gap, not by reading what is written.</li>
+    </ul>
+
+    <h3>Kerberos in one paragraph, and the four attacks stop being names</h3>
+    <p>
+      In a domain you do not send your password to every server. You authenticate once against a domain
+      controller and receive a <strong>ticket-granting ticket (TGT)</strong>, encrypted with the key of a
+      special account called <code>krbtgt</code>. When you want to use a service, you present the TGT and ask
+      for a <strong>service ticket</strong> for that service, identified by its <strong>SPN</strong> — the
+      name it is registered under in the directory. That ticket is encrypted with the service account's
+      password.
+    </p>
+    <table role="table">
+      <tr><th>Attack</th><th>What it exploits, exactly</th></tr>
+      <tr><td><strong>Kerberoasting</strong></td><td>Any authenticated user can request the ticket for a service with an SPN. That ticket is encrypted with the service account's password, so they take it away and crack it <em>offline</em>, with no failed attempts and no lockout. That is why the defence is not "a longer password" but the password <b>ceasing to be human</b>: a gMSA generates a 240-character one and rotates it itself.</td></tr>
+      <tr><td><strong>Golden Ticket</strong></td><td>With the <code>krbtgt</code> key you can <em>forge</em> valid TGTs for any user, including one that does not exist, with whatever permissions you like. Since the TGT is not validated against anything else, the domain believes them. Hence rotating it <b>twice</b>: the account keeps the current key and the previous one, so a single rotation would leave the old one still valid.</td></tr>
+      <tr><td><strong>DCSync</strong></td><td>Domain controllers replicate to each other. Whoever holds replication permissions can <em>request</em> password hashes as if they were another controller, without touching a single machine. Hence the defence being to audit who holds that permission.</td></tr>
+      <tr><td><strong>Pass-the-hash / pass-the-ticket</strong></td><td>Kerberos and NTLM do not need the cleartext password: the hash or the ticket is enough, and those sit in the memory of whichever machine somebody signed in on. That is why the tiered model forbids using domain credentials on lower-trust machines: it is not bureaucracy, it is where they get harvested.</td></tr>
+    </table>
+
+    <h3>PIM: eligible versus active</h3>
+    <p>
+      A role assignment has two states. <strong>Eligible</strong> means you can activate it, but you
+      <em>do not have it</em>: your token does not carry that permission. <strong>Active</strong> means you
+      actually have it. On activation, PIM can require MFA, justification and approval, and it creates a real
+      assignment with an expiry; when that expires, it removes it. All of it is logged.
+    </p>
+    <p>
+      What this implies for the exam: <em>being eligible for Global Administrator does not appear in your
+      token</em>. An attacker who steals your session does not inherit the roles you had not activated. That
+      is PIM's real value, and it is why "reduce standing permissions" and "shorten the window" are the same
+      idea.
+    </p>
+
+    <h3>What a Sentinel analytics rule actually is</h3>
+    <p>
+      When the syllabus says "writing detections", this is what it means: an <strong>analytics rule</strong>
+      is a query in <strong>KQL</strong> — the Azure Monitor query language — that runs on a fixed interval
+      over the workspace's tables and creates an <strong>alert</strong> if it returns rows. Alerts are grouped
+      into <strong>incidents</strong>. A rule also carries its MITRE ATT&amp;CK mapping, and that is where the
+      coverage report comes from.
+    </p>
+    <p>
+      The design consequence, which is what gets asked: <strong>if the data is not ingested into a table, the
+      rule cannot see it</strong>. That is why "connect the source" always precedes "detect", and why the
+      decision about what gets ingested is simultaneously a detection decision and a cost decision.
+    </p>
+
+    <h3>The workspace tiers, which are the cost decision</h3>
+    <table role="table">
+      <tr><th>Tier</th><th>What it allows</th><th>When</th></tr>
+      <tr><td><strong>Analytics</strong></td><td>Full query and analytics rules over that table.</td><td>Whatever feeds detections and hunting.</td></tr>
+      <tr><td><strong>Basic / auxiliary</strong></td><td>Limited query, far cheaper per gigabyte.</td><td>High volume and low analytic value: raw network flows, verbose proxy logs.</td></tr>
+      <tr><td><strong>Long-term retention</strong></td><td>Data is kept, and restored or searched when needed.</td><td>A regulatory obligation or an old investigation.</td></tr>
+    </table>
+    <p>
+      With that, the classic answer — "move the high-volume logs to a cheaper tier and promote only what feeds
+      a rule" — stops being a memorised trick and derives itself.
+    </p>
+
+    <h3>The three planes of the enterprise access model</h3>
+    <div class="diagram">
+      <svg viewBox="0 0 700 346" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="ea-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#7c8aa0"></path>
+          </marker>
+        </defs>
+        <line class="dline" x1="350" y1="118" x2="350" y2="148" marker-end="url(#ea-arrow)"></line>
+        <line class="dline" x1="350" y1="226" x2="350" y2="256" marker-end="url(#ea-arrow)"></line>
+        <line class="dline" x1="160" y1="60" x2="230" y2="60" marker-end="url(#ea-arrow)"></line>
+        <g class="dstep" data-label="Privileged access workstation" data-explain="All privileged access originates from a hardened machine, with no email or general browsing and managed separately. Separating the administrative account is not enough: if the laptop is compromised the attacker is already inside the machine you administer from.">
+          <rect class="dbox-alt" x="8" y="34" width="152" height="52" rx="8"></rect>
+          <text x="22" y="58" class="dtitle">Privileged access</text>
+          <text x="22" y="76" class="dtitle">workstation (PAW)</text>
+        </g>
+        <g class="dstep" data-label="Control plane" data-explain="Entra ID and tenant administration, plus the domain controllers where there is AD DS. Whoever controls this plane controls everything else, so this is where PIM-eligible access, phishing-resistant MFA and emergency access accounts belong.">
+          <rect class="dbox-deny" x="230" y="34" width="440" height="84" rx="8"></rect>
+          <text x="250" y="60" class="dtitle">1. Control plane — identity and tenant administration</text>
+          <text x="250" y="80" class="dstep-cell">Entra ID · Global Administrators · AD DS and krbtgt</text>
+          <text x="250" y="100" class="dstep-cell">Compromising it hands over both other planes entirely</text>
+        </g>
+        <g class="dstep" data-label="Management plane" data-explain="Resource Manager, the management groups and the subscriptions: who can create, move, delete and assign roles over resources. The bridge to watch is the Global Administrator&#x27;s elevation to root scope, which does not expire on its own.">
+          <rect class="dbox-shared" x="230" y="148" width="440" height="78" rx="8"></rect>
+          <text x="250" y="174" class="dtitle">2. Management plane — control over resources</text>
+          <text x="250" y="194" class="dstep-cell">Management groups · subscriptions · role assignment</text>
+          <text x="250" y="214" class="dstep-cell">Azure Policy inherits downward from here</text>
+        </g>
+        <g class="dstep" data-label="Data and workload plane" data-explain="Where the business lives: the machines, the databases, the files. If a plane above falls it takes this one with it; if this one falls it should not take the ones above, which is why an identity in this plane must never be able to administer the others.">
+          <rect class="dbox" x="230" y="256" width="440" height="78" rx="8"></rect>
+          <text x="250" y="282" class="dtitle">3. Data and workload plane</text>
+          <text x="250" y="302" class="dstep-cell">Servers · databases · applications · storage</text>
+          <text x="250" y="322" class="dstep-cell">Blast radius stays bounded when the planes are separate</text>
+        </g>
+      </svg>
+      <div class="dexplain">One account administering two planes merges what the model separates: an attacker who steals it gets both.</div>
+    </div>
 
     <h2 id="como-preguntan">Design, Evaluate, Specify: how this exam asks</h2>
     <p>
@@ -503,6 +651,26 @@
       AI regulation and asking for periodic evidence is asking for Compliance Manager.
     </div>
 
+    <h2 id="fuentes">Official sources</h2>
+    <p class="lede">The Microsoft documentation this module rests on. If something does not add up, or you want to go deeper, start here: it is the only source that counts.</p>
+    <ul class="sources">
+      <li><a href="https://learn.microsoft.com/en-us/unified-secops/overview-unified-security" target="_blank" rel="noopener">Unified security operations platform ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/defender-xdr/microsoft-365-defender" target="_blank" rel="noopener">Microsoft Defender XDR ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/sentinel/overview" target="_blank" rel="noopener">Microsoft Sentinel ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/sentinel/mitre-coverage" target="_blank" rel="noopener">MITRE ATT&CK coverage in Sentinel ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/security/operations/incident-response-overview" target="_blank" rel="noopener">Incident response guidance ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/purview/audit-solutions-overview" target="_blank" rel="noopener">Microsoft Purview Audit ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/entra/identity/conditional-access/concept-continuous-access-evaluation" target="_blank" rel="noopener">Continuous access evaluation ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/entra/identity/hybrid/connect/whatis-phs" target="_blank" rel="noopener">Password hash synchronization ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/defender-for-identity/what-is" target="_blank" rel="noopener">Microsoft Defender for Identity ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/security/privileged-access-workstations/privileged-access-access-model" target="_blank" rel="noopener">Enterprise access model ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/entra/id-governance/access-reviews-overview" target="_blank" rel="noopener">Entra ID access reviews ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/entra/id-governance/entitlement-management-overview" target="_blank" rel="noopener">Entitlement management ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/permissions-management" target="_blank" rel="noopener">Cloud infrastructure entitlement management ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/regulatory-compliance-dashboard" target="_blank" rel="noopener">Defender for Cloud regulatory compliance dashboard ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/governance/policy/concepts/effect-basics" target="_blank" rel="noopener">Azure Policy effects ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/sc-100" target="_blank" rel="noopener">Official SC-100 study guide ↗</a></li>
+    </ul>
     <h2 id="trampas">Common traps in this domain</h2>
     <div class="callout warn">
       <b>Sentinel where Defender XDR was enough</b>
@@ -571,7 +739,7 @@
 <!-- temario:fin -->
 
     <h2 id="quiz">Practice quiz — Security operations, identity and compliance</h2>
-    <p class="lede">48 scenario questions. Pick an option to see whether it is right and why.</p>
+    <p class="lede">100 scenario questions. Pick an option to see whether it is right and why.</p>
     <div id="quiz-root"></div>
 
   </main>
@@ -582,7 +750,8 @@
 </footer>
 
 <script src="quiz-data.js"></script>
-<script src="../../../../assets/js/quiz.js?v=9"></script>
+<script>window.GUIDE_CERT = "sc-100";</script>
+<script src="../../../../assets/js/quiz.js?v=10"></script>
 <script src="../../../../assets/js/app.js?v=9"></script>
 
 </body>

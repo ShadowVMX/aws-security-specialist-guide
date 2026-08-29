@@ -4,9 +4,9 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/exam-SCS--C03-FF9900?style=for-the-badge&logo=amazonaws&logoColor=white" alt="SCS-C03">
-  <img src="https://img.shields.io/badge/domains-6%2F6-3ECF8E?style=for-the-badge" alt="6 of 6 domains">
-  <img src="https://img.shields.io/badge/questions-286-B892FF?style=for-the-badge" alt="286 questions">
-  <img src="https://img.shields.io/badge/simulation-65%20questions%20%C2%B7%20170%20min-4FA8FF?style=for-the-badge" alt="65-question, 170-minute simulation">
+  <img src="https://img.shields.io/badge/exam-SC--100-0078D4?style=for-the-badge&logo=microsoftazure&logoColor=white" alt="SC-100">
+  <img src="https://img.shields.io/badge/questions-610-B892FF?style=for-the-badge" alt="610 questions">
+  <img src="https://img.shields.io/badge/skills-151%2F151-3ECF8E?style=for-the-badge" alt="151 of 151 skills covered">
   <img src="https://img.shields.io/badge/languages-ES%20%7C%20EN-0b1220?style=for-the-badge" alt="Spanish and English">
 </p>
 
@@ -15,34 +15,46 @@
 </p>
 
 <h3 align="center">
-  <a href="https://shadowvmx.github.io/aws-scs-c03/en/">Open the guide →</a>
+  <a href="https://shadowvmx.github.io/en/">Open the guides →</a>
 </h3>
 
 <p align="center">
-  <a href="https://shadowvmx.github.io/aws-scs-c03/en/exam/">Exam simulation</a>
+  <a href="https://shadowvmx.github.io/aws-scs-c03/en/">AWS SCS-C03</a>
   &nbsp;·&nbsp;
-  <a href="https://shadowvmx.github.io/aws-scs-c03/">Versión en español</a>
+  <a href="https://shadowvmx.github.io/sc-100/en/">Microsoft SC-100</a>
+  &nbsp;·&nbsp;
+  <a href="https://shadowvmx.github.io/">Versión en español</a>
 </p>
 
 ---
 
 ## Overview
 
-An interactive study guide for the **AWS Certified Security — Specialty (SCS-C03)** exam, organized around the six official domains and their task statements.
+Interactive study guides for cloud security certifications, each organized around its exam's official domains and task statements.
 
-Every module combines structured theory, interactive diagrams, real AWS CLI and JSON policy examples, Azure comparisons where the mapping is reliable, the exam's most frequent traps, and a quiz with a reasoned explanation on every answer.
+| Guide | Exam | Domains | Skills | Questions | Simulation |
+|---|---|---|---|---|---|
+| [AWS Certified Security — Specialty](https://shadowvmx.github.io/aws-scs-c03/en/) | SCS-C03 | 6 | 70 | 286 | 65 questions · 170 min |
+| [Microsoft Cybersecurity Architect](https://shadowvmx.github.io/sc-100/en/) | SC-100 | 4 | 81 | 324 | 48 questions · 100 min |
+
+Every module combines structured theory, the exam's most frequent traps and a quiz with a reasoned
+explanation on every answer, and cites the official documentation page each explanation rests on.
+The AWS guide adds interactive diagrams, AWS CLI and JSON policy examples, and Azure comparisons
+where the mapping is reliable.
 
 It runs in the browser, with no installation and no accounts: **your progress is saved on your own device**.
 
-> **Note on the exam version**
+> **Note on the exam versions**
 >
-> The SCS-C02 exam retired on December 1, 2025. Since December 2, 2025 the only active version is **SCS-C03**, with restructured domains. This guide follows the numbering and weights of the [official exam guide](https://docs.aws.amazon.com/aws-certification/latest/security-specialty-03/security-specialty-03.html).
+> The SCS-C02 exam retired on December 1, 2025. Since December 2, 2025 the only active version is **SCS-C03**, with restructured domains. That guide follows the numbering and weights of the [official exam guide](https://docs.aws.amazon.com/aws-certification/latest/security-specialty-03/security-specialty-03.html).
+>
+> The **SC-100** guide follows the skills as measured on July 28, 2026. Microsoft publishes weights as ranges (25-30%, for example), so the guide prints the literal range and uses its midpoint to distribute the simulation's questions.
 
 ## Getting started
 
 No installation required:
 
-### [shadowvmx.github.io/aws-security-specialist-guide/en](https://shadowvmx.github.io/aws-scs-c03/en/)
+### [shadowvmx.github.io/en](https://shadowvmx.github.io/en/)
 
 <details>
 <summary>Run it locally</summary>
@@ -77,6 +89,21 @@ theory heading carries the skill number it addresses.
 The simulation draws its 65 questions with those same weights: 10 Detection, 9 Incident
 Response, 12 Infrastructure Security, 13 IAM, 12 Data Protection and 9 Governance.
 
+The four **SC-100** domains come from Microsoft's study guide, with the skills as measured on
+July 28, 2026. Microsoft publishes weights as ranges, so the table prints the range and the
+simulation distributes its 48 questions by the midpoint.
+
+| # | Domain | Weight | Skills | Questions |
+|---|---|---|---|---|
+| 1 | Design solutions that align with security best practices and priorities | 20-25% | 13 | 52 |
+| 2 | Design security operations, identity, and compliance capabilities | 25-30% | 25 | 100 |
+| 3 | Design security solutions for infrastructure | 25-30% | 23 | 92 |
+| 4 | Design security solutions for applications and data | 20-25% | 20 | 80 |
+
+Microsoft does not publish how many questions the exam carries — 40 to 60 is typical — and the
+real score is scaled out of 1000, with 700 to pass. The simulation uses 48 questions and 70% as a
+working reference, not as an equivalence with the official score.
+
 Every module includes:
 
 - Theory organized around the exam guide's official task statements, with their numbering
@@ -92,7 +119,9 @@ Every module includes:
 
 ### Per-domain quiz
 
-286 questions, 26 of them **multiple response** (`choose TWO`), scored all-or-nothing exactly as in the real exam.
+610 questions per language across both guides — 286 for AWS and 324 for SC-100 — with at least
+four per official skill. **Multiple response** questions (`choose TWO`) are scored all-or-nothing,
+exactly as in the real exam.
 
 | Feature | What it's for |
 |---|---|
@@ -104,13 +133,16 @@ Every module includes:
 
 ### Exam simulation
 
-65 questions in 170 minutes, with the official domain mix and no grading until you submit. It ends with your score, the per-domain breakdown and every explanation.
+65 questions in 170 minutes in the AWS guide, 48 in 100 minutes in the SC-100 one, both with the
+official domain mix and no grading until you submit. Each ends with your score, the per-domain
+breakdown and every explanation.
 
 It trains what a topic quiz cannot: **pacing yourself and deciding without knowing how you're doing**.
 
 ### Tracking
 
-The home page shows how much you've answered, your accuracy and your last simulation result.
+Each guide's home page shows how much you've answered, your accuracy and your last simulation
+result. Progress is stored separately per certification, so studying one never erases the other.
 
 ### On a phone
 
@@ -128,8 +160,9 @@ If you spot a content error, [open an issue](https://github.com/ShadowVMX/aws-se
 
 <p align="center">
 <sub>
-Independent study guide. Not affiliated with, sponsored by, or endorsed by Amazon Web Services.<br>
+Independent study guides. Not affiliated with, sponsored by, or endorsed by Amazon Web Services or Microsoft.<br>
 AWS and AWS Certified Security — Specialty are trademarks of Amazon.com, Inc. or its affiliates.<br>
+Microsoft, Azure and Microsoft Cybersecurity Architect are trademarks of the Microsoft group of companies.<br>
 Content reviewed in August 2026.
 </sub>
 </p>

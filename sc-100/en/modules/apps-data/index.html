@@ -13,7 +13,7 @@
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary">
 <title>Applications &amp; Data — Microsoft Cybersecurity Architect (SC-100)</title>
-<link rel="stylesheet" href="../../../../assets/css/style.css?v=9">
+<link rel="stylesheet" href="../../../../assets/css/style.css?v=10">
 </head>
 <body>
 
@@ -40,6 +40,7 @@
 
   <aside class="sidebar">
     <h4>How to read this domain</h4>
+    <a href="#base">What is taken for granted</a>
     <a href="#hilo">The data, not the container</a>
     <h4>4.1 Microsoft 365</h4>
     <a href="#m365-postura">Measuring M365 posture</a>
@@ -64,13 +65,121 @@
     <a href="#bases-datos">Azure SQL, Synapse and Cosmos DB</a>
     <a href="#storage">Azure Storage</a>
     <a href="#defender-datos">Defender for Storage and Databases</a>
+    <a href="#fuentes">Official sources</a>
     <a href="#trampas">Common traps</a>
     <a href="#temario">Official syllabus</a>
     <h4>Practice</h4>
-    <a href="#quiz">Quiz (40 questions)</a>
+    <a href="#quiz">Quiz (80 questions)</a>
   </aside>
 
   <main class="content">
+
+    <h2 id="base">What this exam takes for granted</h2>
+    <p>
+      Four mechanisms this domain uses constantly without explaining them, and on which several answers depend
+      that otherwise look arbitrary.
+    </p>
+
+    <h3>Envelope encryption: why revoking a key makes data unreadable instantly</h3>
+    <p>
+      No service encrypts terabytes with your key directly. Each block of data is encrypted with a
+      <strong>data key</strong> generated on the fly, and <em>that</em> key is in turn encrypted with a
+      <strong>key encryption key</strong> and stored alongside the data. This is called envelope encryption.
+    </p>
+    <p>
+      The key you control — the <strong>customer-managed</strong> one, in Key Vault — is the outer one, the
+      wrapper. That is why withdrawing the service's access to it leaves the data unreadable
+      <strong>immediately and without rewriting anything</strong>: the data keys are still there, but nobody
+      can unwrap them. And it is why rotating that key is cheap, while rotating the inner one would mean
+      re-encrypting everything.
+    </p>
+
+    <h3>How a label's protection travels outside your tenant</h3>
+    <p>
+      A sensitivity label with encryption does not mark the file: it <strong>encrypts</strong> it and embeds a
+      <strong>usage policy</strong> inside — who may open it and what they may do: read, edit, print, forward —
+      along with a reference to the service holding the key.
+    </p>
+    <p>
+      When somebody opens it, the application contacts that service, authenticates, and only then receives the
+      key and the rights it is entitled to. Hence the two consequences the exam asks about: the protection
+      <strong>stays alive outside your organisation</strong>, because the check happens at open time and not at
+      send time; and it <strong>can be revoked afterwards</strong>, because the file is useless if the service
+      stops handing over the key.
+    </p>
+    <div class="callout exam">
+      <b>And hence the difference from DLP too</b>
+      DLP is evaluated <em>in the channel</em> — the mail server, the SharePoint site, the endpoint agent — at
+      the moment the data tries to leave. A label is evaluated <em>in the file</em> every time it is opened.
+      That is why one prevents the exit and the other survives the exit, and why so many requirements need
+      both.
+    </div>
+
+    <h3>What a SAS actually is, and why one of them cannot be revoked</h3>
+    <p>
+      A shared access signature is a string carrying the permissions, the resource, the validity window and a
+      <strong>signature</strong>. Storage consults no database: it recomputes the signature with the key and,
+      if it matches, lets the request through. There is no list of issued SAS anywhere.
+    </p>
+    <p>
+      That explains the whole problem. A SAS signed with the <strong>account key</strong> is only invalidated
+      by changing that key, which takes down everything else using it. A <strong>user delegation SAS</strong>
+      is signed with a temporary key Entra ID hands to a specific identity: revoking that delegation — or that
+      identity's permissions — kills every SAS hanging off it, without touching the account.
+    </p>
+
+    <h3>Workload identity federation: the token exchange</h3>
+    <p>
+      When an external system — a pipeline, somebody else's cluster — needs into Azure, the alternative to a
+      secret is this: you register in Entra ID that you trust a specific <strong>issuer</strong> and a specific
+      <strong>subject</strong> within it — this organisation, this repository, this branch. The external system
+      obtains a token signed by its own issuer, presents it to Entra ID, and Entra ID checks the signature and
+      the match and <strong>exchanges</strong> it for one of its own.
+    </p>
+    <p>
+      Nothing is stored anywhere: the trust is in the relationship, not in a value. That is why the exam
+      prefers it to any secret however well guarded, and why the detail of scoping the branch or the
+      environment matters: without it, any branch in the repository deploys to production.
+    </p>
+
+    <h3>Envelope encryption: why revoking the key cuts access</h3>
+    <div class="diagram">
+      <svg viewBox="0 0 700 312" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="ee-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#7c8aa0"></path>
+          </marker>
+        </defs>
+        <line class="dline" x1="200" y1="88" x2="200" y2="122" marker-end="url(#ee-arrow)"></line>
+        <line class="dline" x1="200" y1="192" x2="200" y2="226" marker-end="url(#ee-arrow)"></line>
+        <line class="dline" x1="424" y1="157" x2="330" y2="157" marker-end="url(#ee-arrow)"></line>
+        <line class="dline-deny" x1="530" y1="200" x2="530" y2="238"></line>
+        <g class="dstep" data-label="The plaintext data" data-explain="The blob, row or file exactly as the application writes it.">
+          <rect class="dbox" x="60" y="36" width="280" height="52" rx="8"></rect>
+          <text x="200" y="60" class="dtitle" text-anchor="middle">Data</text>
+        </g>
+        <g class="dstep" data-label="Data key" data-explain="The service encrypts the data with a data key, fast and single-purpose. This key travels nowhere: it is stored next to the data, but wrapped.">
+          <rect class="dbox-alt" x="60" y="122" width="280" height="70" rx="8"></rect>
+          <text x="200" y="146" class="dtitle" text-anchor="middle">Encrypted with the data key</text>
+          <text x="200" y="164" class="dstep-cell" text-anchor="middle">the key is stored wrapped</text>
+        </g>
+        <g class="dstep" data-label="Key encryption key, in your vault" data-explain="The key that wraps the data key lives in your key vault and is yours. The service does not hold it: it calls out every time it needs to unwrap. This is where a customer-managed key differs from a platform-managed one.">
+          <rect class="dbox-allow" x="424" y="122" width="236" height="70" rx="8"></rect>
+          <text x="542" y="146" class="dtitle" text-anchor="middle">Key encryption key</text>
+          <text x="542" y="164" class="dstep-cell" text-anchor="middle">in your key vault</text>
+        </g>
+        <g class="dstep" data-label="Data encrypted at rest" data-explain="What ends up stored is the encrypted data plus the wrapped data key. Without unwrapping that key there is no way to read anything.">
+          <rect class="dbox" x="60" y="226" width="280" height="62" rx="8"></rect>
+          <text x="200" y="250" class="dtitle" text-anchor="middle">Encrypted data + wrapped key</text>
+        </g>
+        <g class="dstep" data-label="Revoking the key" data-explain="Disabling your key encryption key stops the service being able to unwrap the data key and therefore to decrypt anything. It is immediate and rewrites not a single byte: which is why this design is what satisfies an obligation to ‘cut off access without depending on the provider’.">
+          <rect class="dbox-deny" x="424" y="238" width="236" height="62" rx="8"></rect>
+          <text x="542" y="262" class="dtitle" text-anchor="middle">Disabling it cuts access</text>
+          <text x="542" y="280" class="dstep-cell" text-anchor="middle">instantly, with no rewrite</text>
+        </g>
+      </svg>
+      <div class="dexplain">The data is never re-encrypted on revocation: what breaks is the chain that allows unwrapping the key that opens it.</div>
+    </div>
 
     <h2 id="hilo">The data, not the container: the thread of this domain</h2>
     <p>
@@ -385,6 +494,26 @@
       <tr><td><strong>Defender for Databases</strong><br><span class="skill-id">Defender for SQL · Cosmos DB · open source</span></td><td>It is an umbrella plan: <strong>Defender for SQL</strong> covers Azure SQL, SQL on a virtual machine and Synapse; sibling plans cover Cosmos DB and the open-source relational databases. It detects SQL injection, anomalous access patterns and brute force against the server, and adds vulnerability assessment of the database configuration.</td></tr>
     </table>
 
+    <h2 id="fuentes">Official sources</h2>
+    <p class="lede">The Microsoft documentation this module rests on. If something does not add up, or you want to go deeper, start here: it is the only source that counts.</p>
+    <ul class="sources">
+      <li><a href="https://learn.microsoft.com/en-us/defender-xdr/microsoft-secure-score" target="_blank" rel="noopener">Microsoft Secure Score ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/defender-office-365/safe-links-about" target="_blank" rel="noopener">Safe Links in Defender for Office 365 ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/defender-cloud-apps/what-is-defender-for-cloud-apps" target="_blank" rel="noopener">Microsoft Defender for Cloud Apps ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/copilot/microsoft-365/microsoft-365-copilot-privacy" target="_blank" rel="noopener">Microsoft 365 Copilot privacy and security ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/purview/sensitivity-labels" target="_blank" rel="noopener">Sensitivity labels ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/purview/dlp-learn-about-dlp" target="_blank" rel="noopener">Data loss prevention ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/purview/data-map-classification" target="_blank" rel="noopener">Classification in the Purview data map ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/security/develop/threat-modeling-tool" target="_blank" rel="noopener">Threat Modeling Tool ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/api-management/api-management-key-concepts" target="_blank" rel="noopener">API Management key concepts ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/web-application-firewall/afds/afds-overview" target="_blank" rel="noopener">Web Application Firewall on Front Door ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/entra/workload-id/workload-identity-federation" target="_blank" rel="noopener">Workload identity federation ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/storage/common/customer-managed-keys-overview" target="_blank" rel="noopener">Customer-managed keys ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/storage/common/storage-sas-overview" target="_blank" rel="noopener">Shared access signatures ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-storage-introduction" target="_blank" rel="noopener">Defender for Storage ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-databases-introduction" target="_blank" rel="noopener">Defender for Databases ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/sc-100" target="_blank" rel="noopener">Official SC-100 study guide ↗</a></li>
+    </ul>
     <h2 id="trampas">Common traps in this domain</h2>
     <div class="callout warn">
       <b>Configuring Copilot instead of fixing permissions</b>
@@ -449,7 +578,7 @@
 <!-- temario:fin -->
 
     <h2 id="quiz">Practice quiz — Applications and data</h2>
-    <p class="lede">40 scenario questions. Pick an option to see whether it is right and why.</p>
+    <p class="lede">80 scenario questions. Pick an option to see whether it is right and why.</p>
     <div id="quiz-root"></div>
 
   </main>
@@ -460,7 +589,8 @@
 </footer>
 
 <script src="quiz-data.js"></script>
-<script src="../../../../assets/js/quiz.js?v=9"></script>
+<script>window.GUIDE_CERT = "sc-100";</script>
+<script src="../../../../assets/js/quiz.js?v=10"></script>
 <script src="../../../../assets/js/app.js?v=9"></script>
 
 </body>

@@ -13,7 +13,7 @@
 <meta property="og:locale" content="es_ES">
 <meta name="twitter:card" content="summary">
 <title>Buenas prácticas y prioridades — Microsoft Cybersecurity Architect (SC-100)</title>
-<link rel="stylesheet" href="../../../assets/css/style.css?v=9">
+<link rel="stylesheet" href="../../../assets/css/style.css?v=10">
 </head>
 <body>
 
@@ -40,6 +40,7 @@
 
   <aside class="sidebar">
     <h4>Cómo leer este dominio</h4>
+    <a href="#base">Lo que se da por sabido</a>
     <a href="#marcos">Los cuatro marcos, sin confundirlos</a>
     <h4>1.1 Resiliencia</h4>
     <a href="#resiliencia">Del objetivo de negocio a la prioridad</a>
@@ -57,13 +58,166 @@
     <a href="#recomendar">Recomendar sobre esos marcos</a>
     <a href="#landing-zones">Azure landing zones</a>
     <a href="#devsecops">DevSecOps según el CAF</a>
+    <a href="#fuentes">Fuentes oficiales</a>
     <a href="#trampas">Trampas típicas</a>
     <a href="#temario">Temario oficial</a>
     <h4>Práctica</h4>
-    <a href="#quiz">Quiz (26 preguntas)</a>
+    <a href="#quiz">Quiz (52 preguntas)</a>
   </aside>
 
   <main class="content">
+
+    <h2 id="base">Lo que este examen da por sabido</h2>
+    <p>
+      Este dominio es de estrategia, pero se apoya en tres ideas que rara vez se explican y que deciden
+      preguntas enteras.
+    </p>
+
+    <h3>Responsabilidad compartida: quién responde de qué, según el modelo</h3>
+    <p>
+      Lo que tú tienes que proteger cambia con el modelo de servicio, y ese reparto está en el fondo de muchas
+      respuestas:
+    </p>
+    <table role="table">
+      <tr><th>Responsabilidad</th><th>On-premises</th><th>IaaS</th><th>PaaS</th><th>SaaS</th></tr>
+      <tr><td>Centro de datos, red física, hardware</td><td>Tuya</td><td>Del proveedor</td><td>Del proveedor</td><td>Del proveedor</td></tr>
+      <tr><td>Sistema operativo, parcheo, cifrado de disco</td><td>Tuya</td><td><strong>Tuya</strong></td><td>Del proveedor</td><td>Del proveedor</td></tr>
+      <tr><td>Configuración de red y de la aplicación</td><td>Tuya</td><td>Tuya</td><td><strong>Tuya</strong></td><td>Compartida</td></tr>
+      <tr><td>Identidades, accesos y <strong>datos</strong></td><td>Tuya</td><td>Tuya</td><td>Tuya</td><td><strong>Tuya</strong></td></tr>
+    </table>
+    <p>
+      La fila que nunca cambia es la última: <strong>identidad y dato son siempre tuyos</strong>, en cualquier
+      modelo. Por eso el examen insiste tanto en clasificación, etiquetas, acceso condicional y gobierno de
+      permisos, y por eso una opción que dice «lo protege el proveedor» hablando del dato es casi siempre la
+      incorrecta.
+    </p>
+
+    <h3>Defensa en profundidad, y qué queda de ella con Zero Trust</h3>
+    <p>
+      La idea clásica es apilar controles independientes —perímetro, red, host, aplicación, dato— para que el
+      fallo de uno no sea el fallo del sistema. Zero Trust <strong>no la sustituye</strong>: lo que niega es
+      una premisa concreta de esa arquitectura, la de que estar <em>dentro</em> del perímetro sea señal de
+      confianza. Las capas siguen; lo que desaparece es la zona segura.
+    </p>
+    <p>
+      Por eso el diseño moderno mantiene segmentación y cifrado —capas— y añade verificación en cada petición.
+      Una opción que proponga volver a confiar en la red interna es incorrecta; una que proponga quitar capas
+      «porque ya tenemos Zero Trust», también.
+    </p>
+
+    <h3>RPO y RTO: qué miden y qué diseño obliga cada uno</h3>
+    <p>
+      Son dos números que fija el negocio y que apuntan a mecanismos distintos, y confundirlos es el error
+      clásico de esta tarea.
+    </p>
+    <table role="table">
+      <tr><th></th><th>RPO — objetivo de punto de recuperación</th><th>RTO — objetivo de tiempo de recuperación</th></tr>
+      <tr><td>Qué mide</td><td>Cuánto <strong>dato</strong> aceptas perder, medido en tiempo hacia atrás.</td><td>Cuánto <strong>tiempo</strong> aceptas estar parado.</td></tr>
+      <tr><td>De qué depende</td><td>De la <em>frecuencia</em> con que copias o replicas.</td><td>De la <em>velocidad</em> a la que restauras y vuelves a operar.</td></tr>
+      <tr><td>Qué diseño obliga</td><td>RPO de horas: copias frecuentes. RPO de minutos: replicación continua.</td><td>RTO de días: restaurar de copia. RTO de minutos: entorno secundario ya levantado.</td></tr>
+    </table>
+    <p>
+      La consecuencia que se pregunta: <strong>un RPO exigente y un RTO exigente no se resuelven con la misma
+      pieza</strong>. Se puede tener replicación continua —RPO bajo— y tardar un día en levantar, si nadie
+      preparó ni probó el procedimiento. Por eso el examen separa «copia» de «plan de recuperación probado».
+    </p>
+
+    <h3>Quién responde de qué, modelo a modelo</h3>
+    <div class="diagram">
+      <svg viewBox="0 0 700 412" xmlns="http://www.w3.org/2000/svg">
+        <g>
+          <text x="287" y="26" class="dtitle" text-anchor="middle">On-prem</text>
+          <text x="403" y="26" class="dtitle" text-anchor="middle">IaaS</text>
+          <text x="519" y="26" class="dtitle" text-anchor="middle">PaaS</text>
+          <text x="635" y="26" class="dtitle" text-anchor="middle">SaaS</text>
+        </g>
+        <g class="dstep" data-label="Información y datos — On-prem: Cliente · IaaS: Cliente · PaaS: Cliente · SaaS: Cliente" data-explain="Nunca cambia de dueño. El proveedor no clasifica tu dato, no decide quién lo ve y no responde de que se filtre por un permiso mal puesto.">
+          <rect class="dbox" x="8" y="40" width="218" height="42" rx="8"></rect>
+          <text x="20" y="66" class="dtitle">Información y datos</text>
+          <rect class="dbox-allow" x="232" y="40" width="110" height="42" rx="8"></rect>
+          <text x="287" y="66" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-allow" x="348" y="40" width="110" height="42" rx="8"></rect>
+          <text x="403" y="66" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-allow" x="464" y="40" width="110" height="42" rx="8"></rect>
+          <text x="519" y="66" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-allow" x="580" y="40" width="110" height="42" rx="8"></rect>
+          <text x="635" y="66" class="dstep-cell" text-anchor="middle">Cliente</text>
+        </g>
+        <g class="dstep" data-label="Cuentas e identidades — On-prem: Cliente · IaaS: Cliente · PaaS: Cliente · SaaS: Cliente" data-explain="También es siempre tuya. Quién existe, con qué credencial entra y qué se le exige para entrar lo decides tú en los cuatro modelos.">
+          <rect class="dbox" x="8" y="92" width="218" height="42" rx="8"></rect>
+          <text x="20" y="118" class="dtitle">Cuentas e identidades</text>
+          <rect class="dbox-allow" x="232" y="92" width="110" height="42" rx="8"></rect>
+          <text x="287" y="118" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-allow" x="348" y="92" width="110" height="42" rx="8"></rect>
+          <text x="403" y="118" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-allow" x="464" y="92" width="110" height="42" rx="8"></rect>
+          <text x="519" y="118" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-allow" x="580" y="92" width="110" height="42" rx="8"></rect>
+          <text x="635" y="118" class="dstep-cell" text-anchor="middle">Cliente</text>
+        </g>
+        <g class="dstep" data-label="Infraestructura de identidad — On-prem: Cliente · IaaS: Compartida · PaaS: Compartida · SaaS: Compartida" data-explain="En local la levantas entera. En la nube el proveedor opera el directorio, pero su configuración —directivas, roles, federación— sigue siendo tuya.">
+          <rect class="dbox" x="8" y="144" width="218" height="42" rx="8"></rect>
+          <text x="20" y="170" class="dtitle">Infraestructura de identidad</text>
+          <rect class="dbox-allow" x="232" y="144" width="110" height="42" rx="8"></rect>
+          <text x="287" y="170" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-shared" x="348" y="144" width="110" height="42" rx="8"></rect>
+          <text x="403" y="170" class="dstep-cell" text-anchor="middle">Compartida</text>
+          <rect class="dbox-shared" x="464" y="144" width="110" height="42" rx="8"></rect>
+          <text x="519" y="170" class="dstep-cell" text-anchor="middle">Compartida</text>
+          <rect class="dbox-shared" x="580" y="144" width="110" height="42" rx="8"></rect>
+          <text x="635" y="170" class="dstep-cell" text-anchor="middle">Compartida</text>
+        </g>
+        <g class="dstep" data-label="Aplicaciones — On-prem: Cliente · IaaS: Cliente · PaaS: Compartida · SaaS: Proveedor" data-explain="En IaaS la aplicación es tuya de arriba abajo. En PaaS compartes: el proveedor pone la plataforma y tú el código y su configuración. En SaaS es del proveedor, y a ti te queda cómo la configuras.">
+          <rect class="dbox" x="8" y="196" width="218" height="42" rx="8"></rect>
+          <text x="20" y="222" class="dtitle">Aplicaciones</text>
+          <rect class="dbox-allow" x="232" y="196" width="110" height="42" rx="8"></rect>
+          <text x="287" y="222" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-allow" x="348" y="196" width="110" height="42" rx="8"></rect>
+          <text x="403" y="222" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-shared" x="464" y="196" width="110" height="42" rx="8"></rect>
+          <text x="519" y="222" class="dstep-cell" text-anchor="middle">Compartida</text>
+          <rect class="dbox" x="580" y="196" width="110" height="42" rx="8"></rect>
+          <text x="635" y="222" class="dstep-cell" text-anchor="middle">Proveedor</text>
+        </g>
+        <g class="dstep" data-label="Controles de red — On-prem: Cliente · IaaS: Cliente · PaaS: Compartida · SaaS: Proveedor" data-explain="El punto donde más se equivoca la gente en PaaS: el servicio trae red gestionada, pero abrir o cerrar el acceso público, el punto de conexión privado y las reglas siguen siendo decisión tuya.">
+          <rect class="dbox" x="8" y="248" width="218" height="42" rx="8"></rect>
+          <text x="20" y="274" class="dtitle">Controles de red</text>
+          <rect class="dbox-allow" x="232" y="248" width="110" height="42" rx="8"></rect>
+          <text x="287" y="274" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-allow" x="348" y="248" width="110" height="42" rx="8"></rect>
+          <text x="403" y="274" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-shared" x="464" y="248" width="110" height="42" rx="8"></rect>
+          <text x="519" y="274" class="dstep-cell" text-anchor="middle">Compartida</text>
+          <rect class="dbox" x="580" y="248" width="110" height="42" rx="8"></rect>
+          <text x="635" y="274" class="dstep-cell" text-anchor="middle">Proveedor</text>
+        </g>
+        <g class="dstep" data-label="Sistema operativo — On-prem: Cliente · IaaS: Cliente · PaaS: Proveedor · SaaS: Proveedor" data-explain="En IaaS lo parcheas y lo endureces tú. En PaaS y SaaS desaparece de tu vista, y con él desaparecen el parcheo y el agente.">
+          <rect class="dbox" x="8" y="300" width="218" height="42" rx="8"></rect>
+          <text x="20" y="326" class="dtitle">Sistema operativo</text>
+          <rect class="dbox-allow" x="232" y="300" width="110" height="42" rx="8"></rect>
+          <text x="287" y="326" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox-allow" x="348" y="300" width="110" height="42" rx="8"></rect>
+          <text x="403" y="326" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox" x="464" y="300" width="110" height="42" rx="8"></rect>
+          <text x="519" y="326" class="dstep-cell" text-anchor="middle">Proveedor</text>
+          <rect class="dbox" x="580" y="300" width="110" height="42" rx="8"></rect>
+          <text x="635" y="326" class="dstep-cell" text-anchor="middle">Proveedor</text>
+        </g>
+        <g class="dstep" data-label="Hosts y centro de datos — On-prem: Cliente · IaaS: Proveedor · PaaS: Proveedor · SaaS: Proveedor" data-explain="Fuera de local, esto es del proveedor y lo acredita con certificaciones. Su certificación cubre su mitad: no dice nada de cómo has configurado tú la tuya.">
+          <rect class="dbox" x="8" y="352" width="218" height="42" rx="8"></rect>
+          <text x="20" y="378" class="dtitle">Hosts y centro de datos</text>
+          <rect class="dbox-allow" x="232" y="352" width="110" height="42" rx="8"></rect>
+          <text x="287" y="378" class="dstep-cell" text-anchor="middle">Cliente</text>
+          <rect class="dbox" x="348" y="352" width="110" height="42" rx="8"></rect>
+          <text x="403" y="378" class="dstep-cell" text-anchor="middle">Proveedor</text>
+          <rect class="dbox" x="464" y="352" width="110" height="42" rx="8"></rect>
+          <text x="519" y="378" class="dstep-cell" text-anchor="middle">Proveedor</text>
+          <rect class="dbox" x="580" y="352" width="110" height="42" rx="8"></rect>
+          <text x="635" y="378" class="dstep-cell" text-anchor="middle">Proveedor</text>
+        </g>
+      </svg>
+      <div class="dexplain">Las dos primeras filas no cambian de color en ninguna columna: identidad y datos son siempre tuyos, vaya donde vaya la carga de trabajo.</div>
+    </div>
 
     <h2 id="marcos">Los cinco marcos, sin confundirlos</h2>
     <p>
@@ -319,6 +473,24 @@
       control <strong>rompa la construcción</strong> en vez de generar un aviso que nadie lee.
     </p>
 
+    <h2 id="fuentes">Fuentes oficiales</h2>
+    <p class="lede">Documentación de Microsoft en la que se apoya este módulo. Si algo no te cuadra o quieres profundizar, empieza por aquí: es la única fuente que manda.</p>
+    <ul class="sources">
+      <li><a href="https://learn.microsoft.com/en-us/azure/well-architected/security/" target="_blank" rel="noopener">Pilar de seguridad del marco de buena arquitectura ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/security/adoption/mcra" target="_blank" rel="noopener">Arquitecturas de referencia de ciberseguridad de Microsoft ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/security/benchmark/azure/introduction" target="_blank" rel="noopener">Punto de referencia de seguridad en la nube de Microsoft ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/security/zero-trust/zero-trust-overview" target="_blank" rel="noopener">Modelo de seguridad de Confianza cero ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/security/zero-trust/adopt/zero-trust-adoption-overview" target="_blank" rel="noopener">Marco de adopción de Confianza cero ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/secure/overview" target="_blank" rel="noopener">Seguridad en el marco de adopción de la nube ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/ready/landing-zone/" target="_blank" rel="noopener">Zonas de aterrizaje de Azure ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/security/ransomware/protect-against-ransomware-phase1" target="_blank" rel="noopener">Protección contra ransomware — preparar la recuperación ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/security/ransomware/protect-against-ransomware-phase2" target="_blank" rel="noopener">Protección contra ransomware — limitar el alcance del daño ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/reliability/concept-business-continuity-high-availability-disaster-recovery" target="_blank" rel="noopener">Continuidad de negocio y recuperación ante desastres ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/security/zero-trust/sfi/protect-software-supply-chain" target="_blank" rel="noopener">Proteger la cadena de suministro de software ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/security/zero-trust/develop/secure-devops-environments-zero-trust" target="_blank" rel="noopener">Controles de DevSecOps ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/purview/ai-microsoft-purview" target="_blank" rel="noopener">Gobierno y cumplimiento de la IA con Purview ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/sc-100" target="_blank" rel="noopener">Study guide oficial del SC-100 ↗</a></li>
+    </ul>
     <h2 id="trampas">Trampas típicas de este dominio</h2>
     <div class="callout warn">
       <b>Confundir CAF con Well-Architected</b>
@@ -376,7 +548,7 @@
 <!-- temario:fin -->
 
     <h2 id="quiz">Quiz de práctica — Buenas prácticas y prioridades</h2>
-    <p class="lede">26 preguntas de escenario. Elige una opción para ver si es correcta y por qué.</p>
+    <p class="lede">52 preguntas de escenario. Elige una opción para ver si es correcta y por qué.</p>
     <div id="quiz-root"></div>
 
   </main>
@@ -387,7 +559,8 @@
 </footer>
 
 <script src="quiz-data.js"></script>
-<script src="../../../assets/js/quiz.js?v=9"></script>
+<script>window.GUIDE_CERT = "sc-100";</script>
+<script src="../../../assets/js/quiz.js?v=10"></script>
 <script src="../../../assets/js/app.js?v=9"></script>
 
 </body>

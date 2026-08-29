@@ -13,7 +13,7 @@
 <meta property="og:locale" content="es_ES">
 <meta name="twitter:card" content="summary">
 <title>Aplicaciones y datos — Microsoft Cybersecurity Architect (SC-100)</title>
-<link rel="stylesheet" href="../../../assets/css/style.css?v=9">
+<link rel="stylesheet" href="../../../assets/css/style.css?v=10">
 </head>
 <body>
 
@@ -40,6 +40,7 @@
 
   <aside class="sidebar">
     <h4>Cómo leer este dominio</h4>
+    <a href="#base">Lo que se da por sabido</a>
     <a href="#hilo">El dato, no el contenedor</a>
     <h4>4.1 Microsoft 365</h4>
     <a href="#m365-postura">Medir la postura de M365</a>
@@ -64,13 +65,123 @@
     <a href="#bases-datos">Azure SQL, Synapse y Cosmos DB</a>
     <a href="#storage">Azure Storage</a>
     <a href="#defender-datos">Defender for Storage y Databases</a>
+    <a href="#fuentes">Fuentes oficiales</a>
     <a href="#trampas">Trampas típicas</a>
     <a href="#temario">Temario oficial</a>
     <h4>Práctica</h4>
-    <a href="#quiz">Quiz (40 preguntas)</a>
+    <a href="#quiz">Quiz (80 preguntas)</a>
   </aside>
 
   <main class="content">
+
+    <h2 id="base">Lo que este examen da por sabido</h2>
+    <p>
+      Cuatro mecanismos que este dominio usa constantemente sin explicarlos, y de los que dependen varias
+      respuestas que si no parecen arbitrarias.
+    </p>
+
+    <h3>Cifrado en sobre: por qué revocar una clave hace el dato ilegible al instante</h3>
+    <p>
+      Ningún servicio cifra terabytes con tu clave directamente. Cada bloque de datos se cifra con una
+      <strong>clave de datos</strong> generada al vuelo, y <em>esa</em> clave se cifra a su vez con una
+      <strong>clave de cifrado de claves</strong> y se guarda junto al dato. Es lo que se llama cifrado en
+      sobre.
+    </p>
+    <p>
+      La clave que tú controlas —la <strong>gestionada por el cliente</strong>, en Key Vault— es la de
+      arriba, la que envuelve. Por eso retirarle el acceso al servicio deja el dato ilegible
+      <strong>de inmediato y sin reescribir nada</strong>: las claves de datos siguen ahí, pero nadie puede
+      desenvolverlas. Y por eso rotar esa clave es barato, mientras que rotar la de abajo obligaría a
+      recifrarlo todo.
+    </p>
+
+    <h3>Cómo viaja la protección de una etiqueta fuera de tu tenant</h3>
+    <p>
+      Una etiqueta de confidencialidad con cifrado no marca el fichero: lo <strong>cifra</strong> e incrusta
+      dentro una <strong>política de uso</strong> —quién puede abrirlo y qué puede hacer: leer, editar,
+      imprimir, reenviar— junto con la referencia al servicio que guarda la clave.
+    </p>
+    <p>
+      Cuando alguien lo abre, la aplicación contacta con ese servicio, se autentica y solo entonces recibe la
+      clave y los derechos que le corresponden. De ahí las dos consecuencias que el examen pregunta: la
+      protección <strong>sigue viva fuera de tu organización</strong>, porque la comprobación es en el momento
+      de abrir y no en el de enviar; y <strong>se puede revocar después</strong>, porque el fichero no sirve
+      si el servicio deja de entregar la clave.
+    </p>
+    <div class="callout exam">
+      <b>Y de ahí también la diferencia con DLP</b>
+      La DLP se evalúa <em>en el canal</em> —el servidor de correo, el sitio de SharePoint, el agente del
+      endpoint— en el momento en que el dato intenta salir. La etiqueta se evalúa <em>en el fichero</em> cada
+      vez que se abre. Por eso una impide la salida y la otra sobrevive a la salida, y por eso tantos
+      requisitos necesitan las dos.
+    </div>
+
+    <h3>Qué es exactamente una SAS, y por qué una no se puede revocar</h3>
+    <p>
+      Una firma de acceso compartido es una cadena de texto que lleva los permisos, el recurso, la ventana de
+      validez y una <strong>firma</strong>. El almacenamiento no consulta ninguna base de datos: recalcula la
+      firma con la clave y, si cuadra, deja pasar. No hay lista de SAS emitidas en ninguna parte.
+    </p>
+    <p>
+      Eso explica el problema entero. Una SAS firmada con la <strong>clave de la cuenta</strong> solo se
+      invalida cambiando esa clave, lo que tumba a todo lo demás que la use. Una <strong>SAS de delegación de
+      usuario</strong> se firma con una clave temporal que Entra ID entrega a una identidad concreta: revocando
+      esa delegación —o los permisos de esa identidad— caen todas las SAS que colgaban de ella, sin tocar la
+      cuenta.
+    </p>
+
+    <h3>Federación de identidad de carga de trabajo: el intercambio de token</h3>
+    <p>
+      Cuando un sistema externo —un pipeline, un clúster ajeno— necesita entrar en Azure, la alternativa al
+      secreto es esta: registras en Entra ID que confías en un <strong>emisor</strong> concreto y en un
+      <strong>sujeto</strong> concreto dentro de él —esta organización, este repositorio, esta rama—. El
+      sistema externo obtiene un token firmado por su propio emisor, se lo presenta a Entra ID, y Entra ID
+      comprueba la firma y la correspondencia y lo <strong>cambia</strong> por un token suyo.
+    </p>
+    <p>
+      No hay nada guardado en ningún sitio: la confianza está en la relación, no en un valor. Por eso el examen
+      lo prefiere a cualquier secreto por bien custodiado que esté, y por eso el detalle de acotar la rama o el
+      entorno importa: sin eso, cualquier rama del repositorio despliega en producción.
+    </p>
+
+    <h3>Cifrado de sobre: por qué revocar la clave corta el acceso</h3>
+    <div class="diagram">
+      <svg viewBox="0 0 700 312" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="ee-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#7c8aa0"></path>
+          </marker>
+        </defs>
+        <line class="dline" x1="200" y1="88" x2="200" y2="122" marker-end="url(#ee-arrow)"></line>
+        <line class="dline" x1="200" y1="192" x2="200" y2="226" marker-end="url(#ee-arrow)"></line>
+        <line class="dline" x1="424" y1="157" x2="330" y2="157" marker-end="url(#ee-arrow)"></line>
+        <line class="dline-deny" x1="530" y1="200" x2="530" y2="238"></line>
+        <g class="dstep" data-label="El dato en claro" data-explain="El blob, la fila o el fichero tal cual lo escribe la aplicación.">
+          <rect class="dbox" x="60" y="36" width="280" height="52" rx="8"></rect>
+          <text x="200" y="60" class="dtitle" text-anchor="middle">Dato</text>
+        </g>
+        <g class="dstep" data-label="Clave de datos" data-explain="El servicio cifra el dato con una clave de datos, rápida y de un solo propósito. Esta clave no viaja a ningún sitio: se guarda junto al dato, pero envuelta.">
+          <rect class="dbox-alt" x="60" y="122" width="280" height="70" rx="8"></rect>
+          <text x="200" y="146" class="dtitle" text-anchor="middle">Cifrado con la clave de datos</text>
+          <text x="200" y="164" class="dstep-cell" text-anchor="middle">la clave se guarda envuelta</text>
+        </g>
+        <g class="dstep" data-label="Clave de cifrado de claves, en tu almacén" data-explain="La clave que envuelve a la de datos vive en tu almacén de claves y es tuya. El servicio no la tiene: la llama cada vez que necesita desenvolver. Aquí es donde una clave gestionada por el cliente se diferencia de una gestionada por la plataforma.">
+          <rect class="dbox-allow" x="424" y="122" width="236" height="70" rx="8"></rect>
+          <text x="542" y="146" class="dtitle" text-anchor="middle">Clave de cifrado de claves</text>
+          <text x="542" y="164" class="dstep-cell" text-anchor="middle">en tu almacén de claves</text>
+        </g>
+        <g class="dstep" data-label="Dato cifrado en reposo" data-explain="Lo que queda almacenado es el dato cifrado más la clave de datos envuelta. Sin desenvolver esa clave no hay forma de leer nada.">
+          <rect class="dbox" x="60" y="226" width="280" height="62" rx="8"></rect>
+          <text x="200" y="250" class="dtitle" text-anchor="middle">Dato cifrado + clave envuelta</text>
+        </g>
+        <g class="dstep" data-label="Revocar la clave" data-explain="Al deshabilitar tu clave de cifrado de claves, el servicio deja de poder desenvolver la clave de datos y, por tanto, de descifrar nada. Es inmediato y no reescribe un solo byte: por eso este diseño es el que cumple una obligación de «poder cortar el acceso sin depender del proveedor».">
+          <rect class="dbox-deny" x="424" y="238" width="236" height="62" rx="8"></rect>
+          <text x="542" y="262" class="dtitle" text-anchor="middle">Deshabilitarla corta el acceso</text>
+          <text x="542" y="280" class="dstep-cell" text-anchor="middle">al instante y sin reescribir</text>
+        </g>
+      </svg>
+      <div class="dexplain">El dato nunca se vuelve a cifrar al revocar: lo que se rompe es la cadena que permite desenvolver la clave que lo abre.</div>
+    </div>
 
     <h2 id="hilo">El dato, no el contenedor: el hilo del dominio</h2>
     <p>
@@ -387,6 +498,26 @@
       <tr><td><strong>Defender for Databases</strong><br><span class="skill-id">Defender for SQL · Cosmos DB · open source</span></td><td>Es un plan paraguas: <strong>Defender for SQL</strong> cubre Azure SQL, SQL en máquina virtual y Synapse; hay planes hermanos para Cosmos DB y para las bases de datos relacionales de código abierto. Detecta inyección SQL, patrones de acceso anómalos y fuerza bruta contra el servidor, y añade evaluación de vulnerabilidades de la configuración de la base.</td></tr>
     </table>
 
+    <h2 id="fuentes">Fuentes oficiales</h2>
+    <p class="lede">Documentación de Microsoft en la que se apoya este módulo. Si algo no te cuadra o quieres profundizar, empieza por aquí: es la única fuente que manda.</p>
+    <ul class="sources">
+      <li><a href="https://learn.microsoft.com/en-us/defender-xdr/microsoft-secure-score" target="_blank" rel="noopener">Puntuación de seguridad de Microsoft ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/defender-office-365/safe-links-about" target="_blank" rel="noopener">Vínculos seguros de Defender for Office 365 ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/defender-cloud-apps/what-is-defender-for-cloud-apps" target="_blank" rel="noopener">Microsoft Defender for Cloud Apps ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/copilot/microsoft-365/microsoft-365-copilot-privacy" target="_blank" rel="noopener">Privacidad y seguridad de Microsoft 365 Copilot ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/purview/sensitivity-labels" target="_blank" rel="noopener">Etiquetas de confidencialidad ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/purview/dlp-learn-about-dlp" target="_blank" rel="noopener">Prevención de pérdida de datos ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/purview/data-map-classification" target="_blank" rel="noopener">Clasificación en el mapa de datos de Purview ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/security/develop/threat-modeling-tool" target="_blank" rel="noopener">Herramienta de modelado de amenazas ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/api-management/api-management-key-concepts" target="_blank" rel="noopener">Conceptos de la gestión de API ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/web-application-firewall/afds/afds-overview" target="_blank" rel="noopener">Firewall de aplicaciones web en Front Door ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/entra/workload-id/workload-identity-federation" target="_blank" rel="noopener">Federación de identidades de carga de trabajo ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/storage/common/customer-managed-keys-overview" target="_blank" rel="noopener">Claves gestionadas por el cliente ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/storage/common/storage-sas-overview" target="_blank" rel="noopener">Firmas de acceso compartido ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-storage-introduction" target="_blank" rel="noopener">Defender for Storage ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/defender-for-databases-introduction" target="_blank" rel="noopener">Defender for Databases ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/sc-100" target="_blank" rel="noopener">Study guide oficial del SC-100 ↗</a></li>
+    </ul>
     <h2 id="trampas">Trampas típicas de este dominio</h2>
     <div class="callout warn">
       <b>Configurar Copilot en vez de arreglar los permisos</b>
@@ -451,7 +582,7 @@
 <!-- temario:fin -->
 
     <h2 id="quiz">Quiz de práctica — Aplicaciones y datos</h2>
-    <p class="lede">40 preguntas de escenario. Elige una opción para ver si es correcta y por qué.</p>
+    <p class="lede">80 preguntas de escenario. Elige una opción para ver si es correcta y por qué.</p>
     <div id="quiz-root"></div>
 
   </main>
@@ -462,7 +593,8 @@
 </footer>
 
 <script src="quiz-data.js"></script>
-<script src="../../../assets/js/quiz.js?v=9"></script>
+<script>window.GUIDE_CERT = "sc-100";</script>
+<script src="../../../assets/js/quiz.js?v=10"></script>
 <script src="../../../assets/js/app.js?v=9"></script>
 
 </body>

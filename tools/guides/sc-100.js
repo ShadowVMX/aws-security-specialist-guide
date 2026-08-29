@@ -102,7 +102,7 @@ const DOMAINS = [
         skills: [
           {
             id: "1.3.1",
-            match: /adopción (segura )?de ia|secure ai adoption|estrategia de ia|ai adoption|copilot.{0,40}(plantilla|organización|workforce|organisation)|ia no aprobada|unapproved ai|shadow it/i,
+            match: /adopción (segura )?de ia|secure ai adoption|estrategia de ia|ai adoption|copilot.{0,40}(plantilla|organización|workforce|organisation)|ia no aprobada|unapproved ai|shadow it|ia en la sombra|shadow ai/i,
             text: "Design a strategy for secure AI adoption",
             textEs: "Diseñar una estrategia de adopción segura de IA",
           },
@@ -120,7 +120,7 @@ const DOMAINS = [
           },
           {
             id: "1.3.4",
-            match: /landing zone/i,
+            match: /landing zone|zonas? de aterrizaje/i,
             text: "Design solutions for implementing and governing security by using Azure landing zones",
             textEs: "Diseñar la implantación y el gobierno de la seguridad con Azure landing zones",
           },
@@ -289,7 +289,7 @@ const DOMAINS = [
           },
           {
             id: "2.3.7",
-            match: /\bpaw\b|estaci(ón|ones) .{0,20}privilegiad|privileged access workstation|bastion/i,
+            match: /\bpaw\b|estaci(ón|ones) .{0,30}privilegiad|privileged access workstation|bastion/i,
             text: "Design a solution for secure workstations for privileged access, including remote access",
             textEs: "Diseñar estaciones de trabajo seguras para acceso privilegiado, incluido el acceso remoto",
           },
@@ -353,7 +353,7 @@ const DOMAINS = [
           },
           {
             id: "3.1.2",
-            match: /secure score/i,
+            match: /secure score|puntuaci(ón|ones) de seguridad/i,
             text: "Evaluate security posture by using Microsoft Secure Score",
             textEs: "Evaluar la postura de seguridad con Microsoft Secure Score",
           },
@@ -371,7 +371,7 @@ const DOMAINS = [
           },
           {
             id: "3.1.5",
-            match: /azure arc/i,
+            match: /azure arc|\barc\b/i,
             text: "Design a solution for integrating hybrid and multicloud environments by using Azure Arc",
             textEs: "Diseñar la integración de entornos híbridos y multinube con Azure Arc",
           },
@@ -473,7 +473,7 @@ const DOMAINS = [
           },
           {
             id: "3.3.6",
-            match: /azure ai|servicios? de ia|ai service|azure openai|prompt shield|escudos? de prompt|inyección de instrucciones|prompt injection|filtros? de contenido|content filter/i,
+            match: /azure ai|servicios? de ia|ai service|azure openai|prompt shield|escudos? de (prompt|peticiones)|inyección de instrucciones|prompt injection|filtros? de contenido|content filter|seguridad de contenido|content safety|ataques? indirectos?|indirect attack/i,
             text: "Evaluate solutions that include Azure AI services security",
             textEs: "Evaluar soluciones que incluyan la seguridad de los servicios de IA de Azure",
           },

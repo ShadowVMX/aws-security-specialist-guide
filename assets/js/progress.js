@@ -1,6 +1,6 @@
 /**
  * Hub progress panel. Reads the small roll-ups the quiz and exam engines
- * leave behind (scs-c03:summary:* and scs-c03:examsummary:*) and shows where
+ * leave behind (<cert>:summary:* and <cert>:examsummary:*) and shows where
  * you stand, per domain and overall, plus a global reset.
  *
  * Deliberately does NOT load the question banks: the summaries exist so the
@@ -11,6 +11,8 @@
   if (!grid) return;
 
   const LANG = (document.documentElement.lang || "es").slice(0, 2);
+  // Same namespace the quiz and exam engines write under, set by the page.
+  const CERT = window.GUIDE_CERT || "scs-c03";
   const T =
     LANG === "en"
       ? {
@@ -73,7 +75,7 @@
   cards.forEach((card) => {
     const id = moduleIdFromHref(card.getAttribute("href") || "");
     if (!id) return;
-    const s = read(`scs-c03:summary:${LANG}:${id}`);
+    const s = read(`${CERT}:summary:${LANG}:${id}`);
 
     if (s && s.total) {
       known++;
@@ -108,7 +110,7 @@
     card.appendChild(wrap);
   });
 
-  const exam = read(`scs-c03:examsummary:${LANG}`);
+  const exam = read(`${CERT}:examsummary:${LANG}`);
   if (!any && !exam) return; // nothing worth showing yet
 
   /* ---- summary panel above the grid ---- */
@@ -155,7 +157,7 @@
     if (!window.confirm(T.resetConfirm)) return;
     try {
       Object.keys(localStorage)
-        .filter((k) => k.indexOf("scs-c03:") === 0)
+        .filter((k) => k.indexOf(`${CERT}:`) === 0)
         .forEach((k) => localStorage.removeItem(k));
     } catch (e) {
       /* storage unavailable — nothing was saved to begin with */

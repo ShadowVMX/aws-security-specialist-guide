@@ -13,7 +13,7 @@
 <meta property="og:locale" content="es_ES">
 <meta name="twitter:card" content="summary">
 <title>Soluciones de seguridad para infraestructura — Microsoft Cybersecurity Architect (SC-100)</title>
-<link rel="stylesheet" href="../../../assets/css/style.css?v=9">
+<link rel="stylesheet" href="../../../assets/css/style.css?v=10">
 </head>
 <body>
 
@@ -40,6 +40,7 @@
 
   <aside class="sidebar">
     <h4>Cómo leer este dominio</h4>
+    <a href="#base">Lo que se da por sabido</a>
     <a href="#mapa">El mapa de productos</a>
     <h4>3.1 Postura</h4>
     <a href="#defender-cloud">Defender for Cloud y el MCSB</a>
@@ -68,13 +69,163 @@
     <a href="#internet-access">Entra Internet Access</a>
     <a href="#internet-access-ms">Tráfico de Microsoft y entre tenants</a>
     <a href="#private-access">Entra Private Access</a>
+    <a href="#fuentes">Fuentes oficiales</a>
     <a href="#trampas">Trampas típicas</a>
     <a href="#temario">Temario oficial</a>
     <h4>Práctica</h4>
-    <a href="#quiz">Quiz (46 preguntas)</a>
+    <a href="#quiz">Quiz (92 preguntas)</a>
   </aside>
 
   <main class="content">
+
+    <h2 id="base">Lo que este examen da por sabido</h2>
+    <p>
+      Este dominio es el que más mecánica de plataforma asume. Sin ella, media docena de respuestas parecen
+      cuestión de memoria cuando en realidad se deducen de cómo está construido Azure.
+    </p>
+
+    <h3>Endpoint privado frente a endpoint de servicio, por dentro</h3>
+    <p>
+      Un servicio PaaS —una cuenta de almacenamiento, una base de datos— nace con un nombre público que
+      resuelve a una dirección pública. Las dos opciones que el examen enfrenta hacen cosas distintas con eso:
+    </p>
+    <ul>
+      <li>El <strong>endpoint de servicio</strong> no cambia el destino: el recurso conserva su dirección
+        pública. Lo que cambia es el <em>origen</em>: el tráfico sale por la red troncal de Azure y llega
+        identificado como procedente de tu subred, de modo que el cortafuegos del recurso puede permitir
+        «esta red virtual». Sigue habiendo una puerta pública, solo que con una lista de invitados.</li>
+      <li>El <strong>endpoint privado</strong> crea una <strong>interfaz de red real dentro de tu subred</strong>,
+        con una dirección IP privada tuya, y una <strong>zona DNS privada</strong> que hace que el nombre
+        público del recurso resuelva a esa IP privada. El recurso pasa a ser alcanzable por dirección privada,
+        y con el acceso público deshabilitado deja de existir para internet.</li>
+    </ul>
+    <div class="callout exam">
+      <b>Por eso la respuesta cambia con el requisito</b>
+      «Que el tráfico no salga a internet» lo cumplen los dos. «Que el recurso solo sea accesible desde la red
+      virtual» solo lo cumple el endpoint privado, porque es el único que le quita la puerta pública. Y hay un
+      detalle que el examen aprovecha: al usar endpoint privado hay que resolver el <b>DNS</b>, porque si el
+      cliente sigue resolviendo a la IP pública el enlace privado no se usa.
+    </div>
+
+    <h3>Por qué la postura es sin agente y la protección de cargas no</h3>
+    <p>
+      Todo recurso de Azure vive detrás de un plano de control común, <strong>Azure Resource Manager</strong>,
+      que sabe cómo está configurado cada uno. La <strong>postura</strong> se limita a leer eso por API: por
+      eso el CSPM no necesita instalar nada, por eso funciona igual sobre AWS y GCP asumiendo un rol en la
+      cuenta, y por eso su respuesta es siempre sobre <em>configuración</em>.
+    </p>
+    <p>
+      La <strong>protección de cargas</strong> necesita ver lo que <em>ocurre dentro</em>: procesos en un
+      servidor, consultas contra una base de datos, contenido que se sube. Eso no está en el plano de control,
+      así que hace falta un sensor —Defender for Endpoint en el servidor, el análisis en el momento de la
+      subida, el sensor del nodo del clúster—. De ahí la línea que separa los dos productos y de ahí que
+      «sin agentes» sea una restricción que empuja siempre hacia postura.
+    </p>
+
+    <h3>Qué hace Azure Arc en realidad</h3>
+    <p>
+      Arc instala un agente en la máquina que la <strong>registra como recurso de Azure Resource Manager</strong>,
+      con su identificador, su grupo de recursos y su identidad administrada. A partir de ese momento la máquina
+      es, a ojos de Azure, un recurso más: le aplican RBAC, etiquetas, políticas y grupos de administración. Lo
+      que se le añade encima —Defender for Endpoint, el agente de Azure Monitor, Machine Configuration— son
+      <strong>extensiones</strong> que Azure despliega a través de ese agente.
+    </p>
+    <p>
+      Esto explica de golpe dos respuestas del examen: por qué Arc <em>habilita</em> Azure Policy sobre
+      servidores de fuera —Policy actúa sobre recursos ARM, y Arc los convierte en uno—, y por qué Arc
+      <em>no</em> lleva los logs al SIEM —eso es otra extensión, con su regla de recopilación—.
+    </p>
+
+    <h3>Los grupos de seguridad de red, y por qué se prefieren los de aplicación</h3>
+    <p>
+      Un grupo de seguridad de red es una lista de reglas con <strong>prioridad numérica</strong>: se evalúan
+      de menor a mayor y <strong>la primera que coincide decide</strong>, a diferencia del acceso condicional.
+      Llevan reglas por defecto que permiten el tráfico dentro de la red virtual y bloquean lo entrante de
+      internet, y esas reglas por defecto tienen la prioridad más alta, así que cualquier regla tuya las gana.
+    </p>
+    <p>
+      Un <strong>grupo de seguridad de aplicación</strong> no es una regla: es una <em>etiqueta</em> que se
+      pone a las interfaces de red. Luego las reglas se escriben entre grupos —«de <em>web</em> a
+      <em>base-de-datos</em>, puerto 1433»— en vez de entre direcciones. Una máquina nueva hereda su política
+      con solo entrar en el grupo, y ese es el motivo por el que se prefieren: la regla deja de caducar cada
+      vez que cambia la topología.
+    </p>
+
+    <h3>Herencia de Azure Policy, que es de donde sale «grupo de administración»</h3>
+    <p>
+      Las asignaciones de política se heredan hacia abajo por la jerarquía —grupo de administración,
+      suscripción, grupo de recursos, recurso— y no se pueden anular desde abajo. Los efectos importan en este
+      orden: <code>Disabled</code> apaga la regla; <code>Deny</code> impide crear o modificar el recurso;
+      <code>Audit</code> solo marca; y <code>DeployIfNotExists</code> y <code>Modify</code> corrigen después
+      del despliegue, para lo cual la asignación <strong>necesita una identidad administrada</strong> con
+      permisos, que es un detalle que el examen usa como distractor.
+    </p>
+    <p>
+      Como la herencia baja y las suscripciones nuevas nacen dentro de la jerarquía, una asignación en el grupo
+      de administración alcanza a lo que aún no existe. Ese es todo el argumento de la landing zone.
+    </p>
+
+    <h3>Quién manda en un clúster: dos RBAC distintos</h3>
+    <p>
+      En AKS conviven dos sistemas de permisos y confundirlos es un clásico. <strong>Azure RBAC</strong>
+      gobierna el <em>recurso</em> clúster en Azure: quién puede leer su configuración, escalarlo o descargar
+      credenciales. <strong>Kubernetes RBAC</strong> gobierna lo de <em>dentro</em>: quién puede listar pods o
+      leer secretos en un espacio de nombres.
+    </p>
+    <p>
+      La integración con Entra ID une los dos mundos: el servidor de API acepta un token de Entra ID en vez de
+      un certificado del fichero <em>kubeconfig</em>, con lo que a la persona le aplican MFA, acceso
+      condicional y PIM; y <em>Azure RBAC para Kubernetes</em> permite además asignar los roles de dentro desde
+      Azure. Sin eso, un <em>kubeconfig</em> es una credencial fuera del directorio: no se revoca, no caduca y
+      no deja rastro de quién es quién.
+    </p>
+
+    <h3>Punto de conexión de servicio frente a punto de conexión privado</h3>
+    <div class="diagram">
+      <svg viewBox="0 0 700 306" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="pe-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#7c8aa0"></path>
+          </marker>
+        </defs>
+        <text x="172" y="22" class="dtitle" text-anchor="middle">Punto de conexión de servicio</text>
+        <text x="528" y="22" class="dtitle" text-anchor="middle">Punto de conexión privado</text>
+        <line class="dline" x1="172" y1="92" x2="172" y2="126" marker-end="url(#pe-arrow)"></line>
+        <line class="dline" x1="172" y1="196" x2="172" y2="230" marker-end="url(#pe-arrow)"></line>
+        <line class="dline" x1="528" y1="92" x2="528" y2="126" marker-end="url(#pe-arrow)"></line>
+        <line class="dline" x1="528" y1="196" x2="528" y2="230" marker-end="url(#pe-arrow)"></line>
+        <line class="dline" x1="350" y1="60" x2="350" y2="300" stroke-dasharray="4 4"></line>
+        <g class="dstep" data-label="Máquina en la subred (endpoint de servicio)" data-explain="La máquina sale con su propia dirección. Lo único que cambia respecto de internet es que Azure marca ese tráfico como procedente de tu subred.">
+          <rect class="dbox" x="40" y="40" width="264" height="52" rx="8"></rect>
+          <text x="172" y="64" class="dtitle" text-anchor="middle">Máquina en tu subred</text>
+        </g>
+        <g class="dstep" data-label="El recurso conserva su dirección pública" data-explain="Aquí está la clave: el endpoint de servicio NO da dirección privada al recurso. El almacenamiento sigue teniendo su nombre y su IP públicos; lo que cambia es desde dónde se le permite llegar. Si el requisito dice «que el dato no sea alcanzable desde internet», esto no lo cumple.">
+          <rect class="dbox-shared" x="40" y="126" width="264" height="70" rx="8"></rect>
+          <text x="172" y="150" class="dtitle" text-anchor="middle">Solo cambia el origen permitido</text>
+          <text x="172" y="168" class="dstep-cell" text-anchor="middle">el recurso sigue siendo público</text>
+        </g>
+        <g class="dstep" data-label="Almacenamiento con IP pública" data-explain="El nombre del servicio resuelve a una dirección pública para todo el mundo, dentro y fuera de tu red.">
+          <rect class="dbox-deny" x="40" y="230" width="264" height="62" rx="8"></rect>
+          <text x="172" y="254" class="dtitle" text-anchor="middle">Almacenamiento</text>
+          <text x="172" y="272" class="dstep-cell" text-anchor="middle">nombre e IP públicos</text>
+        </g>
+        <g class="dstep" data-label="Máquina en la subred (endpoint privado)" data-explain="La máquina sigue pidiendo el nombre público del servicio: la aplicación no cambia una línea. Lo que cambia es a qué dirección resuelve ese nombre.">
+          <rect class="dbox" x="396" y="40" width="264" height="52" rx="8"></rect>
+          <text x="528" y="64" class="dtitle" text-anchor="middle">Máquina en tu subred</text>
+        </g>
+        <g class="dstep" data-label="Interfaz de red con IP privada, y la zona DNS" data-explain="El endpoint privado crea una interfaz de red REAL en tu subred, con una IP privada tuya. Y la pieza que se olvida siempre: sin la zona DNS privada enlazada a la red virtual, el nombre sigue resolviendo a la dirección pública, el tráfico intenta salir a internet y —con el acceso público deshabilitado— falla.">
+          <rect class="dbox-alt" x="396" y="126" width="264" height="70" rx="8"></rect>
+          <text x="528" y="150" class="dtitle" text-anchor="middle">Interfaz de red + IP privada</text>
+          <text x="528" y="168" class="dstep-cell" text-anchor="middle">+ zona DNS privada enlazada</text>
+        </g>
+        <g class="dstep" data-label="Almacenamiento sin acceso público" data-explain="Con el acceso público deshabilitado, el recurso solo es alcanzable por la interfaz privada. Ese es el diseño que cumple un requisito de «no alcanzable desde internet».">
+          <rect class="dbox-allow" x="396" y="230" width="264" height="62" rx="8"></rect>
+          <text x="528" y="254" class="dtitle" text-anchor="middle">Almacenamiento</text>
+          <text x="528" y="272" class="dstep-cell" text-anchor="middle">acceso público deshabilitado</text>
+        </g>
+      </svg>
+      <div class="dexplain">El fallo más repetido: se crea el endpoint privado, se deshabilita el acceso público y nadie enlaza la zona DNS. Funciona desde el portal y falla desde la máquina.</div>
+    </div>
 
     <h2 id="mapa">El mapa de productos, que es lo que de verdad se pregunta</h2>
     <p>
@@ -498,6 +649,26 @@
       <tr><td>Con qué se decide</td><td>Credenciales al establecer el túnel.</td><td>Acceso condicional: identidad, dispositivo, riesgo, y continuo con CAE.</td></tr>
     </table>
 
+    <h2 id="fuentes">Fuentes oficiales</h2>
+    <p class="lede">Documentación de Microsoft en la que se apoya este módulo. Si algo no te cuadra o quieres profundizar, empieza por aquí: es la única fuente que manda.</p>
+    <ul class="sources">
+      <li><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/concept-cloud-security-posture-management" target="_blank" rel="noopener">Gestión de la postura de seguridad en la nube ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/plan-multicloud-security-get-started" target="_blank" rel="noopener">Seguridad multinube con Defender for Cloud ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/plan-defender-for-servers-select-plan" target="_blank" rel="noopener">Planes de Defender for Servers ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/defender-xdr/microsoft-secure-score" target="_blank" rel="noopener">Puntuación de seguridad de Microsoft ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/azure-arc/servers/overview" target="_blank" rel="noopener">Azure Arc para servidores ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/external-attack-surface-management/overview" target="_blank" rel="noopener">Gestión de la superficie de ataque externa ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/security-exposure-management/work-attack-paths-overview" target="_blank" rel="noopener">Caminos de ataque en la gestión de exposición ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/governance/machine-configuration/overview/01-overview-concepts" target="_blank" rel="noopener">Configuración de máquina de Azure Policy ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/windows-server/identity/laps/laps-overview" target="_blank" rel="noopener">Windows LAPS ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/defender-for-iot/organizations/overview" target="_blank" rel="noopener">Defender for IoT para tecnología operativa ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview" target="_blank" rel="noopener">Puntos de conexión privados ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/virtual-network/application-security-groups" target="_blank" rel="noopener">Grupos de seguridad de aplicaciones ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/entra/global-secure-access/concept-internet-access" target="_blank" rel="noopener">Entra Internet Access ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/entra/global-secure-access/concept-private-access" target="_blank" rel="noopener">Entra Private Access ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/aks/concepts-identity" target="_blank" rel="noopener">Identidad y acceso en AKS ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/sc-100" target="_blank" rel="noopener">Study guide oficial del SC-100 ↗</a></li>
+    </ul>
     <h2 id="trampas">Trampas típicas de este dominio</h2>
     <div class="callout warn">
       <b>Confundir los dos Secure Score</b>
@@ -568,7 +739,7 @@
 <!-- temario:fin -->
 
     <h2 id="quiz">Quiz de práctica — Infraestructura</h2>
-    <p class="lede">46 preguntas de escenario. Elige una opción para ver si es correcta y por qué.</p>
+    <p class="lede">92 preguntas de escenario. Elige una opción para ver si es correcta y por qué.</p>
     <div id="quiz-root"></div>
 
   </main>
@@ -579,7 +750,8 @@
 </footer>
 
 <script src="quiz-data.js"></script>
-<script src="../../../assets/js/quiz.js?v=9"></script>
+<script>window.GUIDE_CERT = "sc-100";</script>
+<script src="../../../assets/js/quiz.js?v=10"></script>
 <script src="../../../assets/js/app.js?v=9"></script>
 
 </body>

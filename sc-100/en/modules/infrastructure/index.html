@@ -13,7 +13,7 @@
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary">
 <title>Security Solutions for Infrastructure — Microsoft Cybersecurity Architect (SC-100)</title>
-<link rel="stylesheet" href="../../../../assets/css/style.css?v=9">
+<link rel="stylesheet" href="../../../../assets/css/style.css?v=10">
 </head>
 <body>
 
@@ -40,6 +40,7 @@
 
   <aside class="sidebar">
     <h4>How to read this domain</h4>
+    <a href="#base">What is taken for granted</a>
     <a href="#mapa">The product map</a>
     <h4>3.1 Posture</h4>
     <a href="#defender-cloud">Defender for Cloud and the MCSB</a>
@@ -68,13 +69,162 @@
     <a href="#internet-access">Entra Internet Access</a>
     <a href="#internet-access-ms">Microsoft traffic and cross-tenant</a>
     <a href="#private-access">Entra Private Access</a>
+    <a href="#fuentes">Official sources</a>
     <a href="#trampas">Common traps</a>
     <a href="#temario">Official syllabus</a>
     <h4>Practice</h4>
-    <a href="#quiz">Quiz (46 questions)</a>
+    <a href="#quiz">Quiz (92 questions)</a>
   </aside>
 
   <main class="content">
+
+    <h2 id="base">What this exam takes for granted</h2>
+    <p>
+      This is the domain that assumes the most platform mechanics. Without them, half a dozen answers look
+      like memorisation when they actually derive from how Azure is built.
+    </p>
+
+    <h3>Private endpoint versus service endpoint, under the hood</h3>
+    <p>
+      A PaaS service — a storage account, a database — is born with a public name resolving to a public
+      address. The two options the exam sets against each other do different things with that:
+    </p>
+    <ul>
+      <li>A <strong>service endpoint</strong> does not change the destination: the resource keeps its public
+        address. What changes is the <em>source</em>: traffic leaves over the Azure backbone and arrives
+        identified as coming from your subnet, so the resource's firewall can allow "this virtual network".
+        There is still a public door, just with a guest list.</li>
+      <li>A <strong>private endpoint</strong> creates a <strong>real network interface inside your
+        subnet</strong>, with a private IP address of yours, and a <strong>private DNS zone</strong> that makes
+        the resource's public name resolve to that private IP. The resource becomes reachable by private
+        address, and with public access disabled it stops existing for the internet.</li>
+    </ul>
+    <div class="callout exam">
+      <b>That is why the answer changes with the requirement</b>
+      "Traffic must not go out to the internet" is met by both. "The resource must only be reachable from the
+      virtual network" is met only by the private endpoint, because it is the only one that removes the public
+      door. And there is a detail the exam exploits: with a private endpoint you must sort out <b>DNS</b>,
+      because if the client keeps resolving to the public IP the private link is never used.
+    </div>
+
+    <h3>Why posture is agentless and workload protection is not</h3>
+    <p>
+      Every Azure resource sits behind a common control plane, <strong>Azure Resource Manager</strong>, which
+      knows how each one is configured. <strong>Posture</strong> simply reads that over the API: that is why
+      CSPM installs nothing, why it works the same over AWS and GCP by assuming a role in the account, and why
+      its answer is always about <em>configuration</em>.
+    </p>
+    <p>
+      <strong>Workload protection</strong> needs to see what <em>happens inside</em>: processes on a server,
+      queries against a database, content being uploaded. None of that is in the control plane, so a sensor is
+      required — Defender for Endpoint on the server, scanning at upload time, the cluster node sensor. Hence
+      the line separating the two products, and hence "without agents" being a constraint that always pushes
+      towards posture.
+    </p>
+
+    <h3>What Azure Arc actually does</h3>
+    <p>
+      Arc installs an agent on the machine that <strong>registers it as an Azure Resource Manager
+      resource</strong>, with its own identifier, resource group and managed identity. From that moment the
+      machine is, as far as Azure is concerned, just another resource: RBAC, tags, policies and management
+      groups apply to it. What gets added on top — Defender for Endpoint, the Azure Monitor agent, Machine
+      Configuration — are <strong>extensions</strong> Azure deploys through that agent.
+    </p>
+    <p>
+      This explains two exam answers at once: why Arc <em>enables</em> Azure Policy over outside servers —
+      Policy acts on ARM resources, and Arc turns them into one — and why Arc does <em>not</em> take logs to
+      the SIEM: that is a different extension, with its own data collection rule.
+    </p>
+
+    <h3>Network security groups, and why application ones are preferred</h3>
+    <p>
+      A network security group is a list of rules with a <strong>numeric priority</strong>: they are evaluated
+      lowest to highest and <strong>the first match decides</strong>, unlike conditional access. They carry
+      default rules allowing traffic within the virtual network and blocking inbound from the internet, and
+      those defaults sit at the highest priority numbers, so any rule of yours beats them.
+    </p>
+    <p>
+      An <strong>application security group</strong> is not a rule: it is a <em>label</em> applied to network
+      interfaces. Rules are then written between groups — "from <em>web</em> to <em>database</em>, port 1433" —
+      instead of between addresses. A new machine inherits its policy just by joining the group, and that is
+      the reason they are preferred: the rule stops going stale every time the topology changes.
+    </p>
+
+    <h3>Azure Policy inheritance, which is where "management group" comes from</h3>
+    <p>
+      Policy assignments are inherited downwards through the hierarchy — management group, subscription,
+      resource group, resource — and cannot be overridden from below. The effects matter in this order:
+      <code>Disabled</code> turns the rule off; <code>Deny</code> prevents creating or modifying the resource;
+      <code>Audit</code> only flags; and <code>DeployIfNotExists</code> and <code>Modify</code> remediate after
+      deployment, for which the assignment <strong>needs a managed identity</strong> with permissions — a
+      detail the exam uses as a distractor.
+    </p>
+    <p>
+      Since inheritance flows downwards and new subscriptions are born inside the hierarchy, an assignment at
+      the management group reaches what does not exist yet. That is the whole landing zone argument.
+    </p>
+
+    <h3>Who is in charge of a cluster: two different RBACs</h3>
+    <p>
+      Two permission systems coexist in AKS and confusing them is a classic. <strong>Azure RBAC</strong>
+      governs the cluster <em>resource</em> in Azure: who can read its configuration, scale it or download
+      credentials. <strong>Kubernetes RBAC</strong> governs what is <em>inside</em>: who can list pods or read
+      secrets in a namespace.
+    </p>
+    <p>
+      Entra ID integration joins the two worlds: the API server accepts an Entra ID token instead of a
+      certificate from the <em>kubeconfig</em> file, so MFA, conditional access and PIM apply to the person;
+      and <em>Azure RBAC for Kubernetes</em> additionally lets you assign the inside roles from Azure. Without
+      that, a <em>kubeconfig</em> is a credential outside the directory: it is not revoked, it does not expire
+      and it leaves no trace of who is who.
+    </p>
+
+    <h3>Service endpoint versus private endpoint</h3>
+    <div class="diagram">
+      <svg viewBox="0 0 700 306" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <marker id="pe-arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+            <path d="M0,0 L6,3 L0,6 Z" fill="#7c8aa0"></path>
+          </marker>
+        </defs>
+        <text x="172" y="22" class="dtitle" text-anchor="middle">Service endpoint</text>
+        <text x="528" y="22" class="dtitle" text-anchor="middle">Private endpoint</text>
+        <line class="dline" x1="172" y1="92" x2="172" y2="126" marker-end="url(#pe-arrow)"></line>
+        <line class="dline" x1="172" y1="196" x2="172" y2="230" marker-end="url(#pe-arrow)"></line>
+        <line class="dline" x1="528" y1="92" x2="528" y2="126" marker-end="url(#pe-arrow)"></line>
+        <line class="dline" x1="528" y1="196" x2="528" y2="230" marker-end="url(#pe-arrow)"></line>
+        <line class="dline" x1="350" y1="60" x2="350" y2="300" stroke-dasharray="4 4"></line>
+        <g class="dstep" data-label="Machine in the subnet (service endpoint)" data-explain="The machine goes out with its own address. The only difference from the internet is that Azure marks that traffic as coming from your subnet.">
+          <rect class="dbox" x="40" y="40" width="264" height="52" rx="8"></rect>
+          <text x="172" y="64" class="dtitle" text-anchor="middle">Machine in your subnet</text>
+        </g>
+        <g class="dstep" data-label="The resource keeps its public address" data-explain="This is the key: a service endpoint does NOT give the resource a private address. The storage account keeps its public name and IP; what changes is where it may be reached from. If the requirement says ‘the data must not be reachable from the internet’, this does not meet it.">
+          <rect class="dbox-shared" x="40" y="126" width="264" height="70" rx="8"></rect>
+          <text x="172" y="150" class="dtitle" text-anchor="middle">Only the allowed source changes</text>
+          <text x="172" y="168" class="dstep-cell" text-anchor="middle">the resource stays public</text>
+        </g>
+        <g class="dstep" data-label="Storage with a public IP" data-explain="The service name resolves to a public address for everyone, inside and outside your network.">
+          <rect class="dbox-deny" x="40" y="230" width="264" height="62" rx="8"></rect>
+          <text x="172" y="254" class="dtitle" text-anchor="middle">Storage account</text>
+          <text x="172" y="272" class="dstep-cell" text-anchor="middle">public name and IP</text>
+        </g>
+        <g class="dstep" data-label="Machine in the subnet (private endpoint)" data-explain="The machine still asks for the service&#x27;s public name: the application does not change a line. What changes is the address that name resolves to.">
+          <rect class="dbox" x="396" y="40" width="264" height="52" rx="8"></rect>
+          <text x="528" y="64" class="dtitle" text-anchor="middle">Machine in your subnet</text>
+        </g>
+        <g class="dstep" data-label="Network interface with a private IP, and the DNS zone" data-explain="The private endpoint creates a REAL network interface in your subnet, with a private IP of yours. And the piece everyone forgets: without the private DNS zone linked to the virtual network, the name still resolves to the public address, traffic tries to leave over the internet and — with public access disabled — fails.">
+          <rect class="dbox-alt" x="396" y="126" width="264" height="70" rx="8"></rect>
+          <text x="528" y="150" class="dtitle" text-anchor="middle">Network interface + private IP</text>
+          <text x="528" y="168" class="dstep-cell" text-anchor="middle">+ linked private DNS zone</text>
+        </g>
+        <g class="dstep" data-label="Storage with public access disabled" data-explain="With public access disabled, the resource is reachable only through the private interface. That is the design that satisfies a ‘not reachable from the internet’ requirement.">
+          <rect class="dbox-allow" x="396" y="230" width="264" height="62" rx="8"></rect>
+          <text x="528" y="254" class="dtitle" text-anchor="middle">Storage account</text>
+          <text x="528" y="272" class="dstep-cell" text-anchor="middle">public access disabled</text>
+        </g>
+      </svg>
+      <div class="dexplain">The most repeated failure: the private endpoint is created, public access is disabled and nobody links the DNS zone. It works from the portal and fails from the machine.</div>
+    </div>
 
     <h2 id="mapa">The product map, which is what actually gets asked</h2>
     <p>
@@ -487,6 +637,26 @@
       <tr><td>What decides</td><td>Credentials when the tunnel is established.</td><td>Conditional access: identity, device, risk, and continuously with CAE.</td></tr>
     </table>
 
+    <h2 id="fuentes">Official sources</h2>
+    <p class="lede">The Microsoft documentation this module rests on. If something does not add up, or you want to go deeper, start here: it is the only source that counts.</p>
+    <ul class="sources">
+      <li><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/concept-cloud-security-posture-management" target="_blank" rel="noopener">Cloud security posture management ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/plan-multicloud-security-get-started" target="_blank" rel="noopener">Multicloud security with Defender for Cloud ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/defender-for-cloud/plan-defender-for-servers-select-plan" target="_blank" rel="noopener">Defender for Servers plans ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/defender-xdr/microsoft-secure-score" target="_blank" rel="noopener">Microsoft Secure Score ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/azure-arc/servers/overview" target="_blank" rel="noopener">Azure Arc-enabled servers ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/external-attack-surface-management/overview" target="_blank" rel="noopener">External attack surface management ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/security-exposure-management/work-attack-paths-overview" target="_blank" rel="noopener">Attack paths in exposure management ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/governance/machine-configuration/overview/01-overview-concepts" target="_blank" rel="noopener">Azure Policy machine configuration ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/windows-server/identity/laps/laps-overview" target="_blank" rel="noopener">Windows LAPS ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/defender-for-iot/organizations/overview" target="_blank" rel="noopener">Defender for IoT for operational technology ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/private-link/private-endpoint-overview" target="_blank" rel="noopener">Private endpoints ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/virtual-network/application-security-groups" target="_blank" rel="noopener">Application security groups ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/entra/global-secure-access/concept-internet-access" target="_blank" rel="noopener">Entra Internet Access ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/entra/global-secure-access/concept-private-access" target="_blank" rel="noopener">Entra Private Access ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/azure/aks/concepts-identity" target="_blank" rel="noopener">Identity and access in AKS ↗</a></li>
+      <li><a href="https://learn.microsoft.com/en-us/credentials/certifications/resources/study-guides/sc-100" target="_blank" rel="noopener">Official SC-100 study guide ↗</a></li>
+    </ul>
     <h2 id="trampas">Common traps in this domain</h2>
     <div class="callout warn">
       <b>Confusing the two Secure Scores</b>
@@ -557,7 +727,7 @@
 <!-- temario:fin -->
 
     <h2 id="quiz">Practice quiz — Infrastructure</h2>
-    <p class="lede">46 scenario questions. Pick an option to see whether it is right and why.</p>
+    <p class="lede">92 scenario questions. Pick an option to see whether it is right and why.</p>
     <div id="quiz-root"></div>
 
   </main>
@@ -568,7 +738,8 @@
 </footer>
 
 <script src="quiz-data.js"></script>
-<script src="../../../../assets/js/quiz.js?v=9"></script>
+<script>window.GUIDE_CERT = "sc-100";</script>
+<script src="../../../../assets/js/quiz.js?v=10"></script>
 <script src="../../../../assets/js/app.js?v=9"></script>
 
 </body>
