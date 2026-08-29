@@ -12,7 +12,7 @@ var QUIZ_DATA = [
       "Por comparar la postura actual con la de organizaciones parecidas en tamaño y sector",
     ],
     correct: 2,
-    explain: "La estrategia no sale del catálogo de amenazas sino de <b>qué necesita el negocio que siga funcionando</b>. Primero los procesos críticos y sus activos; después qué amenazas ponen en riesgo <em>esos</em> activos, y de ahí la prioridad de los controles. Ordenar por severidad técnica trata igual una crítica en un entorno de pruebas y una media en el camino al sistema de facturación. <a href=\"https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/strategy/business-outcomes/\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "La estrategia no sale del catálogo de amenazas sino de <b>qué necesita el negocio que siga funcionando</b>. Primero los procesos críticos y sus activos; después qué amenazas ponen en riesgo <em>esos</em> activos, y de ahí la prioridad de los controles. Ordenar por severidad técnica trata igual una crítica en un entorno de pruebas y una media en el camino al sistema de facturación. <a href=\"https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/strategy/\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Quién fija el objetivo",
@@ -24,7 +24,7 @@ var QUIZ_DATA = [
       "Decidir cuántas copias se conservan y durante cuánto tiempo antes de eliminarlas",
     ],
     correct: 0,
-    explain: "Una copia diaria implica aceptar perder hasta <b>veinticuatro horas</b> de facturación, y eso no lo decide seguridad: lo decide el <b>negocio</b> con su <b>RPO</b>, igual que fija con el <b>RTO</b> cuánto tiempo puede estar parado. Sin esos dos números el diseño es una suposición. Cifrado, ventana y retención son decisiones posteriores, y todas dependen de la primera. <a href=\"https://learn.microsoft.com/en-us/azure/reliability/disaster-recovery-overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Una copia diaria implica aceptar perder hasta <b>veinticuatro horas</b> de facturación, y eso no lo decide seguridad: lo decide el <b>negocio</b> con su <b>RPO</b>, igual que fija con el <b>RTO</b> cuánto tiempo puede estar parado. Sin esos dos números el diseño es una suposición. Cifrado, ventana y retención son decisiones posteriores, y todas dependen de la primera. <a href=\"https://learn.microsoft.com/en-us/azure/reliability/concept-business-continuity-high-availability-disaster-recovery\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Copias que sobreviven al atacante",
@@ -48,7 +48,7 @@ var QUIZ_DATA = [
       "Cuándo se restauró por última vez y si se cumplió el RTO comprometido",
     ],
     correct: 3,
-    explain: "Una copia verde solo demuestra que el proceso terminó, no que el dato sirva ni que el negocio vuelva a tiempo. La pregunta que separa un plan real de un panel bonito es <b>cuándo se restauró por última vez</b> y si esa restauración cumplió el <b>RTO</b>. Replicación, cifrado y retención son buenas propiedades de un respaldo que quizá nunca se haya probado. <a href=\"https://learn.microsoft.com/en-us/azure/reliability/disaster-recovery-overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Una copia verde solo demuestra que el proceso terminó, no que el dato sirva ni que el negocio vuelva a tiempo. La pregunta que separa un plan real de un panel bonito es <b>cuándo se restauró por última vez</b> y si esa restauración cumplió el <b>RTO</b>. Replicación, cifrado y retención son buenas propiedades de un respaldo que quizá nunca se haya probado. <a href=\"https://learn.microsoft.com/en-us/azure/reliability/concept-business-continuity-high-availability-disaster-recovery\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Por dónde se empieza contra ransomware",
@@ -300,7 +300,7 @@ var QUIZ_DATA = [
       "Permitir que las aplicaciones no críticas se salten la revisión y reservarla para las críticas",
     ],
     correct: 0,
-    explain: "Una puerta al final concentra todos los hallazgos en el momento más caro para arreglarlos, y por eso siempre bloquea. <b>DevSecOps</b> reparte controles <b>automáticos</b> por el ciclo —modelado en diseño, análisis en el código y la pull request, dependencias en la compilación, política en el despliegue—, de modo que cada problema se encuentra donde es barato. Adelantar o reforzar la puerta no cambia su naturaleza. <a href=\"https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/secure/devsecops-controls\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Una puerta al final concentra todos los hallazgos en el momento más caro para arreglarlos, y por eso siempre bloquea. <b>DevSecOps</b> reparte controles <b>automáticos</b> por el ciclo —modelado en diseño, análisis en el código y la pull request, dependencias en la compilación, política en el despliegue—, de modo que cada problema se encuentra donde es barato. Adelantar o reforzar la puerta no cambia su naturaleza. <a href=\"https://learn.microsoft.com/en-us/security/zero-trust/develop/secure-devops-environments-zero-trust\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Que el control cuente",
@@ -312,7 +312,7 @@ var QUIZ_DATA = [
       "Trasladar los avisos a la herramienta de incidencias del equipo para que entren en su planificación",
     ],
     correct: 2,
-    explain: "Un aviso que no detiene nada acaba siendo ruido, y el ruido no se lee. Lo que hace que el control cuente es que el hallazgo por encima del umbral <b>rompa la construcción</b>, con una vía de <b>excepción documentada y con dueño</b> para los casos justificados. Más sensibilidad genera más ruido, y el resumen semanal y el tablero de incidencias siguen dependiendo de que alguien priorice. <a href=\"https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/secure/devsecops-controls\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Un aviso que no detiene nada acaba siendo ruido, y el ruido no se lee. Lo que hace que el control cuente es que el hallazgo por encima del umbral <b>rompa la construcción</b>, con una vía de <b>excepción documentada y con dueño</b> para los casos justificados. Más sensibilidad genera más ruido, y el resumen semanal y el tablero de incidencias siguen dependiendo de que alguien priorice. <a href=\"https://learn.microsoft.com/en-us/security/zero-trust/develop/secure-devops-environments-zero-trust\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Qué se protege primero",
@@ -324,7 +324,7 @@ var QUIZ_DATA = [
       "Que primero hay que completar el inventario de activos y solo después decidir en qué orden se actúa",
     ],
     correct: 2,
-    explain: "Una estrategia de resiliencia empieza en el negocio, no en el escáner. Lo primero es identificar los <b>procesos críticos</b> —los que si paran cuestan dinero, reputación o vidas— y los activos de los que dependen, y a partir de ahí se decide dónde se invierte. Un sistema con cuarenta vulnerabilidades que no soporta nada importante va después de uno con dos que sostiene la facturación. Ordenar por recuento de defectos o por antigüedad optimiza una métrica técnica, no el riesgo. Y el inventario es un paso necesario, pero por sí solo no prioriza: la criticidad la aporta el negocio. <a href=\"https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/strategy/business-outcomes/\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Una estrategia de resiliencia empieza en el negocio, no en el escáner. Lo primero es identificar los <b>procesos críticos</b> —los que si paran cuestan dinero, reputación o vidas— y los activos de los que dependen, y a partir de ahí se decide dónde se invierte. Un sistema con cuarenta vulnerabilidades que no soporta nada importante va después de uno con dos que sostiene la facturación. Ordenar por recuento de defectos o por antigüedad optimiza una métrica técnica, no el riesgo. Y el inventario es un paso necesario, pero por sí solo no prioriza: la criticidad la aporta el negocio. <a href=\"https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/strategy/\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Restaurar no es recuperar",
@@ -336,7 +336,7 @@ var QUIZ_DATA = [
       "Faltaba conservar las copias durante más tiempo, para poder volver a un punto anterior al inicio del incidente",
     ],
     correct: 0,
-    explain: "Tener copias responde al objetivo de punto de recuperación —cuánto dato pierdo—, pero el simulacro fracasó en el objetivo de <b>tiempo</b> de recuperación: cuánto tardo en volver a operar. Y ese depende de cosas que una copia no resuelve: en qué orden se levantan los sistemas, si la identidad está disponible antes que las aplicaciones que dependen de ella, si hay capacidad donde restaurar, si alguien sabe ejecutar el procedimiento. Por eso el plan se <b>prueba entero</b> y se cronometra contra el objetivo declarado. Copiar más a menudo mejora el otro objetivo, no este; cifrar y retener más tampoco cambian el tiempo. <a href=\"https://learn.microsoft.com/en-us/azure/reliability/disaster-recovery-overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Tener copias responde al objetivo de punto de recuperación —cuánto dato pierdo—, pero el simulacro fracasó en el objetivo de <b>tiempo</b> de recuperación: cuánto tardo en volver a operar. Y ese depende de cosas que una copia no resuelve: en qué orden se levantan los sistemas, si la identidad está disponible antes que las aplicaciones que dependen de ella, si hay capacidad donde restaurar, si alguien sabe ejecutar el procedimiento. Por eso el plan se <b>prueba entero</b> y se cronometra contra el objetivo declarado. Copiar más a menudo mejora el otro objetivo, no este; cifrar y retener más tampoco cambian el tiempo. <a href=\"https://learn.microsoft.com/en-us/azure/reliability/concept-business-continuity-high-availability-disaster-recovery\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Las dos prioridades del ransomware",
@@ -468,7 +468,7 @@ var QUIZ_DATA = [
       "Dejar todos los controles en modo informativo, de manera que nunca detengan una compilación y no molesten al equipo",
     ],
     correct: 1,
-    explain: "Un control que el equipo aprende a ignorar no protege nada, y esa es la lección de DevSecOps que el examen busca. El diseño consiste en <b>colocar cada control donde compensa</b>: análisis de secretos y comprobaciones rápidas y de alta señal en la confirmación o la solicitud de cambios, donde bloquear es barato y el hallazgo es casi siempre real; análisis pesados y ruidosos en ejecuciones programadas que alimentan el trabajo pendiente sin frenar a nadie. Y el umbral de bloqueo se acuerda, con excepciones documentadas. Aceptar el coste sin más quema la relación, sacarlo todo fuera pierde la puerta, y dejarlo todo informativo es no tener control. <a href=\"https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/secure/devsecops-controls\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Un control que el equipo aprende a ignorar no protege nada, y esa es la lección de DevSecOps que el examen busca. El diseño consiste en <b>colocar cada control donde compensa</b>: análisis de secretos y comprobaciones rápidas y de alta señal en la confirmación o la solicitud de cambios, donde bloquear es barato y el hallazgo es casi siempre real; análisis pesados y ruidosos en ejecuciones programadas que alimentan el trabajo pendiente sin frenar a nadie. Y el umbral de bloqueo se acuerda, con excepciones documentadas. Aceptar el coste sin más quema la relación, sacarlo todo fuera pierde la puerta, y dejarlo todo informativo es no tener control. <a href=\"https://learn.microsoft.com/en-us/security/zero-trust/develop/secure-devops-environments-zero-trust\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Seguridad frente a disponibilidad",
@@ -624,7 +624,7 @@ var QUIZ_DATA = [
       "Es preferible sustituirla por una identidad administrada única, que elimina el secreto y mantiene la comodidad de gestión actual",
     ],
     correct: 2,
-    explain: "El problema no es el secreto, es el <b>alcance</b>. Una sola identidad con colaborador en todo significa que un fallo en la canalización menos importante —una dependencia comprometida, una rama abierta por cualquiera, un registro que filtra una variable— entrega el estado entero. El diseño correcto separa por equipo y por entorno, con permisos acotados a lo que esa canalización despliega realmente, y a ser posible sin secreto, mediante federación de identidades de carga de trabajo. Custodiar y rotar mejor el secreto, o auditarlo, no reduce lo que consigue quien lo use; y una identidad administrada única mantiene exactamente el mismo alcance excesivo. <a href=\"https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "El problema no es el secreto, es el <b>alcance</b>. Una sola identidad con colaborador en todo significa que un fallo en la canalización menos importante —una dependencia comprometida, una rama abierta por cualquiera, un registro que filtra una variable— entrega el estado entero. El diseño correcto separa por equipo y por entorno, con permisos acotados a lo que esa canalización despliega realmente, y a ser posible sin secreto, mediante federación de identidades de carga de trabajo. Custodiar y rotar mejor el secreto, o auditarlo, no reduce lo que consigue quien lo use; y una identidad administrada única mantiene exactamente el mismo alcance excesivo. <a href=\"https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals?view=azure-devops\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
 ];
 

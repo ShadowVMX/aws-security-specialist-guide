@@ -60,7 +60,7 @@ var QUIZ_DATA = [
       "A data loss prevention policy preventing downloads from unmanaged machines",
     ],
     correct: 1,
-    explain: "Two pieces interlocking, in this order: <b>Intune</b> evaluates disk encryption through a compliance policy and marks the device compliant, and <b>conditional access</b> requires that signal for the SharePoint application. The label protects the file but does not condition on the device, DLP watches the data leaving and retention decides how long it is kept: none of the three looks at the machine's state. <a href=\"https://learn.microsoft.com/en-us/intune/intune-service/protect/device-compliance-get-started\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Two pieces interlocking, in this order: <b>Intune</b> evaluates disk encryption through a compliance policy and marks the device compliant, and <b>conditional access</b> requires that signal for the SharePoint application. The label protects the file but does not condition on the device, DLP watches the data leaving and retention decides how long it is kept: none of the three looks at the machine's state. <a href=\"https://learn.microsoft.com/en-us/intune/device-security/compliance/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Without managing the device",
@@ -192,7 +192,7 @@ var QUIZ_DATA = [
       "Composition analysis in the pipeline, with automated updates of vulnerable dependencies",
     ],
     correct: 3,
-    explain: "Dependencies change daily, so the control has to sit where things are built and be continuous: <b>composition analysis</b> in the pipeline that catches the vulnerable version and <b>automated updating</b> that opens the fix itself. A WAF mitigates some exploitation but does not fix the library. Banning third parties is not realistic. And an annual inventory runs far behind the rate at which vulnerabilities are published. <a href=\"https://learn.microsoft.com/en-us/azure/devops/repos/security/github-advanced-security-dependency-scanning\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Dependencies change daily, so the control has to sit where things are built and be continuous: <b>composition analysis</b> in the pipeline that catches the vulnerable version and <b>automated updating</b> that opens the fix itself. A WAF mitigates some exploitation but does not fix the library. Banning third parties is not realistic. And an annual inventory runs far behind the rate at which vulnerabilities are published. <a href=\"https://learn.microsoft.com/en-us/azure/devops/repos/security/github-advanced-security-dependency-scanning?view=azure-devops\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "The pipeline's credential",
@@ -216,7 +216,7 @@ var QUIZ_DATA = [
       "A mandatory security scan in the pipeline that fails on any new finding",
     ],
     correct: 2,
-    explain: "It is solved in the platform, not by removing permissions or watching afterwards: <b>protected branches</b> prevent direct pushes and require approval on the pull request, and <b>environments with approvals</b> hold the production deployment until somebody authorises it. The alert fires after the fact, removing permissions breaks daily work, and the scan looks at the content of the change, not at who approved it. <a href=\"https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "It is solved in the platform, not by removing permissions or watching afterwards: <b>protected branches</b> prevent direct pushes and require approval on the pull request, and <b>environments with approvals</b> hold the production deployment until somebody authorises it. The alert fires after the fact, removing permissions breaks daily work, and the scan looks at the content of the change, not at who approved it. <a href=\"https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals?view=azure-devops\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Customer identities",
@@ -540,7 +540,7 @@ var QUIZ_DATA = [
       "There is a grace period, the state takes time to propagate and the running session stays valid until it expires",
     ],
     correct: 3,
-    explain: "Three delays converge here and you need to know all of them to design well. First, compliance policies support a configurable <b>grace period</b> before a device is marked non-compliant, so users are not cut off over a pending patch. Second, the state has to propagate to Entra ID. And third, even once marked, the <b>running session</b> stays valid until the token expires, unless continuous access evaluation revokes it. Nothing is broken: these are design timings, and if the requirement is to cut sooner, you shorten the grace period and the token lifetime. <a href=\"https://learn.microsoft.com/en-us/intune/intune-service/protect/device-compliance-get-started\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Three delays converge here and you need to know all of them to design well. First, compliance policies support a configurable <b>grace period</b> before a device is marked non-compliant, so users are not cut off over a pending patch. Second, the state has to propagate to Entra ID. And third, even once marked, the <b>running session</b> stays valid until the token expires, unless continuous access evaluation revokes it. Nothing is broken: these are design timings, and if the requirement is to cut sooner, you shorten the grace period and the token lifetime. <a href=\"https://learn.microsoft.com/en-us/intune/device-security/compliance/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "The contractor's machine",
@@ -552,7 +552,7 @@ var QUIZ_DATA = [
       "A Conditional Access policy allowing access only from the consultancy's IP address range",
     ],
     correct: 1,
-    explain: "The requirement is strong: the data must <b>not arrive</b> on the third-party machine. The clean way to achieve that is not to send it: with a virtual desktop or app, processing happens in the customer's environment and only pixels and keystrokes travel to the laptop. Enrolling a third party's machines is usually unworkable legally and contractually, and the scenario rules it out anyway. Sensitivity labels protect the file wherever it goes, but the file does arrive on the machine. And restricting by IP address says where the consultancy connects from, not what they do with the data once downloaded. <a href=\"https://learn.microsoft.com/en-us/intune/intune-service/apps/app-protection-policy\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "The requirement is strong: the data must <b>not arrive</b> on the third-party machine. The clean way to achieve that is not to send it: with a virtual desktop or app, processing happens in the customer's environment and only pixels and keystrokes travel to the laptop. Enrolling a third party's machines is usually unworkable legally and contractually, and the scenario rules it out anyway. Sensitivity labels protect the file wherever it goes, but the file does arrive on the machine. And restricting by IP address says where the consultancy connects from, not what they do with the data once downloaded. <a href=\"https://learn.microsoft.com/en-us/intune/app-management/protection/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "What travels with the file",
@@ -648,7 +648,7 @@ var QUIZ_DATA = [
       "Cover the rest of the lifecycle: design with threat modelling, dependencies and secrets at build, and runtime protection",
     ],
     correct: 3,
-    explain: "A lifecycle strategy covers <b>every phase</b>, because each one lets through what the previous cannot see. Static analysis finds defects in your own code, but does not see a design threat — that is modelling — nor a vulnerable third-party library — that is dependency analysis — nor a secret in the repository, nor a runtime attack against an application with no known defect. Concentrating everything in one phase leaves the rest of the cycle uncovered however well that phase runs. Neither extending the same control, nor swapping it for another single-phase one, nor adding an annual test closes that gap. <a href=\"https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/secure/devsecops-controls\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "A lifecycle strategy covers <b>every phase</b>, because each one lets through what the previous cannot see. Static analysis finds defects in your own code, but does not see a design threat — that is modelling — nor a vulnerable third-party library — that is dependency analysis — nor a secret in the repository, nor a runtime attack against an application with no known defect. Concentrating everything in one phase leaves the rest of the cycle uncovered however well that phase runs. Neither extending the same control, nor swapping it for another single-phase one, nor adding an annual test closes that gap. <a href=\"https://learn.microsoft.com/en-us/security/zero-trust/develop/secure-devops-environments-zero-trust\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "The secret already in the history",
@@ -672,7 +672,7 @@ var QUIZ_DATA = [
       "Separate the development and deployment teams, so whoever writes the code never has access to production",
     ],
     correct: 2,
-    explain: "Separation of duties is implemented with the <b>gates the platform already ships</b>, which is why it costs no speed: a protected branch rule requiring another person's review before merge, and an approval check on the production environment requiring sign-off from a different group before the pipeline deploys. Automated deployment continues, but one person no longer decides it alone. Going back to manual windowed deployments breaks the pace. Auditing afterwards detects what already happened. And splitting whole teams is a disproportionate reorganisation for a control you configure. <a href=\"https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Separation of duties is implemented with the <b>gates the platform already ships</b>, which is why it costs no speed: a protected branch rule requiring another person's review before merge, and an approval check on the production environment requiring sign-off from a different group before the pipeline deploys. Automated deployment continues, but one person no longer decides it alone. Going back to manual windowed deployments breaks the pace. Auditing afterwards detects what already happened. And splitting whole teams is a disproportionate reorganisation for a control you configure. <a href=\"https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals?view=azure-devops\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "From requirement to technology",

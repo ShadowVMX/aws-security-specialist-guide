@@ -60,7 +60,7 @@ var QUIZ_DATA = [
       "Una política de prevención de pérdida de datos que impida descargar desde equipos no gestionados",
     ],
     correct: 1,
-    explain: "Son dos piezas encajadas y en este orden: <b>Intune</b> evalúa el cifrado de disco con una directiva de cumplimiento y marca el dispositivo como conforme, y el <b>acceso condicional</b> exige esa señal para la aplicación de SharePoint. La etiqueta protege el fichero pero no condiciona por dispositivo, la DLP vigila la salida del dato y la retención decide cuánto se guarda: ninguna de las tres mira el estado del equipo. <a href=\"https://learn.microsoft.com/en-us/intune/intune-service/protect/device-compliance-get-started\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Son dos piezas encajadas y en este orden: <b>Intune</b> evalúa el cifrado de disco con una directiva de cumplimiento y marca el dispositivo como conforme, y el <b>acceso condicional</b> exige esa señal para la aplicación de SharePoint. La etiqueta protege el fichero pero no condiciona por dispositivo, la DLP vigila la salida del dato y la retención decide cuánto se guarda: ninguna de las tres mira el estado del equipo. <a href=\"https://learn.microsoft.com/en-us/intune/device-security/compliance/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Sin gestionar el dispositivo",
@@ -192,7 +192,7 @@ var QUIZ_DATA = [
       "Análisis de composición en el pipeline, con actualización automatizada de las dependencias vulnerables",
     ],
     correct: 3,
-    explain: "Las dependencias cambian a diario, así que el control tiene que estar donde se construye y ser continuo: <b>análisis de composición</b> en el pipeline que detecte la versión vulnerable y <b>actualización automatizada</b> que abra la corrección sola. El WAF mitiga algunas explotaciones pero no arregla la biblioteca. Prohibir terceros no es realista. Y un inventario anual va muy por detrás del ritmo de publicación de vulnerabilidades. <a href=\"https://learn.microsoft.com/en-us/azure/devops/repos/security/github-advanced-security-dependency-scanning\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Las dependencias cambian a diario, así que el control tiene que estar donde se construye y ser continuo: <b>análisis de composición</b> en el pipeline que detecte la versión vulnerable y <b>actualización automatizada</b> que abra la corrección sola. El WAF mitiga algunas explotaciones pero no arregla la biblioteca. Prohibir terceros no es realista. Y un inventario anual va muy por detrás del ritmo de publicación de vulnerabilidades. <a href=\"https://learn.microsoft.com/en-us/azure/devops/repos/security/github-advanced-security-dependency-scanning?view=azure-devops\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "La credencial del pipeline",
@@ -216,7 +216,7 @@ var QUIZ_DATA = [
       "Un análisis de seguridad obligatorio en el pipeline que falle si detecta cualquier hallazgo nuevo",
     ],
     correct: 2,
-    explain: "Se resuelve en la plataforma, no quitando permisos ni vigilando después: <b>ramas protegidas</b> que impiden empujar directo y exigen aprobación en la pull request, y <b>entornos con aprobación</b> que detienen el despliegue a producción hasta que alguien lo autoriza. La alerta avisa cuando ya ocurrió, retirar permisos rompe el trabajo diario, y el análisis mira el contenido del cambio, no quién lo aprobó. <a href=\"https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Se resuelve en la plataforma, no quitando permisos ni vigilando después: <b>ramas protegidas</b> que impiden empujar directo y exigen aprobación en la pull request, y <b>entornos con aprobación</b> que detienen el despliegue a producción hasta que alguien lo autoriza. La alerta avisa cuando ya ocurrió, retirar permisos rompe el trabajo diario, y el análisis mira el contenido del cambio, no quién lo aprobó. <a href=\"https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals?view=azure-devops\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Identidades de cliente",
@@ -540,7 +540,7 @@ var QUIZ_DATA = [
       "Hay un periodo de gracia en la directiva, el estado tarda en propagarse y la sesión en curso vale hasta que caduca",
     ],
     correct: 3,
-    explain: "Aquí se juntan tres retardos que hay que conocer para diseñar bien. Primero, las directivas de cumplimiento admiten un <b>periodo de gracia</b> configurable antes de marcar el dispositivo como no conforme, para no cortar al usuario por un parche pendiente. Segundo, el estado tiene que propagarse a Entra ID. Y tercero, aunque ya esté marcado, la <b>sesión en curso</b> sigue siendo válida hasta que el token caduca, salvo que la evaluación continua de acceso la revoque. No está roto: son plazos de diseño, y si el requisito es cortar antes, se acortan el periodo de gracia y la vida del token. <a href=\"https://learn.microsoft.com/en-us/intune/intune-service/protect/device-compliance-get-started\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Aquí se juntan tres retardos que hay que conocer para diseñar bien. Primero, las directivas de cumplimiento admiten un <b>periodo de gracia</b> configurable antes de marcar el dispositivo como no conforme, para no cortar al usuario por un parche pendiente. Segundo, el estado tiene que propagarse a Entra ID. Y tercero, aunque ya esté marcado, la <b>sesión en curso</b> sigue siendo válida hasta que el token caduca, salvo que la evaluación continua de acceso la revoque. No está roto: son plazos de diseño, y si el requisito es cortar antes, se acortan el periodo de gracia y la vida del token. <a href=\"https://learn.microsoft.com/en-us/intune/device-security/compliance/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "El equipo del contratista",
@@ -552,7 +552,7 @@ var QUIZ_DATA = [
       "Una directiva de acceso condicional que permita el acceso únicamente desde el rango de direcciones IP de la consultora",
     ],
     correct: 1,
-    explain: "El requisito es fuerte: que el dato <b>no llegue</b> al equipo ajeno. La forma limpia de conseguirlo es no enviárselo: con un escritorio o una aplicación virtual, el procesamiento ocurre en el entorno del cliente y al portátil solo viajan píxeles y pulsaciones. Inscribir equipos de terceros suele ser inviable legal y contractualmente, y además el enunciado lo descarta. Las etiquetas de confidencialidad protegen el archivo allá donde vaya, pero el archivo sí llega al equipo. Y restringir por dirección IP dice desde dónde se conecta la consultora, no qué hace con el dato una vez descargado. <a href=\"https://learn.microsoft.com/en-us/intune/intune-service/apps/app-protection-policy\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "El requisito es fuerte: que el dato <b>no llegue</b> al equipo ajeno. La forma limpia de conseguirlo es no enviárselo: con un escritorio o una aplicación virtual, el procesamiento ocurre en el entorno del cliente y al portátil solo viajan píxeles y pulsaciones. Inscribir equipos de terceros suele ser inviable legal y contractualmente, y además el enunciado lo descarta. Las etiquetas de confidencialidad protegen el archivo allá donde vaya, pero el archivo sí llega al equipo. Y restringir por dirección IP dice desde dónde se conecta la consultora, no qué hace con el dato una vez descargado. <a href=\"https://learn.microsoft.com/en-us/intune/app-management/protection/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Qué viaja con el archivo",
@@ -648,7 +648,7 @@ var QUIZ_DATA = [
       "Cubrir el resto del ciclo: diseño con modelado de amenazas, dependencias y secretos en la construcción, y protección en ejecución",
     ],
     correct: 3,
-    explain: "Una estrategia de ciclo de vida cubre <b>todas las fases</b>, porque cada una deja pasar lo que la anterior no ve. El análisis estático encuentra defectos en el código propio, pero no ve una amenaza de diseño —eso es el modelado—, ni una biblioteca vulnerable de terceros —eso es el análisis de dependencias—, ni un secreto en el repositorio, ni un ataque en ejecución contra una aplicación sin defecto conocido. Concentrar todo en una fase deja el resto del ciclo descubierto por bien que se ejecute esa. Ni ampliar el mismo control, ni sustituirlo por otro de una sola fase, ni añadir una prueba anual cierran esa brecha. <a href=\"https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/secure/devsecops-controls\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Una estrategia de ciclo de vida cubre <b>todas las fases</b>, porque cada una deja pasar lo que la anterior no ve. El análisis estático encuentra defectos en el código propio, pero no ve una amenaza de diseño —eso es el modelado—, ni una biblioteca vulnerable de terceros —eso es el análisis de dependencias—, ni un secreto en el repositorio, ni un ataque en ejecución contra una aplicación sin defecto conocido. Concentrar todo en una fase deja el resto del ciclo descubierto por bien que se ejecute esa. Ni ampliar el mismo control, ni sustituirlo por otro de una sola fase, ni añadir una prueba anual cierran esa brecha. <a href=\"https://learn.microsoft.com/en-us/security/zero-trust/develop/secure-devops-environments-zero-trust\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "El secreto que ya está en el historial",
@@ -672,7 +672,7 @@ var QUIZ_DATA = [
       "Separar los equipos de desarrollo y de despliegue, de modo que quien escribe el código nunca tenga acceso a producción",
     ],
     correct: 2,
-    explain: "La separación de funciones se implementa con las <b>puertas que ya trae la plataforma</b>, y por eso no cuesta velocidad: una regla de rama protegida que exija la revisión de otra persona antes de fusionar, y una comprobación de aprobación en el entorno de producción que exija el visto bueno de un grupo distinto antes de que la canalización despliegue. Sigue habiendo despliegue automático, pero ya no lo decide una sola persona. Volver a despliegues manuales en ventana rompe el ritmo. Auditar a posteriori detecta lo que ya pasó. Y separar equipos enteros es una reorganización desproporcionada para un control que se configura. <a href=\"https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "La separación de funciones se implementa con las <b>puertas que ya trae la plataforma</b>, y por eso no cuesta velocidad: una regla de rama protegida que exija la revisión de otra persona antes de fusionar, y una comprobación de aprobación en el entorno de producción que exija el visto bueno de un grupo distinto antes de que la canalización despliegue. Sigue habiendo despliegue automático, pero ya no lo decide una sola persona. Volver a despliegues manuales en ventana rompe el ritmo. Auditar a posteriori detecta lo que ya pasó. Y separar equipos enteros es una reorganización desproporcionada para un control que se configura. <a href=\"https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals?view=azure-devops\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Del requisito a la tecnología",

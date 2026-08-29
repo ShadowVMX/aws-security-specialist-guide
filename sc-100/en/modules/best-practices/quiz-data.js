@@ -12,7 +12,7 @@ var QUIZ_DATA = [
       "By comparing the current posture with that of similar organisations in size and sector",
     ],
     correct: 2,
-    explain: "The strategy does not come from a catalogue of threats but from <b>what the business needs to keep running</b>. First the critical processes and their assets; then which threats put <em>those</em> assets at risk, and from that the priority of controls. Ordering by technical severity treats a critical in a test environment and a medium on the road to the billing system exactly the same. <a href=\"https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/strategy/business-outcomes/\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "The strategy does not come from a catalogue of threats but from <b>what the business needs to keep running</b>. First the critical processes and their assets; then which threats put <em>those</em> assets at risk, and from that the priority of controls. Ordering by technical severity treats a critical in a test environment and a medium on the road to the billing system exactly the same. <a href=\"https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/strategy/\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Who sets the objective",
@@ -24,7 +24,7 @@ var QUIZ_DATA = [
       "Deciding how many backups are kept and for how long before being deleted",
     ],
     correct: 0,
-    explain: "A daily backup means accepting the loss of up to <b>twenty-four hours</b> of billing, and that is not security's call: the <b>business</b> makes it with its <b>RPO</b>, just as it sets with the <b>RTO</b> how long it can be down. Without those two numbers the design is a guess. Encryption, window and retention are later decisions, and all of them depend on the first. <a href=\"https://learn.microsoft.com/en-us/azure/reliability/disaster-recovery-overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "A daily backup means accepting the loss of up to <b>twenty-four hours</b> of billing, and that is not security's call: the <b>business</b> makes it with its <b>RPO</b>, just as it sets with the <b>RTO</b> how long it can be down. Without those two numbers the design is a guess. Encryption, window and retention are later decisions, and all of them depend on the first. <a href=\"https://learn.microsoft.com/en-us/azure/reliability/concept-business-continuity-high-availability-disaster-recovery\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Backups that survive the attacker",
@@ -48,7 +48,7 @@ var QUIZ_DATA = [
       "When the last restore was, and whether it met the committed RTO",
     ],
     correct: 3,
-    explain: "A green backup only proves the process finished, not that the data is usable or that the business comes back in time. The question separating a real plan from a pretty dashboard is <b>when the last restore was</b> and whether it met the <b>RTO</b>. Replication, encryption and retention are good properties of a backup that may never have been tested. <a href=\"https://learn.microsoft.com/en-us/azure/reliability/disaster-recovery-overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "A green backup only proves the process finished, not that the data is usable or that the business comes back in time. The question separating a real plan from a pretty dashboard is <b>when the last restore was</b> and whether it met the <b>RTO</b>. Replication, encryption and retention are good properties of a backup that may never have been tested. <a href=\"https://learn.microsoft.com/en-us/azure/reliability/concept-business-continuity-high-availability-disaster-recovery\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Where to start against ransomware",
@@ -300,7 +300,7 @@ var QUIZ_DATA = [
       "Letting non-critical applications skip the review and reserving it for the critical ones",
     ],
     correct: 0,
-    explain: "A gate at the end concentrates every finding at the most expensive moment to fix them, which is why it always blocks. <b>DevSecOps</b> spreads <b>automatic</b> controls across the lifecycle — modelling at design, scanning in the code and the pull request, dependencies at build, policy at deployment — so each problem is found where it is cheap. Moving or reinforcing the gate does not change its nature. <a href=\"https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/secure/devsecops-controls\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "A gate at the end concentrates every finding at the most expensive moment to fix them, which is why it always blocks. <b>DevSecOps</b> spreads <b>automatic</b> controls across the lifecycle — modelling at design, scanning in the code and the pull request, dependencies at build, policy at deployment — so each problem is found where it is cheap. Moving or reinforcing the gate does not change its nature. <a href=\"https://learn.microsoft.com/en-us/security/zero-trust/develop/secure-devops-environments-zero-trust\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Making the control count",
@@ -312,7 +312,7 @@ var QUIZ_DATA = [
       "Moving the findings into the team's issue tracker so they enter their planning",
     ],
     correct: 2,
-    explain: "A warning that stops nothing becomes noise, and noise does not get read. What makes the control count is that a finding above the agreed threshold <b>breaks the build</b>, with a <b>documented exception path with an owner</b> for justified cases. More sensitivity produces more noise, and the weekly summary and the issue tracker still depend on somebody prioritising. <a href=\"https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/secure/devsecops-controls\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "A warning that stops nothing becomes noise, and noise does not get read. What makes the control count is that a finding above the agreed threshold <b>breaks the build</b>, with a <b>documented exception path with an owner</b> for justified cases. More sensitivity produces more noise, and the weekly summary and the issue tracker still depend on somebody prioritising. <a href=\"https://learn.microsoft.com/en-us/security/zero-trust/develop/secure-devops-environments-zero-trust\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "What gets protected first",
@@ -324,7 +324,7 @@ var QUIZ_DATA = [
       "That the asset inventory must be completed first and only then should the order be decided",
     ],
     correct: 2,
-    explain: "A resiliency strategy starts with the business, not the scanner. The first step is identifying the <b>critical processes</b> — the ones that cost money, reputation or lives when they stop — and the assets they depend on, and from there deciding where to invest. A system with forty vulnerabilities supporting nothing important comes after one with two that carries billing. Ordering by defect count or by age optimises a technical metric, not risk. And the inventory is a necessary step, but on its own it does not prioritise: criticality comes from the business. <a href=\"https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/strategy/business-outcomes/\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "A resiliency strategy starts with the business, not the scanner. The first step is identifying the <b>critical processes</b> — the ones that cost money, reputation or lives when they stop — and the assets they depend on, and from there deciding where to invest. A system with forty vulnerabilities supporting nothing important comes after one with two that carries billing. Ordering by defect count or by age optimises a technical metric, not risk. And the inventory is a necessary step, but on its own it does not prioritise: criticality comes from the business. <a href=\"https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/strategy/\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Restoring is not recovering",
@@ -336,7 +336,7 @@ var QUIZ_DATA = [
       "Keeping the backups longer, so they could return to a point before the incident began",
     ],
     correct: 0,
-    explain: "Having backups answers the recovery point objective — how much data I lose — but the exercise failed the recovery <b>time</b> objective: how long until I am operating again. And that depends on things a backup does not solve: what order systems come up in, whether identity is available before the applications that depend on it, whether there is capacity to restore into, whether anyone knows how to run the procedure. That is why the plan is <b>tested end to end</b> and timed against the declared objective. Backing up more often improves the other objective, not this one; encrypting and retaining longer do not change the time either. <a href=\"https://learn.microsoft.com/en-us/azure/reliability/disaster-recovery-overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Having backups answers the recovery point objective — how much data I lose — but the exercise failed the recovery <b>time</b> objective: how long until I am operating again. And that depends on things a backup does not solve: what order systems come up in, whether identity is available before the applications that depend on it, whether there is capacity to restore into, whether anyone knows how to run the procedure. That is why the plan is <b>tested end to end</b> and timed against the declared objective. Backing up more often improves the other objective, not this one; encrypting and retaining longer do not change the time either. <a href=\"https://learn.microsoft.com/en-us/azure/reliability/concept-business-continuity-high-availability-disaster-recovery\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "The two ransomware priorities",
@@ -468,7 +468,7 @@ var QUIZ_DATA = [
       "Leave every control in informational mode, so they never stop a build and do not bother the team",
     ],
     correct: 1,
-    explain: "A control the team learns to ignore protects nothing, and that is the DevSecOps lesson the exam is after. The design is about <b>placing each control where it pays</b>: secret scanning and fast, high-signal checks at commit or pull request, where blocking is cheap and the finding is almost always real; heavy, noisy analysis in scheduled runs that feed the backlog without slowing anyone. And the blocking threshold is agreed, with documented exceptions. Accepting the cost outright burns the relationship, moving everything out loses the gate, and leaving everything informational is having no control at all. <a href=\"https://learn.microsoft.com/en-us/azure/cloud-adoption-framework/secure/devsecops-controls\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "A control the team learns to ignore protects nothing, and that is the DevSecOps lesson the exam is after. The design is about <b>placing each control where it pays</b>: secret scanning and fast, high-signal checks at commit or pull request, where blocking is cheap and the finding is almost always real; heavy, noisy analysis in scheduled runs that feed the backlog without slowing anyone. And the blocking threshold is agreed, with documented exceptions. Accepting the cost outright burns the relationship, moving everything out loses the gate, and leaving everything informational is having no control at all. <a href=\"https://learn.microsoft.com/en-us/security/zero-trust/develop/secure-devops-environments-zero-trust\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Security against availability",
@@ -624,7 +624,7 @@ var QUIZ_DATA = [
       "Better replaced with a single managed identity, removing the secret while keeping the current management convenience",
     ],
     correct: 2,
-    explain: "The problem is not the secret, it is the <b>scope</b>. One identity with Contributor everywhere means a failure in the least important pipeline — a compromised dependency, a branch anyone can open, a log leaking a variable — hands over the whole estate. The correct design separates by team and environment, with permissions scoped to what that pipeline actually deploys, and ideally with no secret at all, through workload identity federation. Vaulting and rotating the secret better, or auditing it, does not reduce what its holder achieves; and a single managed identity keeps exactly the same excessive scope. <a href=\"https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "The problem is not the secret, it is the <b>scope</b>. One identity with Contributor everywhere means a failure in the least important pipeline — a compromised dependency, a branch anyone can open, a log leaking a variable — hands over the whole estate. The correct design separates by team and environment, with permissions scoped to what that pipeline actually deploys, and ideally with no secret at all, through workload identity federation. Vaulting and rotating the secret better, or auditing it, does not reduce what its holder achieves; and a single managed identity keeps exactly the same excessive scope. <a href=\"https://learn.microsoft.com/en-us/azure/devops/pipelines/process/approvals?view=azure-devops\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
 ];
 

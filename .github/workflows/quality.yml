@@ -46,7 +46,7 @@ jobs:
       # publishes has no questions, if a service it lists as out of scope is
       # the correct answer to something, or if the counts and weights the
       # pages print stop matching the banks.
-      - name: Coverage of the official SCS-C03 outline
+      - name: Coverage of every official exam outline
         run: node tools/check-coverage.js
 
       # The task and skill list printed on each module page is generated from
@@ -102,10 +102,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # Every claim in an explanation is backed by an AWS documentation page.
-      # A source link that 404s is worse than no source at all, and AWS moves
-      # pages. The runner has open internet, so this is the place to check.
-      - name: AWS documentation links still resolve
+      # Every claim in an explanation is backed by a vendor documentation page.
+      # A source link that 404s is worse than no source at all, and both AWS and
+      # Microsoft move pages. The script walks the whole site, so it covers every
+      # certification. The runner has open internet, so this is the place to check.
+      - name: Vendor documentation links still resolve
         run: bash tools/check-links.sh
 
       # A 200 only proves a page exists. This reads each page's title and

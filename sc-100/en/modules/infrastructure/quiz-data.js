@@ -204,7 +204,7 @@ var QUIZ_DATA = [
       "Publishing email through a virtual desktop they connect to from the personal phone",
     ],
     correct: 2,
-    explain: "\"We cannot manage the device\" rules out enrolment, and it also rules out conditioning on compliance, which needs a managed device. <b>App protection policies</b> (MAM) protect the data <em>inside</em> the app — encryption, no copy-paste into personal apps, no saving locally — without touching the rest of the phone. The virtual desktop works, but it is a whole infrastructure for a problem that already has an answer. <a href=\"https://learn.microsoft.com/en-us/intune/intune-service/apps/app-protection-policy\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "\"We cannot manage the device\" rules out enrolment, and it also rules out conditioning on compliance, which needs a managed device. <b>App protection policies</b> (MAM) protect the data <em>inside</em> the app — encryption, no copy-paste into personal apps, no saving locally — without touching the rest of the phone. The virtual desktop works, but it is a whole infrastructure for a problem that already has an answer. <a href=\"https://learn.microsoft.com/en-us/intune/app-management/protection/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Device state as a signal",
@@ -216,7 +216,7 @@ var QUIZ_DATA = [
       "A monthly review of the device inventory, withdrawing access from those that do not comply",
     ],
     correct: 0,
-    explain: "Two pieces interlocking: <b>Intune</b> evaluates the machine against a <b>compliance policy</b> and stamps the result on the device identity; <b>conditional access</b> consumes that signal with the \"require device to be marked as compliant\" control. Azure Policy governs Azure resources, not client machines. The IP says where the machine is, not how it is. And a monthly review arrives late. <a href=\"https://learn.microsoft.com/en-us/intune/intune-service/protect/device-compliance-get-started\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Two pieces interlocking: <b>Intune</b> evaluates the machine against a <b>compliance policy</b> and stamps the result on the device identity; <b>conditional access</b> consumes that signal with the \"require device to be marked as compliant\" control. Azure Policy governs Azure resources, not client machines. The IP says where the machine is, not how it is. And a monthly review arrives late. <a href=\"https://learn.microsoft.com/en-us/intune/device-security/compliance/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "An IoT device's identity",
@@ -276,7 +276,7 @@ var QUIZ_DATA = [
       "With a Sentinel analytics rule that alerts whenever a critical operating system setting changes on a server",
     ],
     correct: 1,
-    explain: "<b>Machine Configuration</b> is the Azure Policy extension that looks <em>inside</em> the operating system: it audits configuration against a baseline and, if allowed, remediates it, on Azure machines and on <b>Arc</b>-connected ones alike. The golden image sets the starting point but does not watch for drift. Intune is for clients. And an alert detects the change, it does not prevent it. <a href=\"https://learn.microsoft.com/en-us/azure/governance/machine-configuration/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "<b>Machine Configuration</b> is the Azure Policy extension that looks <em>inside</em> the operating system: it audits configuration against a baseline and, if allowed, remediates it, on Azure machines and on <b>Arc</b>-connected ones alike. The golden image sets the starting point but does not watch for drift. Intune is for clients. And an alert detects the change, it does not prevent it. <a href=\"https://learn.microsoft.com/en-us/azure/governance/machine-configuration/overview/01-overview-concepts\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Rollout order",
@@ -288,7 +288,7 @@ var QUIZ_DATA = [
       "With a permanent exception for the legacy machines, documented as accepted risk",
     ],
     correct: 2,
-    explain: "It is the same pattern as in governance: <b>audit</b> to learn the real scope, <b>remediate</b> in batches with a change window, and <b>enforce</b> at the end so the drift cannot come back. Remediating eight hundred legacy machines at once is how production breaks. Applying it only to new machines, or accepting the risk forever, leaves the estate split in two indefinitely. <a href=\"https://learn.microsoft.com/en-us/azure/governance/machine-configuration/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "It is the same pattern as in governance: <b>audit</b> to learn the real scope, <b>remediate</b> in batches with a change window, and <b>enforce</b> at the end so the drift cannot come back. Remediating eight hundred legacy machines at once is how production breaks. Applying it only to new machines, or accepting the risk forever, leaves the estate split in two indefinitely. <a href=\"https://learn.microsoft.com/en-us/azure/governance/machine-configuration/overview/01-overview-concepts\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "A repeated local password",
@@ -324,7 +324,7 @@ var QUIZ_DATA = [
       "SaaS security posture management in Defender for Cloud Apps",
     ],
     correct: 3,
-    explain: "Every surface has its tool and mixing them up is the typical mistake in this task. IaaS and PaaS: Defender for Cloud and Azure Policy. <b>Third-party SaaS</b>: <b>SaaS security posture management</b> in <b>Defender for Cloud Apps</b>, which connects to the application and evaluates its configuration. Azure Policy does not reach someone else's SaaS, and the Defender for Cloud secure score measures cloud resources, not those applications' settings. <a href=\"https://learn.microsoft.com/en-us/defender-cloud-apps/security-saas\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Every surface has its tool and mixing them up is the typical mistake in this task. IaaS and PaaS: Defender for Cloud and Azure Policy. <b>Third-party SaaS</b>: <b>SaaS security posture management</b> in <b>Defender for Cloud Apps</b>, which connects to the application and evaluates its configuration. Azure Policy does not reach someone else's SaaS, and the Defender for Cloud secure score measures cloud resources, not those applications' settings. <a href=\"https://learn.microsoft.com/en-us/defender-cloud-apps/posture-overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Where the PaaS baseline is set",
@@ -756,7 +756,7 @@ var QUIZ_DATA = [
       "App protection policies, which enforce control inside the managed application without managing the device",
     ],
     correct: 3,
-    explain: "The distinction the exam is after is <b>managing the device versus managing the application</b>. App protection policies act inside the corporate application — encrypting its store, preventing copy and paste into personal apps, requiring a PIN and allowing a selective wipe that removes only company data — and require neither enrolling the phone nor giving the company power over the rest of it. Enrolling contradicts the explicit requirement. Forcing the browser degrades the experience and does not stop the content being copied. And issuing corporate phones solves with budget a problem that has a technical solution. <a href=\"https://learn.microsoft.com/en-us/intune/intune-service/apps/app-protection-policy\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "The distinction the exam is after is <b>managing the device versus managing the application</b>. App protection policies act inside the corporate application — encrypting its store, preventing copy and paste into personal apps, requiring a PIN and allowing a selective wipe that removes only company data — and require neither enrolling the phone nor giving the company power over the rest of it. Enrolling contradicts the explicit requirement. Forcing the browser degrades the experience and does not stop the content being copied. And issuing corporate phones solves with budget a problem that has a technical solution. <a href=\"https://learn.microsoft.com/en-us/intune/app-management/protection/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Compliant according to whom",
@@ -768,7 +768,7 @@ var QUIZ_DATA = [
       "Both of them evaluate exactly the same thing twice over, so configuring either one is enough, whichever the team prefers",
     ],
     correct: 1,
-    explain: "These are two pieces with different jobs and the split matters. <b>Intune evaluates</b> the device against the compliance policy — encryption, version, antivirus, PIN — and writes the result as state on the device object in Entra ID. <b>Conditional Access decides</b>: when the request arrives it reads that state as a signal and grants or blocks. Neither does the other's work: with no compliance policy the signal is never set, and with no Conditional Access nobody reads it, so a device marked non-compliant would carry on getting in. <a href=\"https://learn.microsoft.com/en-us/intune/intune-service/protect/device-compliance-get-started\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "These are two pieces with different jobs and the split matters. <b>Intune evaluates</b> the device against the compliance policy — encryption, version, antivirus, PIN — and writes the result as state on the device object in Entra ID. <b>Conditional Access decides</b>: when the request arrives it reads that state as a signal and grants or blocks. Neither does the other's work: with no compliance policy the signal is never set, and with no Conditional Access nobody reads it, so a device marked non-compliant would carry on getting in. <a href=\"https://learn.microsoft.com/en-us/intune/device-security/compliance/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "The device that cannot be patched",
@@ -828,7 +828,7 @@ var QUIZ_DATA = [
       "A Sentinel analytics rule alerting whenever a critical operating system setting changes on a server",
     ],
     correct: 2,
-    explain: "A hardened image solves <b>day zero</b>: the server is born correct. What it does not solve is day one hundred, because configuration drifts the moment somebody logs in to fix something. <b>Machine configuration</b> is the continuous mechanism: it evaluates in-guest settings against a definition, reports compliance to the same dashboard as every other policy and can apply remediation. Redeploying is valid for ephemeral workloads but not for stateful servers. A quarterly manual review does not scale and leaves three months of drift. And the Sentinel rule alerts on the change without evaluating compliance or correcting it. <a href=\"https://learn.microsoft.com/en-us/azure/governance/machine-configuration/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "A hardened image solves <b>day zero</b>: the server is born correct. What it does not solve is day one hundred, because configuration drifts the moment somebody logs in to fix something. <b>Machine configuration</b> is the continuous mechanism: it evaluates in-guest settings against a definition, reports compliance to the same dashboard as every other policy and can apply remediation. Redeploying is valid for ephemeral workloads but not for stateful servers. A quarterly manual review does not scale and leaves three months of drift. And the Sentinel rule alerts on the change without evaluating compliance or correcting it. <a href=\"https://learn.microsoft.com/en-us/azure/governance/machine-configuration/overview/01-overview-concepts\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Where the baseline comes from",
@@ -888,7 +888,7 @@ var QUIZ_DATA = [
       "Sentinel analytics rules over the audit logs that each SaaS application exports to their workspace",
     ],
     correct: 0,
-    explain: "SaaS posture is a specific capability of <b>Defender for Cloud Apps</b>: once the application is connected through its API, it reviews its security options against best practice and returns recommendations — public sharing, weak authentication, third-party apps with excessive permissions — alongside the rest of the score. It is the equivalent of cloud posture, but for what somebody else administers. Defender CSPM covers infrastructure and platform resources, not another party's SaaS configuration. Azure Policy only evaluates Resource Manager resources. And Sentinel analyses events, that is what happens, not how the application is configured. <a href=\"https://learn.microsoft.com/en-us/defender-cloud-apps/security-saas\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "SaaS posture is a specific capability of <b>Defender for Cloud Apps</b>: once the application is connected through its API, it reviews its security options against best practice and returns recommendations — public sharing, weak authentication, third-party apps with excessive permissions — alongside the rest of the score. It is the equivalent of cloud posture, but for what somebody else administers. Defender CSPM covers infrastructure and platform resources, not another party's SaaS configuration. Azure Policy only evaluates Resource Manager resources. And Sentinel analyses events, that is what happens, not how the application is configured. <a href=\"https://learn.microsoft.com/en-us/defender-cloud-apps/posture-overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "The data arriving from the field",
@@ -948,7 +948,7 @@ var QUIZ_DATA = [
       "Scan the image in the pipeline and break the build on a critical vulnerability, plus scan the registry",
     ],
     correct: 3,
-    explain: "The requirement is that the image <b>never arrives</b>, so the control has to sit before deployment: it is scanned in the pipeline and the result has consequences — the build fails, with documented exceptions. Registry scanning is kept as well, because an image that is clean today stops being clean when a vulnerability is published tomorrow, and that later finding has to be seen too. Weekly-only scanning lets the image in and lets it stay. Network policies bound the damage without preventing entry. And runtime detection arrives once the requirement has already been broken. <a href=\"https://learn.microsoft.com/en-us/azure/devops/repos/security/github-advanced-security-dependency-scanning\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "The requirement is that the image <b>never arrives</b>, so the control has to sit before deployment: it is scanned in the pipeline and the result has consequences — the build fails, with documented exceptions. Registry scanning is kept as well, because an image that is clean today stops being clean when a vulnerability is published tomorrow, and that later finding has to be seen too. Weekly-only scanning lets the image in and lets it stay. Network policies bound the damage without preventing entry. And runtime detection arrives once the requirement has already been broken. <a href=\"https://learn.microsoft.com/en-us/azure/devops/repos/security/github-advanced-security-dependency-scanning?view=azure-devops\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "The secret inside the container",

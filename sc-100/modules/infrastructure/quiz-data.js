@@ -204,7 +204,7 @@ var QUIZ_DATA = [
       "Publicar el correo a través de un escritorio virtual al que se conecten desde el móvil personal",
     ],
     correct: 2,
-    explain: "«No podemos administrar el dispositivo» descarta la inscripción y descarta también condicionar por cumplimiento, que necesita un dispositivo gestionado. Las <b>directivas de protección de aplicaciones</b> (MAM) protegen el dato <em>dentro</em> de la aplicación —cifrado, sin copiar y pegar a aplicaciones personales, sin guardar en local— sin tocar el resto del móvil. El escritorio virtual resuelve, pero es una infraestructura entera para un problema que ya tiene respuesta. <a href=\"https://learn.microsoft.com/en-us/intune/intune-service/apps/app-protection-policy\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "«No podemos administrar el dispositivo» descarta la inscripción y descarta también condicionar por cumplimiento, que necesita un dispositivo gestionado. Las <b>directivas de protección de aplicaciones</b> (MAM) protegen el dato <em>dentro</em> de la aplicación —cifrado, sin copiar y pegar a aplicaciones personales, sin guardar en local— sin tocar el resto del móvil. El escritorio virtual resuelve, pero es una infraestructura entera para un problema que ya tiene respuesta. <a href=\"https://learn.microsoft.com/en-us/intune/app-management/protection/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "El estado del equipo como señal",
@@ -216,7 +216,7 @@ var QUIZ_DATA = [
       "Una revisión mensual del inventario de equipos, retirando el acceso a los que no cumplan",
     ],
     correct: 0,
-    explain: "Son dos piezas encajadas: <b>Intune</b> evalúa el equipo contra una <b>directiva de cumplimiento</b> y marca el resultado en la identidad del dispositivo; el <b>acceso condicional</b> consume esa señal con el control «requerir que el dispositivo sea conforme». Azure Policy gobierna recursos de Azure, no equipos cliente. La IP dice dónde está el equipo, no cómo está. Y la revisión mensual llega tarde. <a href=\"https://learn.microsoft.com/en-us/intune/intune-service/protect/device-compliance-get-started\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Son dos piezas encajadas: <b>Intune</b> evalúa el equipo contra una <b>directiva de cumplimiento</b> y marca el resultado en la identidad del dispositivo; el <b>acceso condicional</b> consume esa señal con el control «requerir que el dispositivo sea conforme». Azure Policy gobierna recursos de Azure, no equipos cliente. La IP dice dónde está el equipo, no cómo está. Y la revisión mensual llega tarde. <a href=\"https://learn.microsoft.com/en-us/intune/device-security/compliance/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Identidad de un dispositivo IoT",
@@ -276,7 +276,7 @@ var QUIZ_DATA = [
       "Con una regla de análisis en Sentinel que alerte cuando cambie un ajuste crítico del sistema operativo",
     ],
     correct: 1,
-    explain: "<b>Machine Configuration</b> es la extensión de Azure Policy que mira <em>dentro</em> del sistema operativo: audita la configuración contra una línea base y, si se le permite, la corrige, tanto en máquinas de Azure como en las conectadas con <b>Arc</b>. La imagen dorada fija el punto de partida pero no vigila la desviación. Intune es para clientes. Y una alerta detecta el cambio, no lo impide. <a href=\"https://learn.microsoft.com/en-us/azure/governance/machine-configuration/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "<b>Machine Configuration</b> es la extensión de Azure Policy que mira <em>dentro</em> del sistema operativo: audita la configuración contra una línea base y, si se le permite, la corrige, tanto en máquinas de Azure como en las conectadas con <b>Arc</b>. La imagen dorada fija el punto de partida pero no vigila la desviación. Intune es para clientes. Y una alerta detecta el cambio, no lo impide. <a href=\"https://learn.microsoft.com/en-us/azure/governance/machine-configuration/overview/01-overview-concepts\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Orden de aplicación",
@@ -288,7 +288,7 @@ var QUIZ_DATA = [
       "Con una excepción permanente para las máquinas heredadas, documentada como riesgo aceptado",
     ],
     correct: 2,
-    explain: "Es el mismo patrón que en gobierno: <b>auditar</b> para conocer el alcance real, <b>remediar</b> por lotes con ventana de cambio, y <b>exigir</b> al final para que la desviación no vuelva. Corregir de golpe ochocientas máquinas heredadas es cómo se rompe producción. Aplicarla solo a lo nuevo o aceptar el riesgo para siempre dejan el parque partido en dos indefinidamente. <a href=\"https://learn.microsoft.com/en-us/azure/governance/machine-configuration/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Es el mismo patrón que en gobierno: <b>auditar</b> para conocer el alcance real, <b>remediar</b> por lotes con ventana de cambio, y <b>exigir</b> al final para que la desviación no vuelva. Corregir de golpe ochocientas máquinas heredadas es cómo se rompe producción. Aplicarla solo a lo nuevo o aceptar el riesgo para siempre dejan el parque partido en dos indefinidamente. <a href=\"https://learn.microsoft.com/en-us/azure/governance/machine-configuration/overview/01-overview-concepts\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Contraseña local repetida",
@@ -324,7 +324,7 @@ var QUIZ_DATA = [
       "La gestión de postura de SaaS de Defender for Cloud Apps",
     ],
     correct: 3,
-    explain: "Cada superficie tiene su herramienta y confundirlas es el error típico de esta tarea. IaaS y PaaS: Defender for Cloud y Azure Policy. <b>SaaS de terceros</b>: la <b>gestión de postura de SaaS</b> de <b>Defender for Cloud Apps</b>, que se conecta a la aplicación y evalúa su configuración. Azure Policy no llega a un SaaS ajeno, y el secure score de Defender for Cloud mide recursos de nube, no la configuración de esas aplicaciones. <a href=\"https://learn.microsoft.com/en-us/defender-cloud-apps/security-saas\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Cada superficie tiene su herramienta y confundirlas es el error típico de esta tarea. IaaS y PaaS: Defender for Cloud y Azure Policy. <b>SaaS de terceros</b>: la <b>gestión de postura de SaaS</b> de <b>Defender for Cloud Apps</b>, que se conecta a la aplicación y evalúa su configuración. Azure Policy no llega a un SaaS ajeno, y el secure score de Defender for Cloud mide recursos de nube, no la configuración de esas aplicaciones. <a href=\"https://learn.microsoft.com/en-us/defender-cloud-apps/posture-overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Dónde se fija la línea base de PaaS",
@@ -756,7 +756,7 @@ var QUIZ_DATA = [
       "Directivas de protección de aplicaciones, que controlan dentro de la aplicación sin gestionar el dispositivo",
     ],
     correct: 3,
-    explain: "La distinción que el examen busca es <b>gestionar el dispositivo frente a gestionar la aplicación</b>. Las directivas de protección de aplicaciones actúan dentro de la aplicación corporativa —cifran su almacén, impiden copiar y pegar hacia aplicaciones personales, exigen PIN y permiten un borrado selectivo que solo elimina el dato de empresa— y no requieren inscribir el móvil ni dan a la empresa poder sobre el resto del teléfono. Inscribir contradice el requisito explícito. Forzar el navegador degrada la experiencia y no impide copiar el contenido. Y repartir teléfonos corporativos resuelve por presupuesto un problema que tiene solución técnica. <a href=\"https://learn.microsoft.com/en-us/intune/intune-service/apps/app-protection-policy\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "La distinción que el examen busca es <b>gestionar el dispositivo frente a gestionar la aplicación</b>. Las directivas de protección de aplicaciones actúan dentro de la aplicación corporativa —cifran su almacén, impiden copiar y pegar hacia aplicaciones personales, exigen PIN y permiten un borrado selectivo que solo elimina el dato de empresa— y no requieren inscribir el móvil ni dan a la empresa poder sobre el resto del teléfono. Inscribir contradice el requisito explícito. Forzar el navegador degrada la experiencia y no impide copiar el contenido. Y repartir teléfonos corporativos resuelve por presupuesto un problema que tiene solución técnica. <a href=\"https://learn.microsoft.com/en-us/intune/app-management/protection/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "Conforme según quién",
@@ -768,7 +768,7 @@ var QUIZ_DATA = [
       "Ambas evalúan lo mismo por duplicado, y basta con configurar cualquiera de las dos según prefiera el equipo de plataforma",
     ],
     correct: 1,
-    explain: "Son dos piezas con papeles distintos y hay que entender el reparto. <b>Intune evalúa</b> el dispositivo contra la directiva de cumplimiento —cifrado, versión, antivirus, PIN— y escribe el resultado como estado del objeto de dispositivo en Entra ID. <b>El acceso condicional decide</b>: cuando llega la petición, lee ese estado como señal y concede o bloquea. Ninguna de las dos hace el trabajo de la otra: sin directiva de cumplimiento la señal nunca se pone, y sin acceso condicional nadie la mira, de modo que un dispositivo marcado como no conforme seguiría entrando. <a href=\"https://learn.microsoft.com/en-us/intune/intune-service/protect/device-compliance-get-started\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Son dos piezas con papeles distintos y hay que entender el reparto. <b>Intune evalúa</b> el dispositivo contra la directiva de cumplimiento —cifrado, versión, antivirus, PIN— y escribe el resultado como estado del objeto de dispositivo en Entra ID. <b>El acceso condicional decide</b>: cuando llega la petición, lee ese estado como señal y concede o bloquea. Ninguna de las dos hace el trabajo de la otra: sin directiva de cumplimiento la señal nunca se pone, y sin acceso condicional nadie la mira, de modo que un dispositivo marcado como no conforme seguiría entrando. <a href=\"https://learn.microsoft.com/en-us/intune/device-security/compliance/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "El dispositivo que no se puede parchear",
@@ -828,7 +828,7 @@ var QUIZ_DATA = [
       "Una regla de análisis de Sentinel que avise cada vez que cambie un ajuste crítico del sistema operativo de un servidor",
     ],
     correct: 2,
-    explain: "Una imagen endurecida resuelve el <b>día cero</b>: el servidor nace bien. Lo que no resuelve es el día cien, porque la configuración se desvía en cuanto alguien entra a arreglar algo. <b>Configuración de máquina</b> es el mecanismo continuo: evalúa los ajustes dentro del sistema operativo contra una definición, reporta la conformidad al mismo panel que el resto de directivas y puede aplicar la corrección. Redesplegar es válido en cargas efímeras, pero no en servidores con estado. La revisión manual trimestral no escala y deja tres meses de deriva. Y la regla de Sentinel avisa del cambio, sin evaluar la conformidad ni corregirla. <a href=\"https://learn.microsoft.com/en-us/azure/governance/machine-configuration/overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "Una imagen endurecida resuelve el <b>día cero</b>: el servidor nace bien. Lo que no resuelve es el día cien, porque la configuración se desvía en cuanto alguien entra a arreglar algo. <b>Configuración de máquina</b> es el mecanismo continuo: evalúa los ajustes dentro del sistema operativo contra una definición, reporta la conformidad al mismo panel que el resto de directivas y puede aplicar la corrección. Redesplegar es válido en cargas efímeras, pero no en servidores con estado. La revisión manual trimestral no escala y deja tres meses de deriva. Y la regla de Sentinel avisa del cambio, sin evaluar la conformidad ni corregirla. <a href=\"https://learn.microsoft.com/en-us/azure/governance/machine-configuration/overview/01-overview-concepts\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "De dónde sale la línea base",
@@ -888,7 +888,7 @@ var QUIZ_DATA = [
       "Reglas de análisis de Sentinel sobre los registros de auditoría que cada aplicación SaaS exporta a su área de trabajo",
     ],
     correct: 0,
-    explain: "La postura de SaaS es una capacidad concreta de <b>Defender for Cloud Apps</b>: conectada la aplicación con su API, revisa sus opciones de seguridad contra buenas prácticas y devuelve recomendaciones —comparticiones públicas, autenticación débil, aplicaciones de terceros con permisos excesivos— junto al resto de la puntuación. Es el equivalente de la postura en la nube, pero para lo que administra otro. Defender CSPM cubre recursos de infraestructura y plataforma, no la configuración de un SaaS ajeno. Azure Policy solo evalúa recursos de Resource Manager. Y Sentinel analiza eventos, es decir lo que ocurre, no cómo está configurada la aplicación. <a href=\"https://learn.microsoft.com/en-us/defender-cloud-apps/security-saas\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "La postura de SaaS es una capacidad concreta de <b>Defender for Cloud Apps</b>: conectada la aplicación con su API, revisa sus opciones de seguridad contra buenas prácticas y devuelve recomendaciones —comparticiones públicas, autenticación débil, aplicaciones de terceros con permisos excesivos— junto al resto de la puntuación. Es el equivalente de la postura en la nube, pero para lo que administra otro. Defender CSPM cubre recursos de infraestructura y plataforma, no la configuración de un SaaS ajeno. Azure Policy solo evalúa recursos de Resource Manager. Y Sentinel analiza eventos, es decir lo que ocurre, no cómo está configurada la aplicación. <a href=\"https://learn.microsoft.com/en-us/defender-cloud-apps/posture-overview\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "El dato que llega del campo",
@@ -948,7 +948,7 @@ var QUIZ_DATA = [
       "Analizar la imagen en la canalización y romper la compilación ante una vulnerabilidad crítica",
     ],
     correct: 3,
-    explain: "El requisito es que la imagen <b>no llegue</b>, así que el control tiene que estar antes del despliegue: se analiza en la canalización y el resultado tiene consecuencias —la compilación falla, con excepciones documentadas—. El análisis en el registro se mantiene además, porque una imagen sana hoy deja de serlo cuando mañana se publica una vulnerabilidad, y ese hallazgo posterior también hay que verlo. Analizar solo semanalmente permite que la imagen entre y se quede. Las directivas de red acotan el daño, no impiden la entrada. Y la detección en ejecución llega cuando el requisito ya se ha incumplido. <a href=\"https://learn.microsoft.com/en-us/azure/devops/repos/security/github-advanced-security-dependency-scanning\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
+    explain: "El requisito es que la imagen <b>no llegue</b>, así que el control tiene que estar antes del despliegue: se analiza en la canalización y el resultado tiene consecuencias —la compilación falla, con excepciones documentadas—. El análisis en el registro se mantiene además, porque una imagen sana hoy deja de serlo cuando mañana se publica una vulnerabilidad, y ese hallazgo posterior también hay que verlo. Analizar solo semanalmente permite que la imagen entre y se quede. Las directivas de red acotan el daño, no impiden la entrada. Y la detección en ejecución llega cuando el requisito ya se ha incumplido. <a href=\"https://learn.microsoft.com/en-us/azure/devops/repos/security/github-advanced-security-dependency-scanning?view=azure-devops\" target=\"_blank\" rel=\"noopener\">Microsoft Learn ↗</a>",
   },
   {
     tag: "El secreto dentro del contenedor",
