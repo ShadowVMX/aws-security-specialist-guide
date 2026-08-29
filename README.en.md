@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/img/banner.svg" width="100%" alt="AWS Certified Security - Specialty — Interactive study guide">
+  <img src="assets/img/banner.svg" width="100%" alt="Cloud security certification guides — SCS-C03 and SC-100">
 </p>
 
 <p align="center">
@@ -70,10 +70,13 @@ You can also open `index.html` straight from disk: there is no build step and no
 
 </details>
 
-## Exam domains
+## Domains of each exam
 
-The six domains, their weights and their task statements come from the official
-**AWS Certified Security – Specialty (SCS-C03)** exam guide, 2026 edition. Every module
+Each guide prints the domains, weights and task statements of its own exam.
+
+### AWS Certified Security — Specialty (SCS-C03)
+
+The six domains and their weights come from the official exam guide, 2026 edition. Every module
 page prints the tasks and skills it covers, with their official numbering, and every
 theory heading carries the skill number it addresses.
 
@@ -89,7 +92,9 @@ theory heading carries the skill number it addresses.
 The simulation draws its 65 questions with those same weights: 10 Detection, 9 Incident
 Response, 12 Infrastructure Security, 13 IAM, 12 Data Protection and 9 Governance.
 
-The four **SC-100** domains come from Microsoft's study guide, with the skills as measured on
+### Microsoft Cybersecurity Architect (SC-100)
+
+The four domains come from Microsoft's study guide, with the skills as measured on
 July 28, 2026. Microsoft publishes weights as ranges, so the table prints the range and the
 simulation distributes its 48 questions by the midpoint.
 
@@ -104,16 +109,21 @@ Microsoft does not publish how many questions the exam carries — 40 to 60 is t
 real score is scaled out of 1000, with 700 to pass. The simulation uses 48 questions and 70% as a
 working reference, not as an equivalence with the official score.
 
-Every module includes:
+Every module in both guides includes:
 
-- Theory organized around the exam guide's official task statements, with their numbering
+- Theory organized around the official task statements, with their numbering
 - The domain's official content outline printed at the end, to tick off against the guide
 - Interactive SVG diagrams, navigable by keyboard as well
-- AWS CLI and JSON policy examples ready to read and adapt
-- Azure comparisons where the mapping is reliable, or plain-language examples where forcing it would mislead
 - A section on the exam's most frequent traps
-- Links to the official AWS documentation it rests on
+- An official sources section with the documentation it rests on
 - A quiz with a reasoned explanation on every answer
+
+And, depending on the guide:
+
+- **SCS-C03**: AWS CLI and JSON policy examples ready to read and adapt, plus Azure comparisons
+  where the mapping is reliable
+- **SC-100**: an opening section covering the mechanics the exam takes for granted and expects
+  you to have learned from AZ-500, SC-200 or SC-300
 
 ## How to study
 

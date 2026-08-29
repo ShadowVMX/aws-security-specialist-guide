@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/img/banner.svg" width="100%" alt="AWS Certified Security - Specialty — Guía de estudio interactiva">
+  <img src="assets/img/banner.svg" width="100%" alt="Guías de certificación en seguridad cloud — SCS-C03 y SC-100">
 </p>
 
 <p align="center">
@@ -70,10 +70,13 @@ También puede abrirse `index.html` directamente desde el disco: no hay build st
 
 </details>
 
-## Dominios del examen
+## Dominios de cada examen
 
-Los seis dominios, sus pesos y sus *task statements* provienen de la guía oficial
-**AWS Certified Security – Specialty (SCS-C03)**, edición 2026. Cada página de módulo
+Cada guía imprime los dominios, pesos y *task statements* de su propio examen.
+
+### AWS Certified Security — Specialty (SCS-C03)
+
+Los seis dominios y sus pesos provienen del exam guide oficial, edición 2026. Cada página de módulo
 imprime las tareas y skills que le corresponden, con su numeración oficial, y cada
 encabezado de teoría lleva el número de skill que cubre.
 
@@ -90,7 +93,9 @@ El simulacro reparte sus 65 preguntas con esos mismos pesos: 10 de Detection, 9 
 Incident Response, 12 de Infrastructure Security, 13 de IAM, 12 de Data Protection y
 9 de Governance.
 
-Los cuatro dominios del **SC-100** salen del study guide de Microsoft, con los skills medidos a
+### Microsoft Cybersecurity Architect (SC-100)
+
+Los cuatro dominios salen del study guide de Microsoft, con los skills medidos a
 28 de julio de 2026. Microsoft publica los pesos como rangos, así que la tabla imprime el rango
 y el simulacro reparte sus 48 preguntas por el punto medio.
 
@@ -105,16 +110,21 @@ Microsoft no publica cuántas preguntas trae el examen —lo habitual son entre 
 real es escalada sobre 1000, con 700 para aprobar. El simulacro usa 48 preguntas y un 70 % como
 referencia de trabajo, no como equivalencia con la nota oficial.
 
-Cada módulo incluye:
+Cada módulo de las dos guías incluye:
 
-- Teoría organizada por los *task statements* oficiales del exam guide, con su numeración
+- Teoría organizada por los *task statements* oficiales, con su numeración
 - El temario oficial del dominio impreso al final, para ir tachando contra la guía
 - Diagramas SVG interactivos, navegables también con teclado
-- Ejemplos de AWS CLI y de políticas JSON listos para leer y adaptar
-- Comparativas con Azure donde el mapeo es fiable, o ejemplos en lenguaje llano donde forzarlo induciría a error
 - Una sección con las trampas más frecuentes del examen
-- Enlaces a la documentación oficial de AWS en la que se apoya
+- Una sección de fuentes oficiales con la documentación en la que se apoya
 - Un quiz con explicación razonada en cada respuesta
+
+Y además, según la guía:
+
+- **SCS-C03**: ejemplos de AWS CLI y de políticas JSON listos para leer y adaptar, y comparativas
+  con Azure donde el mapeo es fiable
+- **SC-100**: una sección de apertura con la mecánica que el examen da por sabida y que espera
+  aprendida de AZ-500, SC-200 o SC-300
 
 ## Cómo estudiar
 
