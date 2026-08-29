@@ -527,6 +527,18 @@ var QUIZ_DATA = [
     correct: 1,
     explain: "Los <b>routing controls</b> de Application Recovery Controller son interruptores de conmutación con un plano de datos de alta disponibilidad: se accionan a propósito, quedan registrados y cuentan con reglas de seguridad que impiden apagar las dos Regiones a la vez. Editar Route 53 a mano funciona hasta que la consola es justo lo que está degradado. CodeDeploy despliega versiones, no desvía tráfico entre Regiones. Y bajar el TTL ayuda a propagar, pero no es el mecanismo de decisión. <a href=\"https://docs.aws.amazon.com/r53recovery/latest/dg/what-is-route53-recovery.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
+  {
+    tag: "El asistente hereda los permisos",
+    q: "Al desplegar Amazon Q Business sobre los repositorios documentales de la empresa, varios usuarios empiezan a recibir fragmentos de documentos de otras áreas. Nadie ha cambiado permisos.",
+    options: [
+      "El servicio indexa el contenido completo y devuelve resultados con independencia de los permisos de origen",
+      "El modelo ha memorizado los documentos durante la indexación y los reproduce en sus respuestas",
+      "Respeta el control de acceso del origen: aflora una sobreexposición que ya existía",
+      "Es un defecto conocido del conector, que se corrige reindexando con la opción de filtrado activada",
+    ],
+    correct: 2,
+    explain: "Q Business propaga el control de acceso del origen: consulta con la identidad de quien pregunta y solo devuelve lo que esa persona ya podía abrir. Cuando aparecen documentos de otras áreas, lo que ha cambiado no es el permiso sino la <b>facilidad de encontrarlo</b>: antes había que saber que el documento existía. Por eso el trabajo previo al despliegue es de gobierno del dato —revisar comparticiones amplias y permisos heredados de más— y no de configuración del asistente. Ni indexa saltándose permisos, ni memoriza el contenido en el modelo. <a href=\"https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/security.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
 ];
 
 // Registrado para el simulacro de examen, que carga los seis bancos a la vez.

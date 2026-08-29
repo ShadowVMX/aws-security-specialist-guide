@@ -527,6 +527,18 @@ var QUIZ_DATA = [
     correct: 1,
     explain: "Application Recovery Controller's <b>routing controls</b> are failover switches backed by a highly available data plane: you flip them on purpose, the action is recorded, and safety rules stop you turning both Regions off at once. Editing Route 53 by hand works right up until the console is the thing that is degraded. CodeDeploy ships versions, it does not steer traffic between Regions. And lowering the TTL helps propagation but is not the decision mechanism. <a href=\"https://docs.aws.amazon.com/r53recovery/latest/dg/what-is-route53-recovery.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
+  {
+    tag: "The assistant inherits the permissions",
+    q: "On deploying Amazon Q Business over the company's document repositories, several users start receiving fragments of other departments' documents. Nobody changed permissions.",
+    options: [
+      "The service indexes all content and returns results regardless of source permissions",
+      "The model memorised the documents during indexing and reproduces them in its answers",
+      "It respects the source's access control: it surfaces pre-existing overexposure",
+      "It is a known connector defect, fixed by reindexing with the filtering option enabled",
+    ],
+    correct: 2,
+    explain: "Q Business propagates the source's access control: it queries as the asking user and returns only what that person could already open. When other departments' documents appear, what changed is not the permission but how <b>easy it is to find</b>: before, you had to know the document existed. That is why the pre-deployment work is data governance — reviewing broad sharing and over-inherited permissions — not assistant configuration. It neither indexes past permissions nor memorises content into the model. <a href=\"https://docs.aws.amazon.com/amazonq/latest/qbusiness-ug/security.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
 ];
 
 // Registrado para el simulacro de examen, que carga los seis bancos a la vez.

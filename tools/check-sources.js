@@ -37,6 +37,7 @@ const STOP = new Set(
    "html service services page reference con los las del que para una uno por " +
    "como más este esta cuando donde sobre entre desde hasta cada todo todos " +
    "data security access management overview introduction welcome using use " +
+   "learn microsoft azure about " +
    "your you are can not but its it's").split(/\s+/)
 );
 
@@ -172,14 +173,29 @@ async function titleOf(url, attempt = 0) {
       return;
     }
     const correct = Array.isArray(q.correct) ? q.correct : [q.correct];
+    // La explicación es donde la pregunta nombra el producto o el concepto, y
+    // está escrita al margen del título de la página, así que sigue siendo
+    // prueba de que el enlace viene a cuento. Lo que se quita es el propio
+    // enlace: su texto ("Microsoft Learn") casaría con medio catálogo.
+    const sinEnlace = (s) => String(s || "").replace(/<a\b[^>]*>.*?<\/a>/gi, " ");
     const text = (x) =>
-      x ? `${x.tag} ${x.q} ${correct.map((j) => x.options[j] || "").join(" ")}` : "";
+      x
+        ? `${x.tag} ${x.q} ${correct.map((j) => x.options[j] || "").join(" ")} ${sinEnlace(x.explain)}`
+        : "";
     const asked = terms(`${text(q)} ${text(en)}`);
     // the URL slug is written by AWS and describes the page as well as the title
     const page = terms(
       `${got.title} ${got.h1 || ""} ${url.split("/").slice(3).join(" ")}`
     );
-    const shared = [...page].filter((w) => asked.has(w));
+    // Comparar por igualdad exacta hacía saltar pares perfectos por pura
+    // morfología: "label" contra "labels", "política" contra "políticas".
+    // Dos términos cuentan como el mismo si uno es prefijo del otro y la raíz
+    // compartida tiene al menos cinco letras, que ya es específica.
+    const mismaRaiz = (a, b) =>
+      a === b ||
+      (Math.min(a.length, b.length) >= 5 && (a.startsWith(b) || b.startsWith(a)));
+    const pedido = [...asked];
+    const shared = [...page].filter((w) => pedido.some((p) => mismaRaiz(w, p)));
 
     if (!shared.length) {
       suspect.push(

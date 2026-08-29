@@ -291,6 +291,29 @@
       y credenciales separadas, el plan de recuperación es papel.
     </div>
 
+    <p class="code-label">Proteger la copia de quien administra el origen: eliminación temporal y autorización adicional</p>
+    <pre><code># La eliminación temporal retiene lo borrado; &quot;AlwaysON&quot; impide desactivarla.
+az backup vault backup-properties set \
+  --name vault-prod --resource-group rg-backup \
+  --soft-delete-feature-state AlwaysON
+
+# La autorización adicional exige un segundo aprobador para las operaciones
+# críticas: deshabilitar la protección, acortar la retención, borrar datos.
+az resource update \
+  --ids $(az backup vault show -n vault-prod -g rg-backup --query id -o tsv) \
+  --set properties.securitySettings.multiUserAuthorization=Enabled</code></pre>
+
+    <p class="code-label">Contenedor inmutable: ni el administrador de la suscripción puede acortar la retención</p>
+    <pre><code>az storage container immutability-policy create \
+  --account-name stevidencia --container-name registros \
+  --period 2555 --allow-protected-append-writes false
+
+# Bloquearla es lo que la vuelve prueba válida: a partir de aquí solo se puede
+# AMPLIAR el periodo, nunca reducirlo ni eliminarlo.
+az storage container immutability-policy lock \
+  --account-name stevidencia --container-name registros \
+  --if-match &#x27;&quot;&lt;etag-de-la-directiva&gt;&quot;&#x27;</code></pre>
+
     <h2 id="ransomware">Mitigación de ransomware (1.1.3)</h2>
     <p>
       Microsoft ordena esta defensa en tres fases y el examen espera que sepas <strong>en qué orden</strong>
@@ -309,6 +332,14 @@
       privilegiado</strong> segundo porque es lo que convierte un incidente en una catástrofe. Si un enunciado
       pide «lo más urgente» ante ransomware, mira ahí antes que al antivirus.
     </div>
+
+    <p class="code-label">Comprobar qué identidades podrían borrar las copias antes de que lo haga un atacante</p>
+    <pre><code># Quién tiene permisos de escritura o borrado sobre el almacén de copias.
+az role assignment list \
+  --scope $(az backup vault show -n vault-prod -g rg-backup --query id -o tsv) \
+  --include-inherited --include-groups \
+  --query &quot;[?roleDefinitionName!=&#x27;Reader&#x27;].{quien:principalName, rol:roleDefinitionName}&quot; \
+  -o table</code></pre>
 
     <h2 id="parches">Evaluar soluciones de actualizaciones de seguridad (1.1.4)</h2>
     <table role="table">
@@ -463,6 +494,43 @@
       elimina.
     </div>
 
+    <p class="code-label">Asignar la directiva en el grupo de administración, para que la herede lo que aún no existe</p>
+    <pre><code># El ámbito es el grupo, no la suscripción: la suscripción que se cree mañana
+# nace ya conforme, sin que nadie tenga que acordarse de asignarla.
+az policy assignment create \
+  --name exigir-cmk-storage \
+  --scope /providers/Microsoft.Management/managementGroups/mg-produccion \
+  --policy &lt;id-de-la-definicion&gt; \
+  --enforcement-mode Default</code></pre>
+
+    <p class="code-label">Medir antes de bloquear: la misma iniciativa en modo Audit</p>
+    <pre><code># Sobre un estado sin gobernar, Deny el primer día bloquea despliegues
+# legítimos y quema el programa. Audit da el dato sin romper nada.
+az policy assignment create \
+  --name linea-base-seguridad \
+  --scope /providers/Microsoft.Management/managementGroups/mg-produccion \
+  --policy-set-definition &lt;id-de-la-iniciativa&gt; \
+  --enforcement-mode DoNotEnforce
+
+# Cuántos recursos incumplen y cuáles, para corregir por oleadas.
+az policy state summarize \
+  --management-group mg-produccion \
+  --query &quot;results.policyAssignments[].policyDefinitions[?results.nonCompliantResources&gt;\`0\`]&quot; </code></pre>
+
+    <p class="code-label">Una exención con caducidad y responsable, en lugar de una excepción que nadie revisa</p>
+    <pre><code>{
+  &quot;properties&quot;: {
+    &quot;policyAssignmentId&quot;: &quot;/providers/Microsoft.Management/managementGroups/mg-produccion/providers/Microsoft.Authorization/policyAssignments/exigir-cmk-storage&quot;,
+    &quot;exemptionCategory&quot;: &quot;Waiver&quot;,
+    &quot;displayName&quot;: &quot;Legado de facturacion: migracion a CMK planificada&quot;,
+    &quot;expiresOn&quot;: &quot;2027-03-31T23:59:59Z&quot;,
+    &quot;metadata&quot;: {
+      &quot;aprobadoPor&quot;: &quot;comite-de-seguridad&quot;,
+      &quot;motivo&quot;: &quot;El proveedor no soporta CMK hasta la version 8; retirada comprometida para Q1 2027.&quot;
+    }
+  }
+}</code></pre>
+
     <h2 id="devsecops">Un proceso DevSecOps alineado con el CAF (1.3.5)</h2>
     <p>
       La idea de fondo: la seguridad deja de ser una <strong>puerta al final</strong> y se reparte por el
@@ -472,6 +540,21 @@
       que el <strong>pipeline tenga identidad federada</strong> en vez de secretos, y que el fallo de un
       control <strong>rompa la construcción</strong> en vez de generar un aviso que nadie lee.
     </p>
+
+    <p class="code-label">Puertas de despliegue: revisión de otra persona y aprobación en el entorno de producción</p>
+    <pre><code># Separacion de funciones sin frenar la entrega: sigue habiendo despliegue
+# automatico, pero ya no lo decide una sola persona.
+# azure-pipelines.yml
+stages:
+  - stage: Desplegar
+    jobs:
+      - deployment: Produccion
+        environment: produccion   # con una comprobacion de aprobación configurada
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - script: ./deploy.sh</code></pre>
 
     <h2 id="fuentes">Fuentes oficiales</h2>
     <p class="lede">Documentación de Microsoft en la que se apoya este módulo. Si algo no te cuadra o quieres profundizar, empieza por aquí: es la única fuente que manda.</p>

@@ -575,6 +575,78 @@ var QUIZ_DATA = [
     correct: 1,
     explain: "<b>AWS User Notifications</b> es la capa de entrega: se configuran reglas sobre eventos de EventBridge y se eligen destinos —el Notifications Center de la consola, correo, chat o móvil—, con vista consolidada para toda la organización y sin código. Un tema de SNS por cuenta funciona, pero hay que crearlo y mantenerlo en cada una. Lambda es escribir el código que el enunciado descarta. Y Scheduler dispara por horario, no por evento. <a href=\"https://docs.aws.amazon.com/notifications/latest/userguide/what-is-service.html\" target=\"_blank\" rel=\"noopener\">Doc AWS ↗</a>",
   },
+  {
+    tag: "Qué monitorizar antes de cómo",
+    q: "Un equipo va a instrumentar una carga nueva y empieza activando todas las métricas y todos los logs disponibles, para no quedarse corto. ¿Qué corriges del enfoque?",
+    options: [
+      "Nada: en monitorización siempre es preferible recoger de más y filtrar después con consultas",
+      "Que conviene empezar por las métricas y dejar los logs para una segunda fase, por coste",
+      "Que los requisitos salen de lo que la carga necesita demostrar y detectar",
+      "Que hay que activar solo lo que exija la norma de cumplimiento aplicable a esa carga",
+    ],
+    correct: 2,
+    explain: "Analizar la carga para determinar <b>qué</b> monitorizar es un paso de diseño, no una opción. Se parte de las preguntas que hay que poder responder —quién accedió a este dato, se degradó este servicio, cambió alguien esta configuración— y de ahí salen las fuentes, la retención y las alarmas. Activarlo todo produce dos daños: la factura de ingesta crece sin límite y la señal útil queda enterrada bajo eventos que nadie mira. Dejar los logs para después ordena mal las prioridades, y limitarse a la norma cubre la auditoría pero no la operación. <a href=\"https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
+  {
+    tag: "La alarma que nadie atiende",
+    q: "Un equipo tiene 400 alarmas de CloudWatch y admite que ignora la mayoría de las notificaciones. Quieren reducir el ruido sin perder cobertura.",
+    options: [
+      "Revisar cada alarma contra una acción concreta y retirar la que no lleve a ninguna",
+      "Subir los umbrales de todas las alarmas un 20% para que salten con menos frecuencia",
+      "Agrupar todas las notificaciones en un único tema de SNS con resumen diario",
+      "Aumentar el número de periodos de evaluación en todas las alarmas antes de disparar",
+    ],
+    correct: 0,
+    explain: "Una alarma existe para provocar una <b>acción</b>. Si nadie sabe qué hacer cuando salta, no es una alarma: es una métrica, y su sitio es un panel. El criterio para podar es ese, no el umbral: por cada alarma, quién la recibe y qué hace. Subir umbrales a ciegas apaga también las que sí importaban. Un resumen diario convierte una señal de tiempo real en un informe. Y alargar los periodos de evaluación retrasa la detección sin arreglar que la alarma no lleve a ningún sitio. <a href=\"https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
+  {
+    tag: "Umbral fijo o comportamiento",
+    q: "El número de invocaciones de una función varía mucho entre día laborable y fin de semana. Un umbral fijo o dispara falsas alarmas el sábado o no detecta nada el martes. ¿Qué usas?",
+    options: [
+      "Dos alarmas distintas, una para días laborables y otra para fines de semana, con umbrales propios",
+      "Una alarma sobre la media móvil de siete días, que suaviza la diferencia entre semana y fin de semana",
+      "Una alarma compuesta que combine invocaciones con errores, para reducir los falsos positivos",
+      "Detección de anomalías de CloudWatch, que aprende la banda esperada por hora y día y alerta al salirse de ella",
+    ],
+    correct: 3,
+    explain: "La detección de anomalías construye un modelo del comportamiento <b>esperado</b> de la métrica según la hora y el día, y la alarma se define contra esa banda en lugar de contra un número fijo. Es exactamente el caso de una métrica con estacionalidad conocida. Dos alarmas con umbrales propios funcionan hasta que aparece un festivo o cambia el patrón, y hay que mantenerlas. La media móvil oculta precisamente el pico que quieres ver. Y una alarma compuesta reduce falsos positivos combinando señales, pero no resuelve que el umbral base sea inadecuado. <a href=\"https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch-anomaly-detection.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
+  {
+    tag: "Qué logs y con qué retención",
+    q: "Una obligación exige poder reconstruir, hasta cinco años después, quién leyó un objeto concreto de S3. El equipo tiene CloudTrail activado con la configuración por defecto y retención de 90 días.",
+    options: [
+      "Basta con ampliar la retención del trail a cinco años: la lectura del objeto ya se registra por defecto",
+      "Faltan las dos: habilitar data events de S3 y llevar el trail a S3 con cinco años",
+      "Basta con habilitar los logs de acceso al servidor del bucket, que registran cada lectura con detalle suficiente",
+      "Basta con activar Macie sobre el bucket, que inventaría los accesos al contenido sensible",
+    ],
+    correct: 1,
+    explain: "Identificar las fuentes de log a partir del requisito exige mirar dos cosas: <b>qué</b> se registra y <b>cuánto</b> se guarda. CloudTrail registra por defecto solo <b>management events</b> —el plano de control: crear el bucket, cambiar su política—. Quién descargó un objeto concreto es un <b>data event</b>, está desactivado por defecto y hay que habilitarlo. Y la retención de 90 días del historial de eventos no cubre cinco años: hace falta que el trail entregue a S3, con su ciclo de vida. Los logs de acceso al servidor son best-effort y no sirven como registro de auditoría. Y Macie clasifica el dato, no registra los accesos. <a href=\"https://docs.aws.amazon.com/whitepapers/latest/aws-security-incident-response-guide/logging-and-events.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
+  {
+    tag: "Dónde aterrizan los logs",
+    q: "Diseñas la ingesta de logs de una organización con cuarenta cuentas. ¿Dónde entregas los trails y por qué?",
+    options: [
+      "En un bucket por cuenta, para que cada equipo conserve la propiedad de sus propios registros de auditoría",
+      "En el bucket de la cuenta de gestión, que ya concentra la facturación y las políticas de la organización",
+      "En una cuenta de logging dedicada y aislada, para que comprometer producción no dé acceso a los registros",
+      "En un bucket replicado entre las cuarenta cuentas, para que cualquiera pueda consultar el histórico completo",
+    ],
+    correct: 2,
+    explain: "El log es la evidencia de lo que hizo el atacante, así que el diseño asume que el atacante llegará a la cuenta que está atacando: si los registros viven ahí, los borra. Por eso se entregan a una <b>cuenta de logging dedicada</b>, sin cargas de trabajo, con acceso muy restringido y a ser posible con bloqueo de objetos. Un bucket por cuenta pone la evidencia al alcance de quien la generó. La cuenta de gestión es el objetivo de mayor valor de la organización y no debe alojar cargas. Y replicar a las cuarenta multiplica por cuarenta las oportunidades de borrado. <a href=\"https://docs.aws.amazon.com/AmazonS3/latest/userguide/logging-with-S3.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
+  {
+    tag: "Una bandeja para todas las cuentas",
+    q: "Un equipo de plataforma quiere ver en un solo sitio los avisos operativos y de seguridad que AWS emite para las cuarenta cuentas de la organización, sin montar una integración por servicio.",
+    options: [
+      "AWS User Notifications a nivel de organización, que centraliza los avisos de todas",
+      "Una regla de EventBridge por cuenta que reenvíe todos los eventos a un tema de SNS común",
+      "Suscribirse manualmente a los boletines de cada servicio desde la consola de cada una de las cuentas",
+      "Un panel de CloudWatch en la cuenta de gestión con widgets de cada servicio de las cuarenta cuentas",
+    ],
+    correct: 0,
+    explain: "<b>User Notifications</b> es el servicio pensado para esto: agrega los avisos que AWS emite —eventos de estado, hallazgos, recordatorios de mantenimiento— en una bandeja unificada, con configuraciones a nivel de organización para no repetirlas cuenta por cuenta, y los reenvía a los canales que elijas. Cuarenta reglas de EventBridge hacen algo parecido a costa de construirlo y mantenerlo. Suscribirse a mano por consola no escala y se rompe con cada cuenta nueva. Y un panel de CloudWatch muestra métricas, no avisos. <a href=\"https://docs.aws.amazon.com/notifications/latest/userguide/what-is-service.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
 ];
 
 // Registrado para el simulacro de examen, que carga los seis bancos a la vez.

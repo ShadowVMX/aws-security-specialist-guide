@@ -587,6 +587,42 @@ var QUIZ_DATA = [
     correct: 1,
     explain: "IoT policies support <b>policy variables</b> such as <code>${iot:Connection.Thing.ThingName}</code> or <code>${iot:ClientId}</code>, so a single policy covers the whole fleet while confining each device to its own topic. A security group cannot tell devices apart inside a certificate-authenticated MQTT connection. A shared role with topic permission lets anyone publish as anyone. And filtering in a rule is detection after the fact, not authorization. <a href=\"https://docs.aws.amazon.com/iot/latest/developerguide/iot-policies.html\" target=\"_blank\" rel=\"noopener\">AWS docs ↗</a>",
   },
+  {
+    tag: "One identity per device",
+    q: "A manufacturer is about to deploy 50,000 sensors publishing to AWS IoT Core. They propose burning the same certificate into the whole production run, to simplify manufacturing.",
+    options: [
+      "Acceptable if the certificate is rotated with a firmware update once a year",
+      "One certificate per device: with a shared one no single device can be revoked",
+      "Acceptable if an IoT policy is also applied limiting the topics it may publish to",
+      "Acceptable as long as the certificate has a short expiry, under ninety days",
+    ],
+    correct: 1,
+    explain: "The device is physically in anybody's hands, so you must assume somebody will extract its credential. With a certificate <b>per device</b>, that compromise is resolved by revoking one and only one. With a shared certificate there is nothing to revoke without taking down the entire fleet, which is why IoT Core provisioning rests on unique identity, provisioned at the factory or through the provisioning service. An IoT policy bounds what the device may do, which is necessary but different; and rotating by firmware assumes an update capability many embedded devices lack. <a href=\"https://docs.aws.amazon.com/iot/latest/developerguide/iot-security-identity.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
+  {
+    tag: "Where code analysis fits",
+    q: "A team wants to detect injection patterns, embedded secrets and incorrect use of encryption APIs in their own code, before deploying. Which service applies?",
+    options: [
+      "Amazon Inspector, which analyses known vulnerabilities in the application's code",
+      "Amazon Macie, which identifies sensitive data embedded in the team's repositories",
+      "AWS Config with custom rules evaluating the contents of each commit",
+      "Amazon CodeGuru Security, which performs static analysis and flags those patterns",
+    ],
+    correct: 3,
+    explain: "<b>CodeGuru Security</b> is AWS's static analysis: it walks your own code looking for security defects — injection, embedded secrets, insecure cryptography use, resource leaks — and returns the finding with its location and a suggestion. Amazon Inspector analyses known vulnerabilities in dependencies, images and functions, which is third-party code, not yours. Macie classifies data in S3. And AWS Config evaluates the configuration of deployed resources, not the contents of a repository. <a href=\"https://docs.aws.amazon.com/codeguru/latest/security-ug/what-is-codeguru-security.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
+  {
+    tag: "The assistant and your own code",
+    q: "Security asks what controls must be settled before enabling Amazon Q Developer for the development teams.",
+    options: [
+      "Decide the subscription tier and review suggestions like any third-party code",
+      "None: the assistant only suggests code and does not reach organizational data",
+      "Restricting it to private repositories through an IAM policy on the service is enough",
+      "Enabling CloudTrail logging of interactions and reviewing it monthly is enough",
+    ],
+    correct: 0,
+    explain: "A coding assistant raises two governance questions. The first is about <b>data</b>: what is sent to the service and whether it is used to improve it, which depends on the subscription tier and is configured, not assumed. The second is about <b>provenance</b>: suggested code enters your codebase like any external contribution, so it goes through the same review, the same analysis and the same licence checks. Saying it reaches nothing is false, restricting by IAM answers neither question, and auditing afterwards arrives late. <a href=\"https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/security.html\" target=\"_blank\" rel=\"noopener\">AWS Docs ↗</a>",
+  },
 ];
 
 // Registrado para el simulacro de examen, que carga los seis bancos a la vez.
