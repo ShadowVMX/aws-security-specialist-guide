@@ -65,9 +65,9 @@
 
   <main class="content">
 
-    <h2 id="marcos">The four frameworks, kept apart</h2>
+    <h2 id="marcos">The five frameworks, kept apart</h2>
     <p>
-      This domain names four Microsoft frameworks and the exam constantly sets them against each other.
+      This domain names five Microsoft frameworks and the exam constantly sets them against each other.
       Knowing which question each one answers settles half the questions on its own.
     </p>
     <table role="table">
@@ -76,7 +76,23 @@
       <tr><td><strong>MCSB</strong><br>Microsoft Cloud Security Benchmark</td><td>The concrete, measurable <em>controls</em>, mapped to CIS and NIST, evaluated automatically by Defender for Cloud.</td><td>"Is this configured properly?" "Give me a baseline."</td></tr>
       <tr><td><strong>CAF</strong><br>Cloud Adoption Framework</td><td>The adoption <em>journey</em>: strategy, plan, ready, adopt, govern and manage, with security woven in.</td><td>"How do we organise adoption?" "How do we govern this at scale?"</td></tr>
       <tr><td><strong>WAF</strong><br>Well-Architected Framework</td><td>The <em>trade-offs</em> for one workload between security, reliability, cost, operations and performance.</td><td>"Review this workload's design." "What are we sacrificing?"</td></tr>
+      <tr><td><strong>SAF</strong><br>Security Adoption Framework</td><td>The security transformation <em>programme</em>: where to start, in what order, who does what and how progress is measured, split across disciplines — access, operations, asset protection, governance and innovation.</td><td>"How do we take this from strategy to a plan with owners and dates?"</td></tr>
     </table>
+    <p>
+      The confusion to avoid with the last one: the <strong>SAF</strong> does not compete with the CAF, it
+      complements it. The CAF orders the whole <em>cloud adoption</em>; the SAF orders <strong>security
+      modernisation</strong> as a programme in its own right, aimed at moving the organisation from where it
+      is to a Zero Trust model. When the stem talks about a <em>security programme</em> with phases,
+      executive sponsorship and owners per discipline, it is SAF.
+    </p>
+    <div class="callout warn">
+      <b>Antipatterns: the exam asks about these by name too</b>
+      Microsoft publishes not only best practices but what it sees fail. The ones that come up most:
+      security as a <em>gate at the end</em> rather than spread across the lifecycle; trusting the internal
+      network as a safe zone; treating security as a project that ends rather than a programme; buying
+      tools without covering capabilities — the gap the MCRA exposes; and chasing a score instead of
+      reducing risk. Recognising the antipattern is often what eliminates two options at once.
+    </div>
     <div class="callout exam">
       <b>The distinction that comes up most</b>
       <strong>CAF</strong> looks at the <em>organisation</em> and its cloud adoption; <strong>Well-Architected</strong>

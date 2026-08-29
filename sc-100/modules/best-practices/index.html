@@ -65,9 +65,9 @@
 
   <main class="content">
 
-    <h2 id="marcos">Los cuatro marcos, sin confundirlos</h2>
+    <h2 id="marcos">Los cinco marcos, sin confundirlos</h2>
     <p>
-      Este dominio nombra cuatro marcos de Microsoft y el examen los enfrenta constantemente. Saber a qué
+      Este dominio nombra cinco marcos de Microsoft y el examen los enfrenta constantemente. Saber a qué
       pregunta responde cada uno resuelve la mitad de las preguntas por sí solo.
     </p>
     <table role="table">
@@ -76,7 +76,23 @@
       <tr><td><strong>MCSB</strong><br>Microsoft Cloud Security Benchmark</td><td>Los <em>controles</em> concretos y medibles, mapeados a CIS y NIST, evaluados solos por Defender for Cloud.</td><td>«¿Está bien configurado esto?» «Dame una línea base.»</td></tr>
       <tr><td><strong>CAF</strong><br>Cloud Adoption Framework</td><td>El <em>recorrido</em> de adopción: estrategia, plan, preparación, adopción, gobierno y gestión, con la seguridad integrada.</td><td>«¿Cómo organizamos la adopción?» «¿Cómo gobernamos esto a escala?»</td></tr>
       <tr><td><strong>WAF</strong><br>Well-Architected Framework</td><td>Los <em>compromisos</em> de una carga concreta entre seguridad, fiabilidad, coste, operación y rendimiento.</td><td>«Revisa el diseño de esta carga.» «¿Qué estamos sacrificando?»</td></tr>
+      <tr><td><strong>SAF</strong><br>Security Adoption Framework</td><td>El <em>programa</em> de transformación de seguridad: por dónde se empieza, en qué orden, quién hace qué y cómo se mide el avance, repartido en disciplinas —acceso, operaciones, protección de activos, gobierno e innovación—.</td><td>«¿Cómo llevamos esto de la estrategia a un plan con dueños y plazos?»</td></tr>
     </table>
+    <p>
+      La confusión que hay que evitar con el último: el <strong>SAF</strong> no compite con el CAF, lo
+      complementa. El CAF ordena la <em>adopción de la nube</em> entera; el SAF ordena la
+      <strong>modernización de la seguridad</strong> como programa propio, con la vista puesta en llevar a
+      la organización desde donde está hasta un modelo Zero Trust. Cuando el enunciado habla de un
+      <em>programa de seguridad</em> con fases, patrocinio de dirección y responsables por disciplina, es SAF.
+    </p>
+    <div class="callout warn">
+      <b>Antipatrones: el examen también los pregunta por su nombre</b>
+      Microsoft no solo publica buenas prácticas, publica lo que ve fallar. Los que más aparecen:
+      seguridad como <em>puerta al final</em> en vez de repartida por el ciclo; confiar en la red interna
+      como zona segura; tratar la seguridad como un proyecto que termina en vez de un programa; comprar
+      herramientas sin cubrir capacidades —el hueco que enseña el MCRA—; y perseguir una puntuación en
+      lugar de reducir riesgo. Reconocer el antipatrón suele ser lo que descarta dos opciones de golpe.
+    </div>
     <div class="callout exam">
       <b>La distinción que más cae</b>
       <strong>CAF</strong> mira la <em>organización</em> y su adopción de la nube; <strong>Well-Architected</strong>

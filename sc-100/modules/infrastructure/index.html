@@ -445,6 +445,12 @@
         servicio.</li>
       <li><strong>Borde</strong> — WAF y DDoS delante de lo publicado.</li>
       <li><strong>Sin salto directo</strong> — nada de IP pública ni RDP publicado: Bastion y just-in-time.</li>
+      <li><strong>Monitorización</strong> — la cuarta técnica, junto a segmentar, filtrar y gobernar la
+        postura, y la que más se olvida: <strong>registros de flujo de red virtual</strong> para saber quién
+        habla con quién, <strong>Network Watcher</strong> con su <em>verificación de flujo IP</em> y el
+        <em>diagnóstico de siguiente salto</em> para entender por qué una regla bloquea, y el
+        <strong>monitor de conexión</strong> para vigilar de forma continua que un camino crítico sigue
+        abierto. Sin esto, un diseño de red no se puede ni depurar ni auditar.</li>
     </ul>
 
     <h2 id="internet-access">Entra Internet Access como pasarela web segura (3.4.2)</h2>

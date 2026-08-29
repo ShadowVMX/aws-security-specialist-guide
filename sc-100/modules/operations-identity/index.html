@@ -68,6 +68,7 @@
     <a href="#purview">Purview para cumplimiento</a>
     <a href="#azure-policy">Azure Policy</a>
     <a href="#defender-compliance">Defender for Cloud: normativa</a>
+    <a href="#ia-responsable">Gobierno y cumplimiento de la IA</a>
     <a href="#trampas">Trampas típicas</a>
     <a href="#temario">Temario oficial</a>
     <h4>Práctica</h4>
@@ -283,7 +284,7 @@
     <table role="table">
       <tr><th>Pieza</th><th>Qué problema resuelve</th></tr>
       <tr><td><strong>Continuous access evaluation (CAE)</strong></td><td>Que un token siga siendo válido después de que el usuario haya sido deshabilitado o su riesgo haya subido. Con CAE la revocación se aplica casi al momento, sin esperar a que caduque.</td></tr>
-      <tr><td><strong>Riesgo de usuario / de inicio de sesión</strong></td><td>Distinguir «esta cuenta parece comprometida» de «este inicio de sesión concreto es raro». El primero pide cambio de contraseña seguro; el segundo, MFA.</td></tr>
+      <tr><td><strong>Riesgo de usuario / de inicio de sesión</strong><br><span class="skill-id">Entra ID Protection</span></td><td>Quien calcula ese riesgo es <strong>Microsoft Entra ID Protection</strong>, con sus detecciones —credenciales filtradas, viaje imposible, dirección anónima, actividad de un actor de amenazas—. Distinguir «esta cuenta parece comprometida» de «este inicio de sesión concreto es raro». El primero pide cambio de contraseña seguro; el segundo, MFA.</td></tr>
       <tr><td><strong>Protected actions</strong></td><td>Exigir una autenticación reciente y fuerte para operaciones concretas de alto impacto —por ejemplo, modificar las propias políticas de acceso condicional— aunque la sesión ya estuviera abierta.</td></tr>
       <tr><td><strong>Fuerza de autenticación</strong></td><td>Exigir un método concreto, no «MFA» a secas: para los administradores, resistente a phishing (FIDO2, Windows Hello for Business, certificado).</td></tr>
       <tr><td><strong>Modo solo informe y What If</strong></td><td>Publicar una política sin aplicarla: se evalúa en cada inicio de sesión real y se registra el resultado, de modo que se ve a quién bloquearía antes de bloquear a nadie. <em>What If</em> hace lo mismo para un caso concreto, incluso antes de publicarla.</td></tr>
@@ -429,7 +430,26 @@
       <li><strong>Gestión del ciclo de vida y retención</strong> — conservar lo que la norma obliga y borrar lo que obliga a borrar.</li>
       <li><strong>Gestión de riesgo interno y barreras de información</strong> — el ángulo de amenaza interna y separación de funciones.</li>
       <li><strong>Purview Audit</strong> — la evidencia de quién hizo qué.</li>
+      <li><strong>Compliance Manager</strong> — la pieza que engarza todo lo anterior con la norma.</li>
     </ul>
+    <p>
+      <strong>Purview Compliance Manager</strong> merece párrafo propio porque es donde vive la gestión del
+      cumplimiento como programa. Trae <b>plantillas de evaluación</b> por normativa —RGPD, ISO 27001, NIST,
+      HIPAA y, ya en el temario, las de <b>gobierno de IA</b>—, descompone cada norma en <b>acciones de
+      mejora</b> con responsable y estado, reaprovecha los <b>controles compartidos</b> entre normas, y
+      calcula una <b>puntuación de cumplimiento</b> ponderada por el riesgo de cada acción. Cubre Microsoft
+      365 y también recursos de otras nubes.
+    </p>
+    <div class="callout exam">
+      <b>Compliance Manager frente al panel de Defender for Cloud</b>
+      Los dos hablan de cumplimiento y el examen los cruza. <strong>Compliance Manager</strong> es de
+      <em>Purview</em> y gestiona el programa: incluye las acciones <em>no técnicas</em> —de política, de
+      proceso, de formación— que ninguna herramienta de configuración puede evaluar. El <strong>panel de
+      cumplimiento normativo</strong> de Defender for Cloud es de <em>Azure</em> y evidencia el estado
+      técnico real de los recursos contra los controles del estándar. «Demostrar cómo están configurados
+      los recursos» es Defender for Cloud; «gestionar y evidenciar el programa de cumplimiento entero» es
+      Compliance Manager. Los escenarios grandes llevan los dos.
+    </div>
 
     <h2 id="azure-policy">Azure Policy para seguridad y cumplimiento (2.4.3)</h2>
     <table role="table">
@@ -454,6 +474,29 @@
       la herramienta de la que sale la evidencia continua; el <strong>Secure Score</strong>, en cambio, es
       una métrica de mejora relativa, no un informe de cumplimiento.
     </p>
+
+    <h2 id="ia-responsable">Gobierno, riesgo y cumplimiento de la IA (2.4.1 / 2.4.2)</h2>
+    <p>
+      El temario mete la IA dentro del cumplimiento, no solo dentro de la seguridad técnica, y conviene
+      tenerlo separado porque son preguntas distintas. Además de proteger el servicio y el dato, hay que
+      <strong>gobernar</strong> lo que la organización hace con la IA:
+    </p>
+    <table role="table">
+      <tr><th>Obligación</th><th>Cómo se cubre</th></tr>
+      <tr><td>Saber qué sistemas de IA existen y de qué riesgo son</td><td>Un <strong>inventario de casos de uso</strong> con su clasificación de riesgo, y el descubrimiento de la IA no aprobada con Defender for Cloud Apps.</td></tr>
+      <tr><td>Demostrar cumplimiento frente a una norma de IA</td><td>Las <strong>plantillas de evaluación de gobierno de IA</strong> de <strong>Purview Compliance Manager</strong>, con sus acciones de mejora y responsables.</td></tr>
+      <tr><td>Que el dato que entra y sale quede gobernado</td><td>Clasificación y etiquetas sobre el corpus, y <strong>DLP</strong> sobre el canal del <em>prompt</em>.</td></tr>
+      <tr><td>Poder auditar e investigar el uso</td><td><strong>Purview Audit</strong>, con retención y eDiscovery sobre las interacciones.</td></tr>
+      <tr><td>Detectar el uso indebido por parte de personas</td><td><strong>Gestión de riesgo interno</strong>, que tiene indicadores propios de uso de IA.</td></tr>
+      <tr><td>Que la salida no cause daño</td><td><strong>Filtros de contenido</strong> y revisión humana donde el impacto lo exija.</td></tr>
+    </table>
+    <div class="callout exam">
+      <b>Seguridad de la IA y gobierno de la IA no son lo mismo</b>
+      Proteger el servicio —identidad, red, claves— es seguridad. Responder «¿qué sistemas de IA tenemos,
+      con qué riesgo, quién responde de cada uno y cómo lo demostramos ante un auditor?» es
+      <strong>gobierno</strong>, y ahí la respuesta vive en Purview, no en Defender. Un enunciado que
+      menciona una norma de IA y pide evidencia periódica está pidiendo Compliance Manager.
+    </div>
 
     <h2 id="trampas">Trampas típicas de este dominio</h2>
     <div class="callout warn">
