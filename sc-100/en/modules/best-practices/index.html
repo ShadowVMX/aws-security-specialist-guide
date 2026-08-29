@@ -1,0 +1,375 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="SC-100 domain 1: ransomware resilience, BCDR, MCRA and MCSB, Zero Trust, the Cloud Adoption Framework, landing zones and secure AI adoption. Decision criteria, exam traps and scenario questions.">
+<link rel="icon" href="../../../../assets/img/favicon.svg" type="image/svg+xml">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Best Practices &amp; Priorities — Microsoft Cybersecurity Architect (SC-100)">
+<meta property="og:description" content="SC-100 domain 1: ransomware resilience, BCDR, MCRA and MCSB, Zero Trust, the Cloud Adoption Framework, landing zones and secure AI adoption.">
+<meta property="og:url" content="https://shadowvmx.github.io/sc-100/en/modules/best-practices/">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary">
+<title>Best Practices &amp; Priorities — Microsoft Cybersecurity Architect (SC-100)</title>
+<link rel="stylesheet" href="../../../../assets/css/style.css?v=9">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand"><span class="dot">●</span> Microsoft SC-100</div>
+    <nav class="topnav">
+      <a href="../../index.html">← Domains</a>
+      <span class="lang-switch"><a href="../../../modules/best-practices/index.html">ES</a><span class="current">EN</span></span>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero" style="padding-top:40px;">
+    <span class="badge">SC-100 · Domain 1 · 20-25% of the exam</span>
+    <h1>Designing solutions that align with best practices and priorities</h1>
+    <p>The least technical domain and the one most people get wrong, precisely because its questions are not answered by knowing a product. What is asked here is <strong>strategy</strong>: what gets protected first, which framework applies, how a business recovers, and how AI gets adopted without opening a new front. The wrong options are usually technically impeccable and strategically useless.</p>
+    <p class="module-reviewed">Written against the official skills outline, with the skills measured as of 28 July 2026.</p>
+  </section>
+</div>
+
+<div class="wrap module-layout">
+
+  <aside class="sidebar">
+    <h4>How to read this domain</h4>
+    <a href="#marcos">The four frameworks, kept apart</a>
+    <h4>1.1 Resiliency</h4>
+    <a href="#resiliencia">From business goal to priority</a>
+    <a href="#bcdr">BCDR and secure backups</a>
+    <a href="#ransomware">Ransomware mitigation</a>
+    <a href="#parches">Security updates</a>
+    <h4>1.2 MCRA and MCSB</h4>
+    <a href="#mcra">Reference architectures</a>
+    <a href="#amenazas">Insider, external and supply chain</a>
+    <a href="#ia-mcsb">AI aligned with the MCSB</a>
+    <a href="#zero-trust">The Zero Trust adoption framework</a>
+    <h4>1.3 CAF and Well-Architected</h4>
+    <a href="#adopcion-ia">Secure AI adoption</a>
+    <a href="#caf-waf">CAF and Well-Architected</a>
+    <a href="#recomendar">Recommending on those frameworks</a>
+    <a href="#landing-zones">Azure landing zones</a>
+    <a href="#devsecops">DevSecOps per the CAF</a>
+    <a href="#trampas">Common traps</a>
+    <a href="#temario">Official syllabus</a>
+    <h4>Practice</h4>
+    <a href="#quiz">Quiz (26 questions)</a>
+  </aside>
+
+  <main class="content">
+
+    <h2 id="marcos">The four frameworks, kept apart</h2>
+    <p>
+      This domain names four Microsoft frameworks and the exam constantly sets them against each other.
+      Knowing which question each one answers settles half the questions on its own.
+    </p>
+    <table role="table">
+      <tr><th>Framework</th><th>What it gives you</th><th>When it is the answer</th></tr>
+      <tr><td><strong>MCRA</strong><br>Cybersecurity reference architectures</td><td>The <em>map</em>: which security capabilities exist, how they fit together and which Microsoft product covers each.</td><td>"What are we not covering?" "How do these pieces fit?"</td></tr>
+      <tr><td><strong>MCSB</strong><br>Microsoft Cloud Security Benchmark</td><td>The concrete, measurable <em>controls</em>, mapped to CIS and NIST, evaluated automatically by Defender for Cloud.</td><td>"Is this configured properly?" "Give me a baseline."</td></tr>
+      <tr><td><strong>CAF</strong><br>Cloud Adoption Framework</td><td>The adoption <em>journey</em>: strategy, plan, ready, adopt, govern and manage, with security woven in.</td><td>"How do we organise adoption?" "How do we govern this at scale?"</td></tr>
+      <tr><td><strong>WAF</strong><br>Well-Architected Framework</td><td>The <em>trade-offs</em> for one workload between security, reliability, cost, operations and performance.</td><td>"Review this workload's design." "What are we sacrificing?"</td></tr>
+    </table>
+    <div class="callout exam">
+      <b>The distinction that comes up most</b>
+      <strong>CAF</strong> looks at the <em>organisation</em> and its cloud adoption; <strong>Well-Architected</strong>
+      looks at one specific <em>workload</em>. A stem about management groups, subscriptions and governance is
+      CAF; one asking whether an application is well designed is Well-Architected.
+    </div>
+
+    <h2 id="resiliencia">From business goal to security priority (1.1.1)</h2>
+    <p>
+      The exam's first task also sets its tone: the security strategy does not come from the threat
+      catalogue, it comes from <strong>what the business needs to keep running</strong>. The path it expects:
+    </p>
+    <ol>
+      <li>Identify the <strong>critical processes</strong> and the assets they depend on.</li>
+      <li>Agree with the business what it is prepared to lose: <strong>RPO</strong> — how much data — and
+        <strong>RTO</strong> — how much time.</li>
+      <li>Identify the threats putting <em>those</em> assets at risk, not every threat that exists.</li>
+      <li>Prioritise controls by <strong>business impact</strong>, not by technical severity.</li>
+      <li>Measure and revisit, because both the business and the threats change.</li>
+    </ol>
+    <div class="callout warn">
+      <b>RPO and RTO are not security's to set</b>
+      The <strong>business</strong> sets them, and the technical design follows: a daily backup does not meet
+      a one-hour RPO, however well it is run. A stem that hands you an RPO or an RTO is handing you the
+      constraint that eliminates half the options.
+    </div>
+
+    <h2 id="bcdr">Business continuity and disaster recovery (1.1.2)</h2>
+    <table role="table">
+      <tr><th>Need</th><th>Piece</th></tr>
+      <tr><td>Backing up machines, databases and files, in Azure, on-premises and other clouds</td><td><strong>Azure Backup</strong>, with the relevant agent for what sits outside</td></tr>
+      <tr><td>Continuous replication to stand back up in another region</td><td><strong>Azure Site Recovery</strong>, with a tested recovery plan</td></tr>
+      <tr><td>Stopping an attacker with permissions from deleting the backups</td><td><strong>Immutable backups</strong>, <strong>soft delete</strong> and <strong>MFA-protected deletion</strong> on the vault</td></tr>
+      <tr><td>Whoever administers the workload not administering its backup</td><td><strong>Separation of duties</strong> between operations and backup</td></tr>
+      <tr><td>Knowing it works</td><td>Periodic <strong>test restores</strong> and drills, not just green backups</td></tr>
+    </table>
+    <div class="callout exam">
+      <b>A backup that can be deleted is not a backup</b>
+      This is the point the exam chases in any ransomware scenario: an attacker who gets administrator
+      credentials goes for the backups <em>first</em>. Without immutability, soft delete and separated
+      credentials, the recovery plan is paper.
+    </div>
+
+    <h2 id="ransomware">Ransomware mitigation (1.1.3)</h2>
+    <p>
+      Microsoft orders this defence in three phases and the exam expects you to know <strong>which order</strong>
+      they come in, because the order is the answer:
+    </p>
+    <table role="table">
+      <tr><th>Phase</th><th>Goal</th><th>Pieces</th></tr>
+      <tr><td><strong>1. Prepare to recover</strong></td><td>So paying is never the only way out.</td><td>Immutable, isolated backups, tested restore, AD forest recovery plan.</td></tr>
+      <tr><td><strong>2. Limit the damage</strong></td><td>So one compromised machine does not open the organisation.</td><td>Privileged access — PIM, dedicated workstations, LAPS, tiered model — segmentation, least privilege.</td></tr>
+      <tr><td><strong>3. Make entry harder</strong></td><td>Close the usual doors.</td><td>Phishing-resistant MFA, patching, email protection, attack surface reduction, EDR.</td></tr>
+    </table>
+    <div class="callout warn">
+      <b>The order is counter-intuitive, which is why they ask</b>
+      The temptation is to start with prevention. Microsoft puts <strong>recovery</strong> first because it is
+      the only thing that guarantees the business survives even when prevention fails, and <strong>privileged
+      access</strong> second because that is what turns an incident into a catastrophe. If a stem asks for
+      "the most urgent" against ransomware, look there before the antivirus.
+    </div>
+
+    <h2 id="parches">Evaluating security update solutions (1.1.4)</h2>
+    <table role="table">
+      <tr><th>What needs updating</th><th>With what</th></tr>
+      <tr><td>Servers in Azure, on Arc or in another cloud</td><td><strong>Azure Update Manager</strong>, with periodic assessment and maintenance windows</td></tr>
+      <tr><td>Windows clients and managed applications</td><td><strong>Intune</strong>, with update policies and deployment rings</td></tr>
+      <tr><td>Knowing what is missing and how risky it is</td><td><strong>Defender Vulnerability Management</strong>, prioritising by exploitability and exposure</td></tr>
+      <tr><td>What cannot be patched</td><td>Documented compensating mitigation: isolation, virtual patching, planned retirement</td></tr>
+    </table>
+    <p>
+      The design the exam expects is not "patch everything immediately" but <strong>deployment rings</strong> —
+      a pilot group, then production in phases — windows agreed with the business, and a documented fast lane
+      for vulnerabilities being actively exploited.
+    </p>
+
+    <h2 id="mcra">Designing with the reference architectures (1.2.1)</h2>
+    <p>
+      The <strong>MCRA</strong> is the capability map: identity, security operations, endpoint protection,
+      infrastructure, application, data, OT and AI security, with what Microsoft offers in each box and how it
+      connects to the rest. It gets used two ways in the exam: to <strong>find the gap</strong> — which
+      capability has nobody assigned to it — and to <strong>justify a choice</strong> — why this piece and not
+      another, given what already exists.
+    </p>
+
+    <h2 id="amenazas">Insider, external and supply chain threats (1.2.2)</h2>
+    <table role="table">
+      <tr><th>Type</th><th>What characterises it</th><th>Controls</th></tr>
+      <tr><td><strong>External</strong></td><td>Somebody without legitimate access tries to get it.</td><td>Strong identity, reduced surface, detection and response.</td></tr>
+      <tr><td><strong>Insider</strong></td><td>The access is legitimate; the use is not.</td><td><strong>Insider risk management</strong>, DLP, least privilege, separation of duties, information barriers.</td></tr>
+      <tr><td><strong>Supply chain</strong></td><td>It comes in through something you already trust: a dependency, a vendor, a tool.</td><td>Composition analysis, artefact provenance and signing, third-party access governance, vendor assessment.</td></tr>
+    </table>
+    <div class="callout exam">
+      <b>Why the insider threat is different</b>
+      No access control stops it, because the access <em>is correct</em>. What addresses it is looking at
+      <strong>behaviour</strong> rather than permissions, and that is where insider risk management comes in.
+      An option answering "an employee leaving with the customer book" with "strengthen MFA" is answering a
+      different threat.
+    </div>
+
+    <h2 id="ia-mcsb">AI solutions aligned with the MCSB (1.2.3)</h2>
+    <p>
+      New content. The idea being tested is that an AI workload is <strong>not a separate category</strong>:
+      the same benchmark controls apply as to any other — identity, network, data protection, logging,
+      posture, response — plus its own on top. The typical design mistake is treating it as an experiment
+      outside normal governance.
+    </p>
+    <table role="table">
+      <tr><th>MCSB control</th><th>How it applies to the AI workload</th></tr>
+      <tr><td>Identity and access</td><td>Entra ID and managed identities; no local keys; RBAC per service.</td></tr>
+      <tr><td>Network security</td><td>Private endpoint and public access disabled.</td></tr>
+      <tr><td>Data protection</td><td>Corpus classification, customer-managed keys, control over what gets logged.</td></tr>
+      <tr><td>Logging and detection</td><td>Traces into the SIEM and the Defender for Cloud plan for AI services.</td></tr>
+      <tr><td>Posture and vulnerability management</td><td>The workload enters Defender for Cloud like any other.</td></tr>
+      <tr><td>AI-specific</td><td>Content filters and shields against prompt injection.</td></tr>
+    </table>
+
+    <h2 id="zero-trust">The Zero Trust adoption framework (1.2.4)</h2>
+    <p>
+      Three principles, six pillars, and an exam that asks about both. The <strong>principles</strong> are
+      what you validate a design against:
+    </p>
+    <ul>
+      <li><strong>Verify explicitly</strong> — every request is evaluated with all available signals; a prior
+        authentication is not trusted.</li>
+      <li><strong>Use least privilege access</strong> — just-in-time, just-enough-access, adaptive protection.</li>
+      <li><strong>Assume breach</strong> — segment, encrypt, verify end to end and design detection assuming
+        somebody is already inside.</li>
+    </ul>
+    <p>
+      The <strong>pillars</strong> are where it gets rolled out: identities, endpoints, applications, data,
+      infrastructure and networks, all governed by visibility, automation and orchestration.
+    </p>
+    <div class="callout warn">
+      <b>Zero Trust is neither a product nor a project that ends</b>
+      If an option proposes "implementing Zero Trust" by buying a tool, it is the wrong one. It is a
+      <em>model</em> adopted pillar by pillar, and the adoption framework exists precisely to give the order
+      and the milestones.
+    </div>
+
+    <h2 id="adopcion-ia">A secure AI adoption strategy (1.3.1)</h2>
+    <p>
+      The other new point in the syllabus, and the one closest to a real customer conversation. The strategy
+      is not about picking a model, it is about <strong>setting the boundaries before the organisation starts
+      on its own</strong>:
+    </p>
+    <ul>
+      <li><strong>Governance and use cases</strong> — who approves what AI may be used for, with which data
+        and with what level of human review.</li>
+      <li><strong>Prepare the data first</strong> — classify, label and fix oversharing before connecting
+        anything, because an assistant spreads whatever was already shared wrongly.</li>
+      <li><strong>Identity for what acts</strong> — agents get their own identity, with an owner, least
+        privilege and governance.</li>
+      <li><strong>Discover unapproved AI</strong> — what teams already use on their own is discovered with
+        Defender for Cloud Apps and then sanctioned or replaced.</li>
+      <li><strong>The risks specific to AI</strong> — prompt injection, unreliable output, leakage in the
+        prompt: addressed with filters, human review where impact demands it, and DLP over that channel.</li>
+    </ul>
+    <div class="callout exam">
+      <b>The order the exam expects</b>
+      Governance and data <em>before</em> deployment. A stem asking "what do we do before giving Copilot to
+      the whole organisation" is answered with classifying and fixing permissions, not with configuring the
+      assistant or training the users.
+    </div>
+
+    <h2 id="caf-waf">CAF and Well-Architected: what each one looks at (1.3.2)</h2>
+    <table role="table">
+      <tr><th></th><th>Cloud Adoption Framework</th><th>Well-Architected Framework</th></tr>
+      <tr><td>Scope</td><td>The <strong>organisation</strong> and its cloud journey.</td><td>One specific <strong>workload</strong>.</td></tr>
+      <tr><td>Questions it answers</td><td>How do we organise subscriptions and management groups? How do we govern at scale? Who is responsible for what?</td><td>Is this design secure, reliable, efficient and sustainable in cost and operations?</td></tr>
+      <tr><td>Typical output</td><td>Landing zones, a governance model, an adoption plan.</td><td>A review with findings and explicit trade-offs.</td></tr>
+    </table>
+    <p>
+      The piece the exam wants you to name from Well-Architected is the <strong>trade-off</strong>: hardening
+      security almost always costs money, performance or operational convenience, and the mature design is the
+      one that <em>says so</em> instead of pretending otherwise.
+    </p>
+
+    <h2 id="recomendar">Recommending solutions on those frameworks (1.3.3)</h2>
+    <p>
+      Here the exam gets concrete: given a gap, what does the framework recommend. The recurring pairings:
+    </p>
+    <table role="table">
+      <tr><th>Gap</th><th>Recommendation</th></tr>
+      <tr><td>Every team deploys its own way, with no guardrails</td><td>Management groups with <strong>Azure Policy</strong> initiatives, and landing zones</td></tr>
+      <tr><td>Nobody knows who is answerable for each workload's security</td><td>The CAF responsibility model: an owner per workload, defined security functions</td></tr>
+      <tr><td>Security arrives at the end of every project</td><td><strong>DevSecOps</strong>: controls across the lifecycle, not a gate at the end</td></tr>
+      <tr><td>The cost of security is not justified to management</td><td>Tie controls to prioritised business risks, with progress metrics</td></tr>
+    </table>
+
+    <h2 id="landing-zones">Azure landing zones (1.3.4)</h2>
+    <p>
+      A landing zone is an environment <strong>prepared in advance</strong> so that whatever gets deployed
+      inside is born compliant, rather than audited afterwards. What it brings out of the box, and what the
+      exam wants you to recognise:
+    </p>
+    <ul>
+      <li>A <strong>management group hierarchy</strong> with the policies assigned at the top, so they reach
+        future subscriptions.</li>
+      <li><strong>Separate platform subscriptions</strong> — identity, management, connectivity — from the
+        workload ones.</li>
+      <li><strong>Networking</strong> with hub and spoke, hybrid connectivity and controlled egress.</li>
+      <li><strong>Identity and RBAC</strong> defined, with privileged access from the start.</li>
+      <li><strong>Centralised logging</strong> and Defender plans enabled by policy.</li>
+      <li><strong>Everything as code</strong>, so creating a new one is repeatable.</li>
+    </ul>
+    <div class="callout exam">
+      <b>Why the scope is the management group</b>
+      It is the answer to "so it applies to subscriptions that do not exist yet". Assigning per subscription
+      means remembering every time somebody creates one, and that forgetting is exactly what the landing zone
+      removes.
+    </div>
+
+    <h2 id="devsecops">A DevSecOps process aligned with the CAF (1.3.5)</h2>
+    <p>
+      The underlying idea: security stops being a <strong>gate at the end</strong> and spreads across the
+      lifecycle, with automatic controls that do not depend on anybody remembering. In the exam it is
+      recognised by where each control sits — modelling at design, scanning in the code and the pull request,
+      dependencies at build, policy at deployment, detection at runtime — and by two governance decisions:
+      that the <strong>pipeline holds a federated identity</strong> instead of secrets, and that a control's
+      failure <strong>breaks the build</strong> rather than raising a warning nobody reads.
+    </p>
+
+    <h2 id="trampas">Common traps in this domain</h2>
+    <div class="callout warn">
+      <b>Confusing CAF with Well-Architected</b>
+      CAF governs the organisation and its adoption; Well-Architected reviews one workload and its trade-offs.
+    </div>
+    <div class="callout warn">
+      <b>Starting the ransomware plan with prevention</b>
+      Microsoft's order is recovery, privileged access, then entry. What is urgent is that the business survives the failure.
+    </div>
+    <div class="callout warn">
+      <b>Backups the attacker can delete</b>
+      Without immutability, soft delete and separated credentials, the recovery plan does not exist.
+    </div>
+    <div class="callout warn">
+      <b>Treating Zero Trust as a product</b>
+      It is a model adopted pillar by pillar and validated against three principles, not something you buy.
+    </div>
+    <div class="callout warn">
+      <b>Answering the insider threat with more authentication</b>
+      The access is already legitimate. What applies is looking at behaviour: insider risk management and DLP.
+    </div>
+    <div class="callout warn">
+      <b>Deploying AI before fixing the data</b>
+      An assistant inherits the source's permissions. Classifying and fixing oversharing comes first.
+    </div>
+
+    <!-- temario:inicio -->
+    <h2 id="temario">Official exam content covered</h2>
+    <p class="lede">The tasks and skills Microsoft publishes for domain 1 in the exam guide. 20-25% of the exam's questions come from here.</p>
+    <div class="syllabus">
+      <h4>Task 1.1 — Design a resiliency strategy for ransomware and other attacks based on Microsoft Security Best Practices</h4>
+      <ul class="skills">
+        <li><span class="skill-id">1.1.1</span> <span>Design a security strategy to support business resiliency goals, including identifying and prioritizing threats to business-critical assets</span></li>
+        <li><span class="skill-id">1.1.2</span> <span>Design solutions for business continuity and disaster recovery (BCDR), including secure backup and restore for hybrid and multicloud environments</span></li>
+        <li><span class="skill-id">1.1.3</span> <span>Design solutions for mitigating ransomware attacks, including prioritization of BCDR and privileged access</span></li>
+        <li><span class="skill-id">1.1.4</span> <span>Evaluate solutions for security updates</span></li>
+      </ul>
+      <h4>Task 1.2 — Design solutions that align with the Microsoft Cybersecurity Reference Architectures (MCRA) and Microsoft Cloud Security Benchmark (MCSB)</h4>
+      <ul class="skills">
+        <li><span class="skill-id">1.2.1</span> <span>Design solutions that align with best practices for cybersecurity capabilities and controls</span></li>
+        <li><span class="skill-id">1.2.2</span> <span>Design solutions that align with best practices for protecting against insider, external, and supply chain attacks</span></li>
+        <li><span class="skill-id">1.2.3</span> <span>Design AI solutions that align to the Microsoft Cloud Security Benchmark <span class="skill-new" title="Content Microsoft added in the 28 July 2026 revision">new in 2026</span></span></li>
+        <li><span class="skill-id">1.2.4</span> <span>Design solutions that align with the Zero Trust adoption framework</span></li>
+      </ul>
+      <h4>Task 1.3 — Design solutions that align with the Microsoft Cloud Adoption Framework for Azure (CAF) and the Azure Well-Architected Framework</h4>
+      <ul class="skills">
+        <li><span class="skill-id">1.3.1</span> <span>Design a strategy for secure AI adoption <span class="skill-new" title="Content Microsoft added in the 28 July 2026 revision">new in 2026</span></span></li>
+        <li><span class="skill-id">1.3.2</span> <span>Design a new or evaluate an existing strategy for security and governance based on CAF and the Azure Well-Architected Framework</span></li>
+        <li><span class="skill-id">1.3.3</span> <span>Recommend solutions for security and governance based on CAF and the Azure Well-Architected Framework</span></li>
+        <li><span class="skill-id">1.3.4</span> <span>Design solutions for implementing and governing security by using Azure landing zones</span></li>
+        <li><span class="skill-id">1.3.5</span> <span>Design a DevSecOps process that aligns with best practices in CAF</span></li>
+      </ul>
+      <p class="syllabus-note">Wording as published by Microsoft in the exam guide. SC-100 (official skills outline, skills measured as of 28 Jul 2026).</p>
+    </div>
+<!-- temario:fin -->
+
+    <h2 id="quiz">Practice quiz — Best practices and priorities</h2>
+    <p class="lede">26 scenario questions. Pick an option to see whether it is right and why.</p>
+    <div id="quiz-root"></div>
+
+  </main>
+</div>
+
+<footer>
+  <div class="wrap">Independent study guide, not affiliated with Microsoft. Reviewed as of August 2026.</div>
+</footer>
+
+<script src="quiz-data.js"></script>
+<script src="../../../../assets/js/quiz.js?v=9"></script>
+<script src="../../../../assets/js/app.js?v=9"></script>
+
+</body>
+</html>

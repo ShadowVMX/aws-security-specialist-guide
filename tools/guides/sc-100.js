@@ -36,13 +36,13 @@ const DOMAINS = [
         skills: [
           {
             id: "1.1.1",
-            match: /resiliencia|resilienc|activos? crític|business-critical|priorizar amenaza/i,
+            match: /resiliencia|resilienc|activos? crític|business-critical|priorizar amenaza|procesos? crítico|critical business process|\bRPO\b|\bRTO\b|estrategia de seguridad|security strategy/i,
             text: "Design a security strategy to support business resiliency goals, including identifying and prioritizing threats to business-critical assets",
             textEs: "Diseñar una estrategia de seguridad que sostenga los objetivos de resiliencia del negocio, identificando y priorizando amenazas a los activos críticos",
           },
           {
             id: "1.1.2",
-            match: /\bbcdr\b|continuidad de negocio|business continuity|disaster recovery|copia de seguridad|backup/i,
+            match: /\bbcdr\b|continuidad de negocio|business continuity|disaster recovery|copias? de seguridad|backup|restaur|restore|inmutab|immutab|site recovery/i,
             text: "Design solutions for business continuity and disaster recovery (BCDR), including secure backup and restore for hybrid and multicloud environments",
             textEs: "Diseñar continuidad de negocio y recuperación ante desastres (BCDR), con copia y restauración seguras en entornos híbridos y multinube",
           },
@@ -102,7 +102,7 @@ const DOMAINS = [
         skills: [
           {
             id: "1.3.1",
-            match: /adopción segura de ia|secure ai adoption|estrategia de ia/i,
+            match: /adopción (segura )?de ia|secure ai adoption|estrategia de ia|ai adoption|copilot.{0,40}(plantilla|organización|workforce|organisation)|ia no aprobada|unapproved ai|shadow it/i,
             text: "Design a strategy for secure AI adoption",
             textEs: "Diseñar una estrategia de adopción segura de IA",
           },

@@ -42,11 +42,6 @@ const CERTS = [
     guide: "./guides/sc-100.js",
     name: "Microsoft Cybersecurity Architect",
     code: "SC-100",
-    // While a certification is a draft its modules are still being written, so
-    // the coverage report says what is missing instead of failing the build.
-    // Flip this off the day every skill has questions — and not before, so the
-    // number on the page never claims more than the bank holds.
-    draft: true,
     lang: {
       es: { hub: "index.html", exam: "examen/index.html", modules: "modules" },
       en: { hub: "en/index.html", exam: "en/exam/index.html", modules: "en/modules" },
