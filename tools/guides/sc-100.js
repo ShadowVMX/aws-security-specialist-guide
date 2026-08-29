@@ -102,7 +102,7 @@ const DOMAINS = [
         skills: [
           {
             id: "1.3.1",
-            match: /adopción (segura )?de ia|secure ai adoption|estrategia de ia|ai adoption|copilot.{0,40}(plantilla|organización|workforce|organisation)|ia no aprobada|unapproved ai|shadow it/i,
+            match: /adopción (segura )?de ia|secure ai adoption|estrategia de ia|ai adoption|copilot.{0,40}(plantilla|organización|workforce|organisation)|ia no aprobada|unapproved ai|shadow it|ia en la sombra|shadow ai/i,
             text: "Design a strategy for secure AI adoption",
             textEs: "Diseñar una estrategia de adopción segura de IA",
           },
@@ -120,7 +120,7 @@ const DOMAINS = [
           },
           {
             id: "1.3.4",
-            match: /landing zone/i,
+            match: /landing zone|zonas? de aterrizaje/i,
             text: "Design solutions for implementing and governing security by using Azure landing zones",
             textEs: "Diseñar la implantación y el gobierno de la seguridad con Azure landing zones",
           },
